@@ -1,4 +1,4 @@
-# OpenZFS 文档
+# OpenZFS 中文文档
 
 原项目地址：[OpenZFS Documentation](https://openzfs.github.io/openzfs-docs/index.html)。
 
