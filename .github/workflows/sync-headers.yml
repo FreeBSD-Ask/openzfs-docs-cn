@@ -25,8 +25,8 @@ jobs:
 
           # 读取 SUMMARY.md 中的 Markdown 链接
           while IFS= read -r line; do
-            # 使用正则提取标题和路径，允许空格
-            if [[ $line =~ \*\ *\[(.+)\]\((.+)\) ]]; then
+            # 使用正则提取标题和路径，锚定到项目符号行并避免贪婪匹配
+            if [[ $line =~ ^\*\s*\[([^]]+)\]\(([^)]+)\) ]]; then
               title="${BASH_REMATCH[1]}"
               path="${BASH_REMATCH[2]}"
 
