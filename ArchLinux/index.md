@@ -35,6 +35,7 @@ ZFS 支持由第三方的 [archzfs 仓库](https://github.com/archzfs/archzfs) �
    # 将 ~/.local/bin 添加到 "${PATH}"，例如在 ~/.bashrc 中添加：
    [ -d "${HOME}"/.local/bin ] && export PATH="${HOME}"/.local/bin:"${PATH}"
    ```
+
 3. 进行你的修改。
 4. 测试：
 
@@ -43,4 +44,5 @@ ZFS 支持由第三方的 [archzfs 仓库](https://github.com/archzfs/archzfs) �
    make html
    sensible-browser _build/html/index.html
    ```
+
 5. 使用 `git commit --signoff` 提交到分支，`git push`，然后创建 pull request。然后 @ne9z。

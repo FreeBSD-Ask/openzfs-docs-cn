@@ -27,6 +27,7 @@
 
    dd if=input-file of=output-file bs=1M
    ```
+
 3. 以 root 用户登录。密码为空。
 4. 配置网络
 
@@ -40,6 +41,7 @@
    <按回车键以完成网络设置>
    manual netconfig:  n
    ```
+
 5. 如果使用无线网络但网络未显示在列表中，请参阅 [Alpine Linux wiki](https://wiki.alpinelinux.org/wiki/Wi-Fi#wpa_supplicant) 获取更多细节。可在无网络情况下通过命令 `apk add wpa_supplicant` 安装 `wpa_supplicant`。
 6. 配置 SSH 服务器
 
@@ -50,22 +52,26 @@
    allow root:        "prohibit-password" 或 "yes"
    ssh key:           "none" 或 "<公钥>"
    ```
+
 7. 设置 root 密码或 `/root/.ssh/authorized_keys`。
 8. 从另一台计算机连接
 
    ```sh
    ssh root@192.168.1.91
    ```
+
 9. 配置 NTP 客户端进行时间同步
 
    ```sh
    setup-ntp busybox
    ```
+
 10. 设置 apk-repo。将显示可用镜像列表，按空格键继续。
 
     ```sh
     setup-apkrepos
     ```
+
 11. 本指南中使用由 udev 生成的可预测磁盘名称。
 
     ```sh
@@ -73,6 +79,7 @@
     apk add eudev
     setup-devd udev
     ```
+
 12. 目标磁盘
     列出可用磁盘：
 
@@ -92,11 +99,13 @@
     ```sh
     DISK='/dev/disk/by-id/disk1'
     ```
+
 13. 设置挂载点
 
     ```sh
     MNT=$(mktemp -d)
     ```
+
 14. 设置分区大小：
     设置 swap 大小（GB），若不希望 swap 占用过多空间，可设为 1。
 
@@ -109,11 +118,13 @@
     ```sh
     RESERVE=1
     ```
+
 15. 从 Live 安装介质安装 ZFS 支持：
 
     ```sh
     apk add zfs
     ```
+
 16. 安装分区工具
 
     ```sh
@@ -147,6 +158,7 @@
       partition_disk "${i}"
    done
    ```
+
 2. 仅为本次安装设置临时加密 swap，当可用内存较小时非常有用：
 
    ```sh
@@ -156,11 +168,13 @@
       swapon /dev/mapper/"${i##*/}"-part3
    done
    ```
+
 3. 加载 ZFS 内核模块
 
    ```sh
    modprobe zfs
    ```
+
 4. 创建根存储池
 
    * 未加密：
@@ -184,6 +198,7 @@
            printf '%s ' "${i}-part2";
           done)
      ```
+
 5. 创建根系统容器：
 
    > ```sh
@@ -197,6 +212,7 @@
    mount -o X-mount.mkdir -t zfs rpool/root "${MNT}"
    mount -o X-mount.mkdir -t zfs rpool/home "${MNT}"/home
    ```
+
 6. 格式化并挂载 ESP。仅使用其中一个作为 `/boot`，之后需设置镜像：
 
    ```sh
@@ -230,12 +246,14 @@
    ln -s "${MNT}" "${MNT}"/root.x86_64
    tar x  -C "${MNT}" -af rootfs.tar.gz root.x86_64
    ```
+
 2. 启用社区仓库：
 
    ```sh
    sed -i '/edge/d' /etc/apk/repositories
    sed -i -E 's/#(.*)community/\1community/' /etc/apk/repositories
    ```
+
 3. 生成 fstab：
 
    ```sh
@@ -245,6 +263,7 @@
    | sed "s|vfat.*rw|vfat rw,x-systemd.idle-timeout=1min,x-systemd.automount,noauto,nofail|" \
    > "${MNT}"/etc/fstab
    ```
+
 4. chroot：
 
    ```sh
@@ -252,6 +271,7 @@
    for i in /dev /proc /sys; do mkdir -p "${MNT}"/"${i}"; mount --rbind "${i}" "${MNT}"/"${i}"; done
    chroot "${MNT}" /usr/bin/env DISK="${DISK}" bash
    ```
+
 5. 在 pacman 配置中添加 archzfs 仓库：
 
    ```sh
@@ -298,6 +318,7 @@
    sed -i 's|#,||' /etc/pacman.conf
    sed -i 's|^#||' /etc/pacman.d/mirrorlist
    ```
+
 6. 安装基础软件包：
 
    ```sh
@@ -310,38 +331,45 @@
    | awk '{ print $1 }')"
    pacman -U --noconfirm https://america.archive.pkgbuild.com/packages/l/linux/linux-"${kernel_compatible_with_zfs}"-x86_64.pkg.tar.zst
    ```
+
 7. 安装 ZFS 软件包：
 
    ```sh
    pacman -S --noconfirm zfs-linux zfs-utils
    ```
+
 8. 配置 mkinitcpio：
 
    ```sh
    sed -i 's|filesystems|zfs filesystems|' /etc/mkinitcpio.conf
    mkinitcpio -P
    ```
+
 9. 物理机还需安装固件：
 
    ```sh
    pacman -S linux-firmware intel-ucode amd-ucode
    ```
+
 10. 启用网络时间同步：
 
     ```sh
     systemctl enable systemd-timesyncd
     ```
+
 11. 生成 host id：
 
     ```sh
     zgenhostid -f -o /etc/hostid
     ```
+
 12. 进行本地化：
 
     ```sh
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
     locale-gen
     ```
+
 13. 设置语言、键盘布局、时区、主机名：
 
     ```sh
@@ -353,6 +381,7 @@
     --hostname=testhost \
     --keymap=us
     ```
+
 14. 设置 root 密码：
 
     ```sh
@@ -375,6 +404,7 @@
    | xargs -0I{} mv {} /boot/EFI/BOOT/BOOTX64.EFI
    rm -rf refind.zip refind-bin-0.14.0.2
    ```
+
 2. 添加引导条目：
 
    ```sh
@@ -382,25 +412,30 @@
    "Arch Linux" "root=ZFS=rpool/root rw zfs_import_dir=/dev/"
    EOF
    ```
+
 3. 退出 chroot：
 
    ```sh
    exit
    ```
+
 4. 卸载文件系统并创建初始系统快照：
 
    ```sh
    umount -Rl "${MNT}"
    zfs snapshot -r rpool@initial-installation
    ```
+
 5. 导出所有存储池：
 
    ```sh
    zpool export -a
    ```
+
 6. 重启：
 
    ```sh
    reboot
    ```
+
 7. 挂载其他 EFI 系统分区，然后设置服务来同步其内容。
