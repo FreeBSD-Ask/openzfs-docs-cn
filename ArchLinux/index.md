@@ -45,4 +45,4 @@ ZFS 支持由第三方的 [archzfs 仓库](https://github.com/archzfs/archzfs) �
    sensible-browser _build/html/index.html
    ```
 
-5. 使用 `git commit --signoff` 提交到分支，`git push`，然后创建 pull request。然后 @ne9z。
+5. 使用 `git commit --signoff` 提交到分支，`git push`，然后创建 pull request，再 @ne9z。
