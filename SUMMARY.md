@@ -6,7 +6,7 @@
 
 ## 入门
 
-### Alpine Linux
+## Alpine Linux
 
 * [Alpine Linux 概述](AlpineLinux/index.md)
 * [使 Alpine Linux 根系统基于 ZFS](AlpineLinux/RootonZFS.md)
