@@ -26,6 +26,7 @@
 
    dd if=input-file of=output-file bs=1M
    ```
+
 3. 以 root 用户登录。密码为空。
 4. 配置网络
 
@@ -39,6 +40,7 @@
    <此处按回车完成网络配置>
    manual netconfig:  n
    ```
+
 5. 如果你使用的是无线网络但未显示出现，请参阅 [Alpine Linux wiki](https://wiki.alpinelinux.org/wiki/Wi-Fi#wpa_supplicant) 获取更多细节。`wpa_supplicant` 可以在没有互联网连接的情况下通过命令 `apk add wpa_supplicant` 进行安装。
 6. 配置 SSH 服务器
 
@@ -58,16 +60,19 @@
    ```sh
    ssh root@192.168.1.91
    ```
+
 9. 配置 NTP 客户端，用于同步时间
 
    ```sh
    setup-ntp busybox
    ```
+
 10. 设置 apk-repo。将显示可用镜像列表。按空格键继续。
 
     ```sh
     setup-apkrepos
     ```
+
 11. 在本指南中，我们使用由 udev 生成的可预测磁盘名称
 
     ```sh
@@ -97,11 +102,13 @@
     ```sh
     DISK='/dev/disk/by-id/disk1'
     ```
+
 13. 设置挂载点
 
     ```ini
     MNT=$(mktemp -d)
     ```
+
 14. 设置分区大小：
     设置 swap 大小（单位为 GB），如果不希望 swap 占用过多空间，可设置为 1。
 
@@ -114,16 +121,19 @@
     ```ini
     RESERVE=1
     ```
+
 15. 通过安装介质安装 ZFS 支持：
 
     ```sh
     apk add zfs
     ```
+
 16. 安装引导加载程序和分区工具
 
     ```sh
     apk add parted e2fsprogs cryptsetup util-linux
     ```
+
 ## 系统安装
 
 1. 对磁盘进行分区。
@@ -151,6 +161,7 @@
       partition_disk "${i}"
    done
    ```
+
 2. 仅为本次安装设置临时加密 swap。当可用内存较小时，这很有用：
 
    ```sh
@@ -160,11 +171,13 @@
       swapon /dev/mapper/"${i##*/}"-part3
    done
    ```
+
 3. 加载 ZFS 内核模块
 
    ```sh
    modprobe zfs
    ```
+
 4. 创建根存储池
 
    * 未加密：
@@ -188,6 +201,7 @@
            printf '%s ' "${i}-part2";
           done)
      ```
+
 5. 创建根系统容器：
 
    > ```sh
@@ -201,6 +215,7 @@
    mount -o X-mount.mkdir -t zfs rpool/root "${MNT}"
    mount -o X-mount.mkdir -t zfs rpool/home "${MNT}"/home
    ```
+
 6. 格式化并挂载 ESP。只有其中一个会被用作 `/boot`，之后你需要再设置镜像。
 
    ```sh
@@ -237,6 +252,7 @@
    | xargs -0I{} mv {} "${MNT}"/boot/EFI/BOOT/BOOTX64.EFI
    rm -rf refind.zip refind-bin-0.14.0.2
    ```
+
 3. 添加启动项：
 
    ```sh
@@ -244,6 +260,7 @@
    "Alpine Linux" "root=ZFS=rpool/root"
    EOF
    ```
+
 4. 卸载文件系统，创建初始系统快照：
 
    ```sh
@@ -251,9 +268,11 @@
    zfs snapshot -r rpool@initial-installation
    zpool export -a
    ```
+
 5. 重启
 
    ```sh
    reboot
    ```
+
 6. 挂载其他 EFI 系统分区，然后设置服务来同步其内容。

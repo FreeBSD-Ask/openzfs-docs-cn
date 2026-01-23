@@ -11,6 +11,7 @@
    ```sh
    apk add zfs zfs-lts
    ```
+
 2. 加载内核模块：
 
    ```sh
@@ -26,6 +27,7 @@
    ```sh
    rc-update add zfs-import default
    ```
+
 2. 在启动时挂载存储池 ：
 
    ```sh
