@@ -19,7 +19,7 @@
 ## 准备
 
 1. 禁用安全启动。如果启用了安全启动，将无法加载 ZFS 模块。
-2. 下载最新版扩展变体的 [Alpine Linux 实时镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，校验 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，然后从该镜像启动。
+2. 下载最新 extended（衍生版本）的 [Alpine Linux Live 镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，校验 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，然后从该镜像启动。
 
    ```sh
    gpg --auto-key-retrieve --keyserver hkps://keyserver.ubuntu.com --verify alpine-extended-*.asc
