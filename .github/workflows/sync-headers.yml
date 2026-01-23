@@ -36,7 +36,7 @@ jobs:
 
               # 获取文件第一行并清理格式
               first_line=$(head -n 1 "$path" | sed 's/^#*//; s/^[[:space:]]*//; s/[[:space:]]*$//')
-              clean_title=$(echo "$title" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+              clean_title=$(printf '%s\n' "$title" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 
               # 比较并更新
               if [ "$first_line" != "$clean_title" ]; then
