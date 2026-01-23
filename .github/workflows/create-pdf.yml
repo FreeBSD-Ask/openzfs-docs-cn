@@ -1,0 +1,152 @@
+name: 🔗 创建并发布 PDF & EPUB
+
+on:
+  schedule:
+    - cron: '30 15 * * 0'  # 每周日 UTC 时间 15:30 运行
+  workflow_dispatch:       # 可手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ================= 字体安装部分 =================
+      - name: 安装字体
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ttf-wqy-microhei ttf-wqy-zenhei fonts-noto-core fonts-noto-cjk
+
+      - name: 设置时区
+        run: |
+          sudo timedatectl set-timezone Asia/Shanghai
+          timedatectl
+
+      # ================= 仓库检出部分 =================
+      - name: 检出 FreeBSD-Ask 主仓库
+        uses: actions/checkout@v6
+        with:
+          path: openzfs-docs-cn
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 检出 gitbook-pdf-export 工具
+        uses: actions/checkout@v6
+        with:
+          repository: FreeBSD-Ask/gitbook-pdf-export
+          path: pdf-generator
+
+      # ================= 初始化标签检查 =================
+      - name: 检查或创建初始标签
+        working-directory: openzfs-docs-cn
+        run: |
+          timedatectl
+          if ! git describe --tags --abbrev=0 2>/dev/null; then
+            echo "创建初始标签 v0.0.0"
+            git config --global user.email "actions@github.com"
+            git config --global user.name "GitHub Actions"
+            git tag v0.0.0
+            git push origin v0.0.0
+          fi
+
+      # ================= 环境配置部分 =================
+      - name: 设置 Python 环境
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          check-latest: true
+
+      - name: 安装 Python 依赖
+        run: |
+          sudo apt-get install -y \
+            libpango-1.0-0 \
+            libpangoft2-1.0-0 \
+            libpangocairo-1.0-0
+          pip install weasyprint mistune pygments EbookLib beautifulsoup4
+      # ================= PDF 生成部分 =================
+      - name: 生成 PDF 文档
+        run: |
+          cd pdf-generator
+          python mdconv.py ../openzfs-docs-cn
+          mv build/final.pdf build/$(date +'%Y.%m.%d').pdf
+          mv build/final.epub build/$(date +'%Y.%m.%d').epub
+        env:
+          PYTHONPATH: ${{ github.workspace }}/pdf-generator
+      # ================= 发布流程部分 =================
+      - name: 🚀 设置发布日期标签
+        id: set_tag
+        run: echo "RELEASE_TAG=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
+
+      - name: 🔍 获取前一个标签 (优化版本)
+        working-directory: openzfs-docs-cn
+        run: |
+          git fetch --tags --force
+          TAG_PATTERN="[0-9][0-9][0-9][0-9].[0-9][0-9].[0-9][0-9]"
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 --match "$TAG_PATTERN" --exclude "${{ env.RELEASE_TAG }}" 2>/dev/null)
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "警告：未找到匹配的先前标签，将使用默认基准标签 'v0.0.0'"
+            PREVIOUS_TAG="v0.0.0"
+          fi
+          echo "PREVIOUS_TAG=$PREVIOUS_TAG" >> $GITHUB_ENV
+
+      - name: 调试 - 检查提取到的标签值
+        run: |
+          echo "本次发布标签 (RELEASE_TAG): ${{ env.RELEASE_TAG }}"
+          echo "上次发布标签 (PREVIOUS_TAG): ${{ env.PREVIOUS_TAG }}"
+          echo "------------------------------------------------------"
+
+      - name: 🏷️ 创建 Git 标签并推送
+        working-directory: openzfs-docs-cn
+        run: |
+          timedatectl
+          git config --global user.email "yklaxds@gmail.com"
+          git config --global user.name "ykla"
+          git tag ${{ env.RELEASE_TAG }}
+          git push origin ${{ env.RELEASE_TAG }}
+
+      - name: 📜 生成增量变更日志
+        uses: janheinrichmerker/action-github-changelog-generator@v2.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sinceTag: ${{ env.PREVIOUS_TAG }}
+          user: FreeBSD-Ask
+          repo: openzfs-docs-cn
+
+      - name: 📥 读取变更日志内容
+        id: read_changelog
+        run: |
+          timedatectl
+          CHANGES=$(cat CHANGELOG.md | sed 's/\"/\\"/g')
+          echo "CHANGES_CONTENT<<EOF" >> $GITHUB_ENV
+          echo "$CHANGES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: ✨ 创建 GitHub Release
+        uses: ncipollo/release-action@v1.20.0
+        id: create_release
+        with:
+          tag: ${{ env.RELEASE_TAG }}
+          name: ${{ env.RELEASE_TAG }}
+          artifacts: |
+            pdf-generator/build/${{ env.RELEASE_TAG }}.pdf
+            pdf-generator/build/${{ env.RELEASE_TAG }}.epub
+          token: ${{ secrets.GITHUB_TOKEN }}
+          makeLatest: true
+
+      - name: 📝 更新 Release 说明 (包含变更日志)
+        uses: actions/github-script@v8.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag: process.env.RELEASE_TAG
+            });
+            console.log(`找到 Release ID: ${release.id}`);
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id,
+              body: process.env.CHANGES_CONTENT
+            });
+            console.log('Release body 更新完成。');
