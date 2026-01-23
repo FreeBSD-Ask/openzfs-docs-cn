@@ -20,7 +20,7 @@ ZFS 支持由第三方的 [archzfs 仓库](https://github.com/archzfs/archzfs) �
 
 可以将 ZFS 用作 Arch Linux 的根文件系统。安装指南参见：
 
-* [基于 ZFS 根文件系统的 Arch Linux](https://openzfs.github.io/openzfs-docs/Getting%20Started/Arch%20Linux/Root%20on%20ZFS.html)
+* [根文件系统基于 ZFS 的 Arch Linux](ArchLinuxRoot.md)
 
 ## 贡献
 
