@@ -8,4 +8,7 @@
 
 * Alpine Linux
   * [Alpine Linux 概述](AlpineLinux/index.md)
-  * [使 Alpine Linux 根系统基于 ZFS](AlpineLinux/RootonZFS.md)
+  * [根文件系统基于 ZFS 的 Alpine Linux](AlpineLinux/RootonZFS.md)
+* Arch Linux
+  * [Arch Linux 概述](ArchLinux/index.md)
+  * [根文件系统基于 ZFS 的 Arch Linux](ArchLinux/ArchLinuxRoot.md)

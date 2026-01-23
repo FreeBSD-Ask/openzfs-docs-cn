@@ -3,7 +3,7 @@ name: 🔗 从 SUMMARY.md 更新一级标题
 on:
   push:
   workflow_run:
-    workflows: [🔗 从 SUMMARY.md 更新目录]   # 这里要写 mulu.yml 中定义的 workflow 名字，而不是文件名
+    workflows: [🔗 从 SUMMARY.md 更新目录]
     types:
       - completed
   workflow_dispatch:
@@ -20,38 +20,37 @@ jobs:
       - name: Sync headers
         id: sync
         run: |
-          # 设置修改标志
+          export LC_ALL=C.UTF-8
           CHANGED="false"
 
-          # 使用进程替换，避免管道导致子 Shell 中修改变量
+          # 读取 SUMMARY.md 中的 Markdown 链接
           while IFS= read -r line; do
-            # 提取标题和文件路径
-            title=$(sed -n 's/.*\[\([^]]*\)\].*/\1/p' <<< "$line")
-            path=$(sed -n 's/.*](\([^)]*\)).*/\1/p' <<< "$line")
+            # 使用正则提取标题和路径，允许空格
+            # 锚定行首，使用非贪婪匹配标题，并限制路径为下一个右括号之前的内容
+            if [[ $line =~ ^\*\s*\[(.+?)\]\(([^)]+)\) ]]; then
+              title="${BASH_REMATCH[1]}"
+              path="${BASH_REMATCH[2]}"
 
-            # 跳过无效条目
-            [ -z "$title" ] || [ ! -f "$path" ] && continue
+              # 如果文件不存在则跳过
+              [ ! -f "$path" ] && continue
 
-            # 获取文件第一行并清理格式
-            first_line=$(head -n 1 "$path" | sed 's/^#*//; s/^[[:space:]]*//; s/[[:space:]]*$//')
-            clean_title=$(sed 's/^[[:space:]]*//; s/[[:space:]]*$//' <<< "$title")
+              # 获取文件第一行并清理格式
+              first_line=$(head -n 1 "$path" | sed 's/^#*//; s/^[[:space:]]*//; s/[[:space:]]*$//')
+              clean_title=$(printf '%s\n' "$title" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 
-            # 比较标题并更新文件
-            if [ "$first_line" != "$clean_title" ]; then
-              echo "Updating $path: '$first_line' -> '$clean_title'"
-              
-              # 使用临时文件进行安全替换
-              temp_file=$(mktemp)
-              echo "# $clean_title" > "$temp_file"
-              tail -n +2 "$path" >> "$temp_file"
-              mv -f "$temp_file" "$path"
-
-              git add "$path"
-              CHANGED="true"
+              # 比较并更新
+              if [ "$first_line" != "$clean_title" ]; then
+                echo "Updating $path: '$first_line' -> '$clean_title'"
+                temp_file=$(mktemp)
+                echo "# $clean_title" > "$temp_file"
+                tail -n +2 "$path" >> "$temp_file"
+                mv -f "$temp_file" "$path"
+                git add "$path"
+                CHANGED="true"
+              fi
             fi
-          done < <(grep -E '^\* \[' SUMMARY.md)
+          done < SUMMARY.md
 
-          # 输出修改状态
           echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
       - name: Commit changes

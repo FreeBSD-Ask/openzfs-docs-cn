@@ -1,4 +1,4 @@
-# 使 Alpine Linux 根系统基于 ZFS
+# 根文件系统基于 ZFS 的 Alpine Linux
 
 **ZFSBootMenu**
 
