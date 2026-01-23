@@ -20,6 +20,9 @@ jobs:
       - name: Sync headers
         id: sync
         run: |
+          # 设置 UTF-8 环境，保证中文处理正常
+          export LC_ALL=C.UTF-8
+
           # 设置修改标志
           CHANGED="false"
 
@@ -49,7 +52,7 @@ jobs:
               git add "$path"
               CHANGED="true"
             fi
-          done < <(grep -E '^\* \[' SUMMARY.md)
+          done < <(grep -E '^\*\s*\[' SUMMARY.md)
 
           # 输出修改状态
           echo "changed=$CHANGED" >> $GITHUB_OUTPUT
