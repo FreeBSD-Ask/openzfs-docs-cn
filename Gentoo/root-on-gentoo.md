@@ -262,7 +262,7 @@ mkdir -p /etc/dracut.conf.d
 nano /etc/dracut.conf.d/zol.conf
 ```
 
-ZFS 的 Dracut 配置文件 **/etc/dracut.conf.d/zol.conf** 
+ZFS 的 Dracut 配置文件 **/etc/dracut.conf.d/zol.conf**
 
 ```ini
 nofsck="yes"
@@ -329,9 +329,9 @@ emerge sys-boot/zfsbootmenu
 
 之后，需要调整 ZFSBootMenu 配置以：
 
-* 启用镜像自动管理：`ManageImages:true`
-* 指向 EFI 挂载点：`BootMountPoint: /efi`
-* 启用 EFI 二进制生成：EFI 部分 `Enabled: true`
+- 启用镜像自动管理：`ManageImages:true`
+- 指向 EFI 挂载点：`BootMountPoint: /efi`
+- 启用 EFI 二进制生成：EFI 部分 `Enabled: true`
 
 ZFSBootMenu 配置文件 **/etc/zfsbootmenu/config.yaml**
 
@@ -465,6 +465,6 @@ reboot
 
 需要添加的部分以完善指南：
 
-* 添加 LUKS 加密
-* 添加备用引导加载器说明
-* 添加通过 `generate-zbm` 安装 ZFSBootMenu 的说明（可能需要使用 GURU）
+- 添加 LUKS 加密
+- 添加备用引导加载器说明
+- 添加通过 `generate-zbm` 安装 ZFSBootMenu 的说明（可能需要使用 GURU）
