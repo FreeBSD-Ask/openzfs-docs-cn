@@ -1,6 +1,6 @@
 # 在 Gentoo 中启用 ZFS 支持
 
-- 原文地址：[ZFS](https://wiki.gentoo.org/wiki/ZFS)，此页面最后编辑于2025年11月6日 (星期四) 20:52。
+- 原文地址：[ZFS](https://wiki.gentoo.org/wiki/ZFS)，此页面最后编辑于 2025 年 11 月 6 日 (星期四) 20:52。
 
 
 **ZFS** 是一种由 Matthew Ahrens 和 Jeff Bonwick 创建的下一代 [文件系统](https://wiki.gentoo.org/wiki/Filesystem)。它围绕着几个核心理念进行设计：
@@ -44,7 +44,7 @@ ZFS 的 Linux 内核模块与用户态工具
 
 Linux 内核模块及 ZFS 用户空间工具的可选功能：
 
-|USE 标志|说明|
+|USE 标志 | 说明|
 | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | [`+dist-kernel-cap`](https://packages.gentoo.org/useflags/+dist-kernel-cap) | 在与 USE=dist-kernel 结合时，可防止升级到未受支持的内核版本                                                                                               |
 | [`+initramfs`](https://packages.gentoo.org/useflags/+initramfs)             | 在 initramfs 中内置内核模块，并重新安装内核（仅对发行版内核有效）                                                                                             |
@@ -411,7 +411,7 @@ zpool_test  99.5G   456K  99.5G        -         -     0%     0%  1.00x    ONLIN
 - FRAG：空闲空间碎片率，以百分比表示。碎片化对于 ZFS 来说并不是问题，因为它在设计时就考虑了这一点。目前也没有对 zpool 进行碎片整理的方法，除非从头重新创建并从备份中恢复数据
 - CAP：已使用空间的百分比
 - DEDUP：数据去重因子。除非某个 zpool 启用了数据去重，否则始终为 `1.00x`
-- HEALTH：当前 pool 的状态，“ONLINE” 表示 pool 处于最佳状态（即未降级，或更糟的是不可用）
+- HEALTH：当前 pool 的状态，“ONLINE”表示 pool 处于最佳状态（即未降级，或更糟的是不可用）
 - ALTROOT：备用根路径（重启后不会持久保留）。当需要在 live media 环境中处理 zpool 时非常有用：所有数据集都会相对于该路径挂载，该路径可以通过 `zpool import` 命令的 `-R` 选项来设置
 
 也可以使用 `-v` 选项查看更多细节：
@@ -576,8 +576,8 @@ zpool upgrade -v
 
 请记住，zpool 是跨所有 vdev 进行条带化的，当设备发生故障时可能出现两种情况：
 
-- 要么冗余度足够，zpool 仍然可用，但处于 “DEGRADED” 状态
-- 要么冗余度不足，zpool 进入 “SUSPENDED” 状态（此时必须从备份中恢复数据）
+- 要么冗余度足够，zpool 仍然可用，但处于“DEGRADED”状态
+- 要么冗余度不足，zpool 进入“SUSPENDED”状态（此时必须从备份中恢复数据）
 
 可以通过 `zpool status` 查看当前情况：
 
@@ -1330,7 +1330,7 @@ du -sh --apparent-size /zpool_test/fds4
 8.5G    /zpool_test/fds4
 ```
 
-### 销毁文件系统数据集（Destroying a文件系统数据集）
+### 销毁文件系统数据集（Destroying a 文件系统数据集）
 
 基础知识掌握后，现在可以销毁 `zpool_test/fds4`：
 
@@ -1356,7 +1356,7 @@ zfs destroy -r zpool_test/fdsX
 zfs destroy -nv zpool_test/fdsX
 ```
 
-### 文件系统数据集属性（Filesystem数据集properties）
+### 文件系统数据集属性（Filesystem 数据集 properties）
 
 与 zpool 一样，数据集也有属性。在文件系统数据集的情况下，属性分为两类：
 
@@ -1850,7 +1850,7 @@ ls -l /zpool_test/testfsds1/.zfs/snapshot/snap1
 
 可以看到快照创建后被 `rm -rf {a,b,c}*` 删除的文件和目录。这样就可以在快照创建的精确时间点复制或检查文件，非常有用来恢复被修改或删除的文件。
 
-检查第二个快照时，由于在创建 `zpool_test/testfsds1@snap2` 前删除了文件，所以没有文件或目录以 “a”、“b”、“c” 开头：
+检查第二个快照时，由于在创建 `zpool_test/testfsds1@snap2` 前删除了文件，所以没有文件或目录以“a”、“b”、“c”开头：
 
 ```sh
 ls -l /zpool_test/testfsds1/.zfs/snapshot/snap2
@@ -1862,7 +1862,7 @@ ls -l /zpool_test/testfsds1/.zfs/snapshot/snap2
 zfs diff zpool_test/testfsds1@snap1 zpool_test/testfsds1@snap2 | sort
 ```
 
-命令显示：所有以 “a”、“b”、“c” 开头的文件和目录已被删除（注意左边的 `-`），因此 `/zpool_test/testfsds1` 路径发生了变化（注意最后一行左边的 `M`）。
+命令显示：所有以“a”、“b”、“c”开头的文件和目录已被删除（注意左边的 `-`），因此 `/zpool_test/testfsds1` 路径发生了变化（注意最后一行左边的 `M`）。
 
 此时，我们进一步删除更多文件并再次创建快照 (`zpool_test/testfsds1@snap3`)：
 
@@ -2220,7 +2220,7 @@ zpool iostat 6
 
 OpenZFS 使用 [ARC](https://en.wikipedia.org/wiki/Adaptive_replacement_cache "wikipedia:Adaptive replacement cache")（自适应替换缓存）页面替换算法，而不是其他文件系统使用的最近最少使用（LRU）算法。ARC 命中率更高，因此提供了更好的性能。ZFS 中 ARC 的实现与原论文有所不同：作为缓存使用的内存量是可变的。将能在系统内存紧张时通过内核的 shrinker 机制回收 ARC 内存，并在系统有空闲内存时扩展。ARC 分配的最小和最大内存量随系统内存而异。默认最小值为总内存的 1/32 或 64MB（取较大者），默认最大值为系统内存的 1/2 或 64MB（取较大者）。
 
-Linux 对 ARC 使用的内存计量方式与页缓存不同。具体来说，ARC 使用的内存显示在 `free` 输出中的 “used” 项下，而非 “cached”。这并不妨碍系统在内存不足时释放这些内存，但可能让人误以为 ARC（及 ZFS）会尽可能使用全部系统内存。
+Linux 对 ARC 使用的内存计量方式与页缓存不同。具体来说，ARC 使用的内存显示在 `free` 输出中的“used”项下，而非“cached”。这并不妨碍系统在内存不足时释放这些内存，但可能让人误以为 ARC（及 ZFS）会尽可能使用全部系统内存。
 
 #### 调整 ARC 内存占用
 
