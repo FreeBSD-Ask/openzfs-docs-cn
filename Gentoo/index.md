@@ -543,7 +543,6 @@ cannot set property for 'zpool_test': property 'feature@zstd_compress' can only 
 zpool get feature@zstd_compress zpool_test
 NAME        PROPERTY               VALUE                  SOURCE
 zpool_test  feature@zstd_compress  active                 local
- Important
 ```
 
 >**重要**
@@ -598,8 +597,9 @@ config:
             /dev/sdh1  ONLINE       0     0     0
 ```
 
-**Tip**
-可以通过对块设备执行 `echo offline > /sys/block/<block device>/device/state` 来模拟磁盘故障（执行 `echo running > /sys/block/<block device>/device/state` 可将磁盘恢复为在线状态）。
+>**技巧**
+>
+>可以通过对块设备执行 `echo offline > /sys/block/<block device>/device/state` 来模拟磁盘故障（执行 `echo running > /sys/block/<block device>/device/state` 可将磁盘恢复为在线状态）。
 
 有缺陷的磁盘（/dev/sde）需要被物理替换为另一块磁盘（此处为 /dev/sdg）。该操作首先需要将故障磁盘从 zpool 中下线：
 
