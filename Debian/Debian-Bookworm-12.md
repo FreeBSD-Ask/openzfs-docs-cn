@@ -16,7 +16,7 @@
 
 * [64 位 Debian GNU/Linux Bookworm Live CD（带 GUI，例如 gnome ISO）](https://cdimage.debian.org/mirror/cdimage/release/current-live/amd64/iso-hybrid/)
 * 强烈建议使用 [64-bit 内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
-* 在逻辑扇区为 4 KiB（“4Kn” 磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[GRUB 在 legacy（BIOS）启动模式下无法也不会支持 4K 扇区。](http://savannah.gnu.org/bugs/?46700)
+* 在逻辑扇区为 4 KiB（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[GRUB 在 legacy（BIOS）启动模式下无法也不会支持 4K 扇区。](http://savannah.gnu.org/bugs/?46700)
 
 内存小于 2 GiB 的计算机运行 ZFS 时会非常缓慢。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication），则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
 
@@ -288,7 +288,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 **注意事项：**
 
 * 这里推荐使用 `ashift=12`，因为如今许多磁盘即使对外呈现为 512 B 逻辑扇区，实际上也具有 4 KiB（或更大）的物理扇区。此外，后续更换的磁盘也可能具有 4 KiB 物理扇区（此时 `ashift=12` 是理想选择），或者具有 4 KiB 逻辑扇区（此时 `ashift=12` 是必需的）。
-* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的 “o”），因为 journald 需要 ACL。
+* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 journald 需要 ACL。
 * 设置 `xattr=sa` 可以极大地提升扩展属性的性能。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，一些桌面 GUI 应用会用到它们。Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的。需要注意的是，`xattr=sa` 是 Linux 特有的。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍然可以）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
 * 设置 `normalization=formD` 可以消除与 UTF-8 文件名规范化相关的一些极端情况。它还隐含启用了 `utf8only=on`，这意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请勿使用此选项。关于为何强制要求 UTF-8 文件名可能不是一个好主意的讨论，请参见相关链接。
 * `recordsize` 未设置（保持默认的 128 KiB）。如果你希望进行调优（例如 `-O recordsize=1M`），请参阅相关博客文章。
@@ -584,7 +584,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
       **注意：**
 
-      * 仅在磁盘提供 4 KiB 逻辑扇区（“4Kn” 磁盘）时才需要 `mkdosfs` 中的 `-s 1` ，用于满足 FAT32 的最小簇大小要求（在分区大小为 512 MiB 的情况下）。在提供 512 B 扇区的磁盘上同样可以正常工作。
+      * 仅在磁盘提供 4 KiB 逻辑扇区（“4Kn”磁盘）时才需要 `mkdosfs` 中的 `-s 1` ，用于满足 FAT32 的最小簇大小要求（在分区大小为 512 MiB 的情况下）。在提供 512 B 扇区的磁盘上同样可以正常工作。
       * 对于 mirror 或 raidz 拓扑，此步骤只会在第一块磁盘上安装 GRUB，其他磁盘将在后续步骤中处理。
 11. 可选：卸载 os-prober：
 
@@ -963,7 +963,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    ```sh
    sudo vi /etc/ssh/sshd_config
-   # 删除: PermitRootLogin yes
+   # 删除：PermitRootLogin yes
 
    sudo systemctl restart ssh
    ```

@@ -7,7 +7,7 @@
 
 **ZFSBootMenu**
 
-[ZFSBootMenu](https://zfsbootmenu.org/) 是一种替代引导加载程序，不受上述限制，并支持启动环境。如果计划使用ZFSBootMenu，请勿参照本文，因为布局不兼容。安装详情请参考其官方网站。
+[ZFSBootMenu](https://zfsbootmenu.org/) 是一种替代引导加载程序，不受上述限制，并支持启动环境。如果计划使用 ZFSBootMenu，请勿参照本文，因为布局不兼容。安装详情请参考其官方网站。
 
 **自定义配置**
 

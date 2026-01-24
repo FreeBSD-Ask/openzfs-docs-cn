@@ -16,7 +16,7 @@
 
 * [64 位 Debian GNU/Linux Stretch Live CD](https://cdimage.debian.org/mirror/cdimage/release/current-live/amd64/iso-hybrid/)
 * 强烈建议使用 [64-bit 内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
-* 在逻辑扇区为 4 KiB（“4Kn” 磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[GRUB 在 legacy（BIOS）启动模式下无法也不会支持 4K 扇区。](http://savannah.gnu.org/bugs/?46700)
+* 在逻辑扇区为 4 KiB（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[GRUB 在 legacy（BIOS）启动模式下无法也不会支持 4K 扇区。](http://savannah.gnu.org/bugs/?46700)
 
 内存小于 2 GiB 的计算机运行 ZFS 时会非常缓慢。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication），则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
 
@@ -471,7 +471,7 @@ Pin-Priority: 990
 # apt install --yes grub-efi-amd64 shim
 ```
 
-* `mkdosfs` 中的 `-s 1` 仅对呈现 4 KiB 逻辑扇区（“4Kn” 硬盘）的驱动器必要，以满足 FAT32 的最小簇大小（针对 512 MiB 分区），对呈现 512 B 扇区的驱动器也适用。
+* `mkdosfs` 中的 `-s 1` 仅对呈现 4 KiB 逻辑扇区（“4Kn”硬盘）的驱动器必要，以满足 FAT32 的最小簇大小（针对 512 MiB 分区），对呈现 512 B 扇区的驱动器也适用。
 
 >**注意：**
 >
@@ -542,7 +542,7 @@ update-initramfs: Generating /boot/initrd.img-4.9.0-8-amd64
 
 >**注意：**
 >
->在使用 LUKS 时，可能会显示 “WARNING could not determine root device from /etc/fstab”。这是因为 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906)。
+>在使用 LUKS 时，可能会显示“WARNING could not determine root device from /etc/fstab”。这是因为 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906)。
 
 5.3 解决 GRUB 对 ZFS 存储池特性支持缺失的问题：
 
