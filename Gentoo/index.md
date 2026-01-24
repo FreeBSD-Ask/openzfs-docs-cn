@@ -43,7 +43,7 @@ Solaris 的首个版本包含了一些在大规模辞职之前就已在开发中
 Linux 内核模块及 ZFS 用户空间工具的可选功能：
 
 |USE 标志 | 说明|
-| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| :--------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
 | [`+dist-kernel-cap`](https://packages.gentoo.org/useflags/+dist-kernel-cap) | 当与 USE=dist-kernel 结合时，可防止升级到未受支持的内核版本                                                                                               |
 | [`+initramfs`](https://packages.gentoo.org/useflags/+initramfs)             | 在 initramfs 中内置内核模块，并重新安装内核（仅对发行版内核有效）                                                                                             |
 | [`+modules`](https://packages.gentoo.org/useflags/+modules)                 | 编译内核模块                                                                                                                             |
@@ -173,7 +173,7 @@ Cryptographic API --->
 >
 >在安装内核模块时，必须始终选择稳定版本。你可以在 [这里](https://github.com/openzfs/zfs/releases) 查看最新的稳定版本及其对应的内核版本，同时也应确认 Portage 是否提供了该特定的 [内核版本](https://packages.gentoo.org/packages/sys-kernel/gentoo-sources)。
 
-你还应当在 package.mask 目录中添加一些文件，用于屏蔽特定版本的 zfs-kmod 和 zfs。这可以避免拉取这两个包的不同版本。此外，sys-fs/zfs 的版本也必须与 zfs-kmod 的版本保持一致。
+你还应当在 `package.mask` 目录中添加一些文件，用于屏蔽特定版本的 zfs-kmod 和 zfs。这可以避免拉取这两个包的不同版本。此外，sys-fs/zfs 的版本也必须与 zfs-kmod 的版本保持一致。
 
 如果使用的是由 dracut 或 genkernel 生成的 initramfs，请在（重新）编译模块后重新生成 initramfs。如果你使用的是自定义 initramfs，请参见下一节。
 
@@ -192,7 +192,7 @@ Cryptographic API --->
 mkdir -vp /usr/src/initramfs/lib/modules/$(uname -r)
 ```
 
-复制二进制文件，以便在 init 中可以使用 modprobe：
+复制二进制文件，以便能在 init 中使用 `modprobe`：
 
 ```sh
 cp -Prv /lib/modules/$(uname -r)/extra/* /usr/src/initramfs/lib/modules/$(uname -r)/extra/
@@ -210,7 +210,7 @@ lddtree --copy-to-tree /usr/src/initramfs /sbin/zvol_wait
 
 >**注意**
 >
->如果 modules 目录中存在多个内核文件夹，可以在 find 命令中使用 `-not -path` 来排除特定文件夹。
+>如果在 modules 目录中存在多个内核文件夹，可以在 find 命令中使用 `-not -path` 来排除特定文件夹。
 
 以下示例，演示为 6.6.2 创建 initramfs，并排除 6.1.118：
 
@@ -338,7 +338,7 @@ losetup -a
 - 数据集：一组文件和目录，可挂载到 VFS 中，就像 xfs 或 ext4 这样的传统文件系统一样
 - zvolume（或 zvol）：虚拟卷，可以作为虚拟块设备访问，像机器上的任何物理硬盘一样使用，位于 `/dev` 下
 
-在创建了 zpool 后，就可以对其中不同的 zvolume 和数据集创建时间点快照（snapshot）。这些快照可以被浏览，甚至可以回滚，用于将内容恢复到过去的某个时间点。ZFS 的另一个重要理念是：可以通过一系列属性来管理 zpool、数据集和 zvolume，例如加密、数据压缩、使用配额等，这些都只是属性可调内容的示例。
+在创建了 zpool 后，就可以对其中不同的 zvolume 和数据集创建时间点快照。这些快照可以被浏览，甚至可以回滚，用于将内容恢复到过去的某个时间点。ZFS 的另一个重要理念是：可以通过一系列属性来管理 zpool、数据集和 zvolume，例如加密、数据压缩、使用配额等，这些都只是属性可调内容的示例。
 
 切记：zpool 是在其 vdev 之间进行条带化的，因此哪怕只丢失了一个 vdev，也意味着整个 ZFS 存储池的丢失。冗余发生在 vdev 层面，而不是 zpool 层面。万一 zpool 丢失，唯一的选择就是从头重建，并从备份中恢复其内容。仅仅创建快照并不足以保证在崩溃后的恢复，还必须将这些快照发送到其他地方。后续章节将对此进行进一步说明。
 
@@ -369,7 +369,7 @@ zpool create <池名> [{striped,mirror,raidz,raidz2,raidz3}] /dev/blockdevice1 /
 
 >**提示**
 >
->还有一些其他用于 vdev 类型的关键字，例如 `spare`、`cache`、`slog`、`metadata` 或 `draid`（分布式 RAID）。
+>还有一些其他用于 vdev 类型的关键字，例如 `spare`、`cache`、`slog`、`metadata` 和 `draid`（分布式 RAID）。
 
 如果使用的是文件而不是块设备，只需将块设备路径替换为所使用文件的完整路径即可。例如：
 
@@ -430,7 +430,7 @@ zpool status
 >
 >有关所有可用选项的详细说明，请参阅 `zpool-import(8)` 手册页。
 
-zpool 并不会自动出现，它必须先 **导入**，系统才能识别并使用它。在 zpool 被导入后，将会发生以下事情：
+zpool 并不会自动出现，必须先行 **导入**，系统才能识别，使用它。在 zpool 被导入后，将会发生以下事情：
 
 1. 所有数据集（包括根数据集）都会挂载到 VFS 中，除非 `mountpoint` 属性另有指定（例如 `mountpoint=none`）。如果数据集之间存在嵌套关系并且需要按层级方式挂载，ZFS 会自动处理这种情况。
 2. 将在 `/dev/zvol/<存储池名称>` 下创建 zvolume 的块设备条目。
@@ -480,7 +480,7 @@ zpool export zpool_test
 
 #### 编辑 Zpool 属性
 
-zpool 具有若干属性（也称为 properties）。其中一部分是可以修改的，用来作为“旋钮”控制诸如数据压缩、加密等方面；而另一些属性则是内在属性，只能读取，不能修改。可以通过 `zpool` 命令的两个选项来与这些属性交互：
+zpool 具有若干属性（也称为 propertie）。其中一部分是可以修改的，用来作为“旋钮”控制诸如数据压缩、加密等方面；而另一些属性则是内在属性，只能读取，不能修改。可以通过 `zpool` 命令的两个选项来与这些属性交互：
 
 - `zpool get 属性名称 zpoolname` 用于查看指定的属性名称（特殊的属性名称 *all* 可用于查看全部属性）
 - `zpool set 属性名称=属性值 zpoolname` 用于将属性名称设置为 `属性值`
@@ -496,7 +496,7 @@ zpool get all zpool_test
 
 虽然不会对所有属性逐一说明，但有一点会立刻引起注意：有一些属性名称以 `feature@` 开头。这是什么？是历史原因 <https://wiki.gentoo.org/wiki/ZFS#cite_note-2>
 
-传统的 zpool 版本号编号方案在 2012 年被废弃（大致是在 Oracle 停止 OpenSolaris 并转为闭门开发 ZFS 之后），并切换为 *feature flags* 机制（zpool 的版本号同时被设置为 5000，自此不再变化）。因此，才会在上述命令输出中看到各种 `feature@` 条目。
+传统的 zpool 版本号编号方案在 2012 年被废弃（大致是在 Oracle 停止 OpenSolaris 并转为闭门开发 ZFS 之后），并切换为 *feature flag* 机制（zpool 的版本号同时被设置为 5000，自此不再变化）。因此，才会在上述命令输出中看到各种 `feature@` 条目。
 
 >**技巧**
 >
@@ -506,11 +506,11 @@ zpool get all zpool_test
 
 例如，在 Solaris 10 9/10（支持的 zpool 版本号最高为 22）下创建的 zpool，可以在 Solaris 10 1/13（支持的 zpool 版本号最高为 32）下导入，并且之后仍然可以再次在 Solaris 10 1/13 下导入——前提是该 zpool 的版本号尚未在 Solaris 10 1/13 下被升级（否则会将 zpool 标记为版本 32）。
 
-同样的逻辑也适用于 feature flags：如果某个 zpool 启用了当前系统所使用的 ZFS 版本并不支持的 feature flag，则该 zpool 将无法被导入。与（legacy）版本号机制类似，为了获得后续 OpenZFS/ZFS 版本提供的新 feature flags，必须对 zpool 进行升级（手动操作），使其支持这些新的 feature flags。在完成这一操作后，较旧的 OpenZFS/ZFS 版本将无法再导入该 zpool。
+同样的逻辑也适用于 feature flag：如果某个 zpool 启用了当前系统所使用的 ZFS 版本并不支持的 feature flag，则该 zpool 将无法被导入。与（legacy）版本号机制类似，为了获得后续 OpenZFS/ZFS 版本提供的新 feature flags，必须对 zpool 进行升级（手动操作），使其支持这些新的 feature flags。在完成这一操作后，较旧的 OpenZFS/ZFS 版本将无法再导入该 zpool。
 
 >**重要**
 >
->仅就 zpool 导入而言，feature flag 处于 `disabled` 还是 `enabled` 状态并不重要。仅在处于 `active` 状态时，才需要遵循 [Feature Flags 对照表](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Feature%20Flags.html) 中关于只读或完全不可导入的规则。
+>仅就 zpool 导入而言，feature flag 处于 `disabled` 还是 `enabled` 状态并不重要。仅在处于 `active` 状态时，才需要遵循 [Feature Flag 对照表](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Feature%20Flags.html) 中关于只读或完全不可导入的规则。
 
 >**警告**
 >
@@ -599,7 +599,7 @@ config:
 
 >**技巧**
 >
->可以通过对块设备执行 `echo offline > /sys/block/<block device>/device/state` 来模拟磁盘故障（执行 `echo running > /sys/block/<block device>/device/state` 可将磁盘恢复为在线状态）。
+>可以通过对块设备执行 `echo offline > /sys/block/<block device>/device/state` 来模拟磁盘故障（执行 `echo running > /sys/block/<块设备>/device/state` 可将磁盘恢复为在线状态）。
 
 存在故障的磁盘（`/dev/sde`）需要被物理替换为另一块磁盘（此处为 `/dev/sdg`）。该操作首先需要将故障磁盘从 zpool 中下线：
 
@@ -832,7 +832,7 @@ errors: No known data errors
 
 当不再需要某个 zpool 时，可以使用 `zpool destroy` 销毁它。如果 zpool 不为空并包含 zvol 或数据集，需要加选项 `-r`。无需先导出 zpool，ZFS 会自动处理。
 
-如果 zpool 刚被销毁，且其所有 vdev 仍完好，可以通过 `zpool import` 并加选项 `-D` 重新导入：
+如果 zpool 刚被销毁，且其所有 vdev 仍完好，可以通过 `zpool import` 再加选项 `-D` 重新导入：
 
 ```sh
 zpool destroy zpool_test
@@ -1223,16 +1223,16 @@ NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE                  DIO LOG-SEC
 >
 >哪怕文件位于同一 zpool 内，移动文件集之间的文件也是“复制后删除”（cp-then-rm）操作，而非瞬间移动。
 
-- 快照（snapshot）是文件系统或 zvolume 的冻结只读时间点状态。ZFS 是写时复制（copy-on-write）系统，快照只保留自上一次快照以来发生的变化，因此如果没有变化，快照几乎是“零成本”的。与 LVM 快照不同，ZFS 快照不需要空间预留，并且数量可以无限。快照可以通过“魔法路径”浏览，查看快照时的文件系统或 zvolume 内容，也可以用于回滚相关文件系统或 zvolume，命名格式为：`*zpoolname/datasetname@snapshotname*`。
+- 快照（snapshot）是文件系统或 zvolume 的冻结只读时间点状态。ZFS 是写时复制（copy-on-write）系统，快照只保留自上一次快照以来发生的变化，因此如果没有变化，快照几乎是“零成本”的。与 LVM 快照不同，ZFS 快照不需要空间预留，并且数量可以无限。快照可以通过“魔法路径”浏览，查看快照时的文件系统或 zvolume 内容，也可以用于回滚相关文件系统或 zvolume，命名格式为：*zpoolname/datasetname@snapshotname*。
 
 >**警告**
 >
 >关于快照的重要事项：
 
 - **务必备份到外部系统！** 如果 zpool 损坏/不可用或数据集被销毁，数据将永久丢失。
-- 快照不是事务性的，正在进行的写入不能保证完整存储在快照中（例如，当快照创建时，一个 40GB 文件仅写入了 15GB，那么快照只会记录这 15GB）。
+- 快照不是事务性的，正在进行的写入不能保证完整存储在快照中（例如，当快照创建时，若 40GB 文件仅写入了 15GB，那么快照只会记录这 15GB）。
 - 对于设置了保留（reservation）的 zvolume，其首次快照可能会产生意外的空间占用，因为它会为覆盖整个卷预留足够空间，同时考虑已有的已分配空间。
-- 书签（bookmark）类似快照，但不保存数据，仅存储时间点引用。这对于对备份系统进行增量传输非常有用，而无需在源系统保留该数据集的所有历史快照。就像书签标记在书页上一样。另一个用途是创建经过编辑的数据集，命名格式为：`*zpoolname/datasetname#bookmarkname*`。
+- 书签（bookmark）类似快照，但不保存数据，仅存储时间点引用。这对于对备份系统进行增量传输非常有用，而无需在源系统保留该数据集的所有历史快照。就像书签标记在书页上一样。另一个用途是创建经过编辑的数据集，命名格式为 *zpoolname/datasetname#bookmarkname*。
 - 克隆（clone）是快照的可写“视图”，可以像文件系统一样挂载到系统 VFS。其特点是引入了父子依赖关系：当克隆被创建后，原始数据集在克隆存在期间不能被销毁。可以通过 *promote* 操作将克隆提升为父数据集，从而使原始文件系统成为子数据集（同时影响原始文件系统的快照，也会被“反转”）。
 - zvolume 是模拟块设备，可像任何物理硬盘一样使用，在目录 `/dev/zvol/zpoolname` 下作为特殊块设备条目访问。
 
@@ -1433,7 +1433,7 @@ zfs get all zpool_test
 | readonly    | on|off                                          | 控制文件系统是否只读（`on`）或可写（`off`）。                                                                                                                                                                                    |
 | atime       | on|off                                          | 控制是否更新文件访问时间。若无需访问时间，可关闭以减少大量文件访问时的额外开销。                                                                                                                                                                       |
 | xattr       | on|off|sa                                       | 控制是否启用扩展属性。默认 `on` 使用目录级属性，可能带来 I/O 开销；设置为 `sa` 可缓解开销。MDAC 系统如 SELinux 需启用扩展属性，POSIX ACL（Linux）同样需要。NFSv4（FreeBSD）不存储在扩展属性中。                                                                                   |
-| encryption  | on|off|algorithm                                | 控制数据是否加密（`on`）或不加密（`off`）。默认使用 AES-256-GCM，亦可指定算法。zpool 必须启用 `feature@encrypted`，创建数据集时需提供 *keyformat*。加密时，ZFS 会加密数据及部分元数据，但 **不加密 zpool 结构**。可在后续更改密钥（如密钥泄露或其他原因）。详见 *zfs-load-key(8)*。                       |
+| encryption  | on|off|algorithm                                | 控制数据是否加密（`on`）或不加密（`off`）。默认使用 AES-256-GCM，亦可指定算法。zpool 必须启用 `feature@encrypted`，创建数据集时需提供 *keyformat*。加密时，ZFS 会加密数据及部分元数据，但 **不会加密 zpool 结构**。可在后续更改密钥（如密钥泄露或其他原因）。详见 *zfs-load-key(8)*。                       |
 
 >**提示**
 >
@@ -1459,7 +1459,7 @@ zpool_test/fds1/fds1_1             compression  on   inherited from zpool_test
 zpool_test/fds1/fds1_1/fds1_1_1_1  compression  on   inherited from zpool_test/fds1/fds1_1
 ```
 
-对于根数据集 zpool_test，`local` 表示这里覆盖了默认值。而 zpool_test/fds1 及其所有子数据集继承了该值，ZFS 会智能地显示继承来源。
+对于根数据集 `zpool_test|，`local` 表示这里覆盖了默认值。而 `zpool_test/fds1` 及其所有子数据集继承了该值，ZFS 会智能地显示继承来源。
 
 将 `zpool_test/fds1/fds1_1` 的 compression 属性设置为 `off`：
 
@@ -1530,7 +1530,7 @@ find /zpool_test -name '*.dd' -delete
 
 #### 通过 NFS/CIFS 共享 ZFS 数据集
 
-可以直接通过 NFS 和/或 SMBFS/CIFS 共享 ZFS 文件系统数据集。没什么魔法，ZFS 会在后台自动调整 `/etc/exports.d/zfs.exports`（NFS）和 `/etc/samba/smb.conf`（Samba）文件的内容，让管理员无需手动修改。要共享数据集，只需设置 `sharenfs`/`sharesmb` 属性为所需协议即可。可以同时使用两种协议，但要注意：如果文件在读写模式下被打开，NFS 和 SMBFS/CIFS 的锁机制不会互相感知。
+可以直接通过 NFS、SMBFS/CIFS 共享 ZFS 文件系统数据集。没什么魔法，ZFS 会在后台自动调整 `/etc/exports.d/zfs.exports`（NFS）和 `/etc/samba/smb.conf`（Samba）文件的内容，让管理员无需手动修改。要共享数据集，只需设置 `sharenfs`/`sharesmb` 属性为所需协议即可。可以同时使用两种协议，但要注意：如果文件在读写模式下被打开，NFS 和 SMBFS/CIFS 的锁机制不会互相感知。
 
 首先创建一个共享文件系统数据集 `zpool_test/share_test` 并通过 NFS 共享：
 
