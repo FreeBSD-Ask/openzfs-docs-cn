@@ -7,13 +7,13 @@
 ## 入门
 
 * Alpine Linux
-  * [Alpine Linux 概述](AlpineLinux/index.md)
+  * [在 Alpine Linux 上获得 ZFS 支持](AlpineLinux/index.md)
   * [使用 ZFS 作为根文件系统的 Alpine Linux](AlpineLinux/RootonZFS.md)
 * Arch Linux
-  * [Arch Linux 概述](ArchLinux/index.md)
+  * [在 Arch Linux 上获得 ZFS 支持](ArchLinux/index.md)
   * [使用 ZFS 作为根文件系统的 Arch Linux](ArchLinux/ArchLinuxRoot.md)
 * Debian
-  * [Debian 概述](Debian/index.md)
+  * [在 Debian 上获得 ZFS 支持](Debian/index.md)
   * [使用 ZFS 作为根文件系统的 Debian 13 (Trixie)](Debian/Debian-Trixie-13.md)
   * [使用 ZFS 作为根文件系统的 Debian 12 (Bookworm)](Debian/Debian-Bookworm-12.md)
   * [使用 ZFS 作为根文件系统的 Debian 11 (Bullseye)](Debian/Debian-Bullseye-11.md)
