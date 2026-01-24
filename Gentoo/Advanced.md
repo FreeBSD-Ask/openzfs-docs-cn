@@ -4,11 +4,11 @@
 
 ## 概述
 
-本节深入探讨 ZFS 用户的高级主题，涵盖广泛的高级功能和优化技术。用户将学习自动化脚本以简化日常任务和系统维护，以及全面的 ZFS 调优策略，以在不同工作负载场景中最大化性能。内容包括高级数据集管理、用于监控和维护的自定义脚本、通过 ARC 和 ZIL 调优实现性能优化、复杂的备份与恢复流程，以及企业级高可用性配置。此外，本节还探讨高级加密方法、RAID-Z 扩展技术、特殊 VDEV 优化和容器集成策略。无论是管理家庭服务器还是企业存储基础设施，这些高级主题都将帮助用户通过适当的系统集成、自动化维护和性能监控充分发挥 ZFS 的潜力。特别关注实际场景和实践应用，确保用户能够将这些高级概念有效应用于其特定用例。
+本节深入探讨 ZFS 用户的高级主题，包括广泛的高级功能和优化技术。用户将学习自动化脚本以简化日常任务和系统维护，以及全面的 ZFS 调优策略，以在不同工作负载场景中最大化性能。内容包括高级数据集管理、用于监控和维护的自定义脚本、通过 ARC 和 ZIL 调优实现性能优化、复杂的备份与恢复流程，以及企业级高可用性配置。此外，本节还探讨高级加密方法、RAID-Z 扩展技术、特殊 VDEV 优化和容器集成策略。无论是管理家庭服务器还是企业存储基础设施，这些高级主题都将帮助用户通过适当的系统集成、自动化维护和性能监控充分发挥 ZFS 的潜力。特别关注实际场景和实践应用，确保用户能够将这些高级概念有效应用于其特定用例。
 
 ## 自动化脚本
 
-**抽象说明：** 手动更新 ZFS 内核模块可能耗时且容易出错，包括：
+**概述：** 手动更新 ZFS 内核模块可能耗时且容易出错，比如：
 
 * 监控 OpenZFS GitHub 发布页面的更新
 * 检查每个新版本的内核兼容性
@@ -21,38 +21,46 @@
 * 安装 curl 用于下载发布信息
 * 可访问 GitHub 的网络连接
 * 安装内核模块和更新所需的权限
-* 具有脚本操作所需写权限的目录
+* 脚本操作所需目录具有写权限
 
 #### 使用 eix post sync
 
-下面的脚本将由一个名为 `system_update.sh` 的脚本触发。每次用户更新系统时应执行它。如果根据提供的参数没有新更新，脚本将退出。这是为了确保脚本在 post-sync 后检查任何新内核版本。创建你的 hook 脚本在 postsync.d 中：
+下面的脚本将由脚本 `system_update.sh` 触发。在每次更新系统时用户应执行它。如果根据提供的参数没有新更新，脚本将退出。这是为了确保脚本在 post-sync 后检查任何新内核版本。在 `postsync.d` 下创建你的 hook 脚本：
 
-`sudo nano -w /etc/portage/postsync.d/zfs-check`
-
-文件 **`/etc/portage/postsync.d/zfs-check` 设置 eix post sync**
-
+```sh
+sudo nano -w /etc/portage/postsync.d/zfs-check
 ```
+
+为文件 `/etc/portage/postsync.d/zfs-check` 设置 **eix post sync**
+
+```sh
 #!/bin/bash
 /etc/hooks.d/zfs/system_update.sh stable 0 "/home/masterkuckles"
 ```
 
-**注意**
-将 stable 替换为 testing 或 unknown，如需调试数据结构，将 0 改为 1，并将 "/home/masterkuckles" 改为你希望复制内核配置的路径。
+>**注意**
+>
+>将 stable 替换为 testing 或 unknown，如需调试数据结构，将 0 改为 1，并将 `"/home/masterkuckles"` 改为你希望复制内核配置的路径。
 
 现在使其可执行：
 
-`chmod +x /etc/portage/postsync.d/zfs-check`
+```sh
+chmod +x /etc/portage/postsync.d/zfs-check
+```
 
 #### 系统更新脚本
 
-**注意**
-bash 编程语言是图灵完备的。然而，它缺少 try、catch、except、throw 等关键字，这使得调试更困难。此外，即使语法略有错误，bash 仍会运行，因此需要注意。有关正则解析，请访问 [此处](https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html)。如 error 等函数及数据结构定义在另一个脚本中。
+>**注意**
+>
+>bash 编程语言是图灵完备的。然而，它缺少 try、catch、except、throw 等关键字，这使得调试更困难。此外，即使语法略有错误，bash 仍会运行，因此需要注意。有关正则解析，请访问 [此处](https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html)。如 error 等函数及数据结构定义在另一个脚本中。
 
-**注意**
-可能存在一些未知的边缘情况。如果 DOM 树结构发生变化，脚本可能会失效。解决方法之一是在 `parse_linux_compatibility` 中前置另一个 if 语句，但需要检查 [这里](https://github.com/openzfs/zfs/releases) 以找到正确的表达式。目前：Linux: compatible with ... kernels 和 Linux kernels ... 将兼容从 zfs-3.0 到 zfs-2.2.5。如果这太复杂且你认为有问题，可以在启用 DEBUG 后运行 `debug_releases()` 并创建 pull request [这里](https://github.com/alphastigma101/BashScripts)，或提交 bug 报告。
+>**注意**
+>
+>可能存在一些未知的极端情况。如果 DOM 树结构发生变化，脚本可能会失效。解决方法之一是在 `parse_linux_compatibility` 中前置另一个 if 语句，但需要检查 [这里](https://github.com/openzfs/zfs/releases) 以找到正确的表达式。目前：`Linux: compatible with ... kernels` 和 `Linux kernels ...` 将兼容从 zfs-3.0 到 zfs-2.2.5。如果这太复杂且你认为有问题，可以在启用 DEBUG 后运行 `debug_releases()` 并创建 pull request [这里](https://github.com/alphastigma101/BashScripts)，或提交 bug 报告。
 
-**警告**
-截至 25 年 2 月 12 日，上述脚本仍在测试中。大部分已在 Gentoo 机器上测试过并可运行。它将根据 CLI 中传入的参数（如 stable、testing、unknown）安装新内核版本。仍存在一些需要解决的 bug，例如安装新的 ZFS 模块以及删除旧的内核目录。此外，该脚本仅用 stable 参数测试过。如果使用 testing 或 unknown，也应能正常工作。如脚本崩溃，你会知道如何处理。
+>**警告**
+>
+>截至 25 年 2 月 12 日，上述脚本仍在测试中。大部分已在 Gentoo 机器上测试过并可运行。它将根据 CLI 中传入的参数（如 stable、testing、unknown）安装新内核版本。仍存在一些需要解决的 bug，例如安装新的 ZFS 模块以及删除旧的内核目录。此外，该脚本仅用 stable 参数测试过。如果使用 testing 或 unknown，也应能正常工作。如脚本崩溃，你会知道如何处理。
 
 该脚本将从 Portage 树中安装最新可用内核版本，并删除任何过期内核。如果在内核安装、编译或安装新的 ZFS 模块过程中出现错误，脚本会捕获错误并退出。脚本功能依赖于提供的参数。
 
@@ -67,23 +75,24 @@ ZFS_KEY=""
 STATUS="$1"
 CONFIG_PATH="$3"
 
-# Function that will check to see if there is an update or not
+# 检查是否有更新的函数
 check_kernel() {
-    # Assuming that user merged kernel source from portage
+    # 假设用户已从 Portage 合并内核源代码
     local pkg=$(cat /var/lib/portage/world | grep -E '^sys-kernel\/[[:alpha:]]+-[[:alpha:]]+:[0-9]+\.[0-9]+\.[0-9]+$')
     if echo $pkg | grep -Eq 'gentoo-sources'; then
-        # Can't assign an array to the map. Therefore, make it a string
-        # and convert it back into an array using mapfile
+
+    # 无法将数组直接赋值给映射。因此，将其转换为字符串
+    # 然后使用 mapfile 再将其转换回数组
         INSTALLED_KERNELS["gentoo-sources"]=$pkg
         KEY="gentoo-sources"
-        # TODO Need to find the most latest stable version and increment it by one
+        # 待办事项：需要找到最新的稳定版本并在此基础上 +1
         touch /etc/portage/package.mask/gentoo-sources
         #echo >=
     else
         if echo $pkg | grep -Eq 'gentoo-kernel-bin'; then
             INSTALLED_KERNELS["gentoo-kernel-bin"]=$pkg
             KEY="gentoo-kernel-bin"
-            # TODO Need to find the most latest stable version and increment it by one
+            # 待办事项：需要找到最新的稳定版本并在此基础上 +1
             touch /etc/portage/package.mask/gentoo-kernel-bin
             #echo >=
         else
@@ -93,28 +102,28 @@ check_kernel() {
     fi
     return 0
 }
-# Function that will check and see if there is an update for zfs
+# 检查 ZFS 是否有可用更新的函数
 check_zfs() {
-    # Re-Update the installed kernel map
+    # 重新更新已安装内核的映射
     check_kernel
     curl -s https://packages.gentoo.org/packages/sys-fs/zfs > gentoo_zfs_sources.html
     local line=$(grep -oP 'title="\d+\.\d+\.\d+ [^"]+"' gentoo_zfs_sources.html)
     local installed_zfs=$(cat /etc/portage/package.mask/zfs | sed 's/^[^a-zA-Z]*//;s/[[:space:]]*$//')
     installed_zfs=$(echo "$installed_zfs" | sed 's/[[:space:]]*$//')
-    # Create an array that holds zfs and zfs-kmod package versions
+    # 创建数组，用于保存 zfs 和 zfs-kmod 包的版本
     mapfile -t CURRENT_ZFS <<< "$(echo "$installed_zfs" | tr ' ' '\n')"
     local current=${CURRENT_ZFS[0]}
     while read -d '"' -r chunk; do
         if [[ $chunk =~ ^title= ]]; then
-            continue  # Skip the "title=" part
+            continue  # 跳过 "title=" 这一部分
         fi
         if [[ $chunk =~ ^([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]is[[:space:]](testing|stable|unknown)[[:space:]]on[[:space:]]([a-z0-9]+)$ ]]; then
             version="${BASH_REMATCH[1]}"
             status="${BASH_REMATCH[2]}"
             architecture="${BASH_REMATCH[3]}"
-            # Initialize if empty
+            # 如果为空则初始化
             ZFS_DICT[$architecture]="${ZFS_DICT[$architecture]:-}"
-            # Append new value
+            # 追加新值
             ZFS_DICT[$architecture]+="$status:$version "
         fi
     done < <(echo "$line")
@@ -133,7 +142,7 @@ check_zfs() {
             echo "====================================="
  
         fi
-        # Note: Issue could occur here if the DOM tree structure changes the versions around
+        # 注意：如果 DOM 树结构发生变化导致版本顺序改变，此处可能会出现问题
         if [ "$STATUS" == "$status_val" ]; then 
             if [ ! -n "$ZFS_KEY" ]; then
                 ZFS_KEY="zfs-$version_val"
@@ -144,7 +153,7 @@ check_zfs() {
             AVAILABLE_ZFS["$status_val"]+="sys-fs/zfs-$version_val "
         fi
     done
-    # Check to see if the user has the latest version
+    # 检查用户是否拥有最新版本
     local new_zfs=${AVAILABLE_ZFS["$STATUS"]}
     local usr_version=$(echo "$current" | sed 's/.*-\(.*\)/\1/')
     IFS=' ' read -r -a zfs <<< "$new_zfs"
@@ -169,7 +178,7 @@ check_zfs() {
     return 0
 }
 
-# Function that will install the new kernel 
+# 安装新内核的函数
 install_kernel() {
     local usr_kernel_str=${INSTALLED_KERNELS[$KEY]}
     local output=0
@@ -178,7 +187,7 @@ install_kernel() {
         version=$(echo "$build" | sed 's/^[^-]*-//')
         eselect kernel set $build
         cd /usr/src/linux || error "install_kernel" "Folder /usr/src/linux does not exist!"
-        # Note: config file needs to be copied somewhere else other than home
+        # 注意：配置文件需要复制到除 home 之外的其他位置
         if [ "$copy_config" -ne 1 ]; then
             config=$(ls $CONFIG_PATH/*-config | head -n 1)
             cp -Prv $config ./.config
@@ -228,7 +237,7 @@ install_kernel() {
             echo "====================================="
             clean_up=1
         fi
-        # Strip off the package name and colon to extract just the version
+        # 去掉包名和冒号，仅提取版本号
         usr_version=$(echo "$usr_kernels" | sed 's/^[^:]*://')
         if [ -d "/usr/src/initramfs/$usr_version-gentoo-$TYPE" ]; then
             if [ -d "/usr/src/initramfs/lib/modules/$usr_version-gentoo-$TYPE" ]; then 
@@ -272,7 +281,7 @@ install_kernel() {
     return 0
 }
 
-# Function will only install the specific version based on the argument that is passed in before run time
+# 函数将仅根据运行前传入的参数安装特定版本
 install_kernel_resources() {
     local usr_kernel_str=${INSTALLED_KERNELS[$KEY]}
     local available_kernel_str=""
@@ -286,7 +295,7 @@ install_kernel_resources() {
         system_update_bug_report
         exit 0
     fi
-    # Split the lines at white-spaces
+    # 在空格处拆分行
     IFS=' ' read -r -a lines <<< "$available_kernel_str"
     for line in "${lines[@]}"; do
         IFS=':' read -r status_val version_val <<< "$line"
@@ -304,14 +313,14 @@ install_kernel_resources() {
     local copy_config=0
     local kernel_update=0
     for usr_kernels in "${usr_kernel_arr[@]}"; do
-        # Strip off the package name and colon to extract just the version
+        # 去掉包名和冒号，只提取版本号
         usr_version=$(echo "$usr_kernels" | sed 's/^[^:]*://')
         if [ ! -n "$usr_version" ]; then
             system_update_bug_report
             exit 0
         fi
         for available_kernels in "${kernel_arr[@]}"; do
-            # Strip off the package name and colon to extract just the version
+            # 去掉包名和冒号，仅保留版本号
             available_version=$(echo "$available_kernels" | sed 's/^[^:]*://')
             if [ ! -n "$available_kernels" ]; then
                 system_update_bug_report
@@ -321,7 +330,7 @@ install_kernel_resources() {
                 if [[ ! "$build_str" =~ "linux-$available_version-gentoo" ]]; then
                     build_str+="linux-$available_version-gentoo "
                 fi
-                # Note: config file needs to be copied somewhere else other than home
+                # 注意：配置文件需要复制到除 home 之外的其他位置
                 if [ "$copy_config" -ne 1 ]; then
                     copy_config=1
                     kernel_update=1
@@ -340,7 +349,7 @@ install_kernel_resources() {
         done 
     done
     if [ "$kernel_update" -ne 0 ]; then
-        # Remove trailing spaces and newlines
+        # 去除末尾的空格和换行符
         build_str=$(echo "$build_str" | sed 's/[[:space:]]*$//')
         mapfile -d ' ' -t BUILD_KERNELS <<< "$build_str"
         install_kernel
@@ -356,7 +365,7 @@ install_kernel_resources() {
     return 0
 }
 
-# Function that will update to the newest zfs
+# 更新到最新 ZFS 的函数
 install_zfs() {
     local compatible_kernel_ranges=${COMPATIBLE_RELEASES[$ZFS_KEY]}
     local installed_kernels_str=${INSTALLED_KERNELS[$KEY]}
@@ -364,7 +373,7 @@ install_zfs() {
     local end=$(echo "$compatible_kernel_ranges" | sed 's/^[^-]*-//')
     mapfile -t kernels <<< "$installed_kernels_str"
     for ele in "${kernels[@]}"; do
-        # Strip off the package name and colon to extract just the version
+        # 去掉包名和冒号，仅提取版本号
         version=$(echo "$ele" | sed 's/^[^:]*://')
         if version_greater_than_equal "$version" "$start" && version_less_than_equal "$version" "$end"; then
             new_path="$version-$TYPE"
@@ -403,15 +412,15 @@ update_init() {
             echo "====================================="
         else 
             Dracut=$(cat /var/lib/portage/world | grep -E '^sys-kernel\/dracut-+:[0-9]+\.[0-9]+\.[0-9]+$')
-            # Need to check to see if the string is empty
+            # 需要检查字符串是否为空
             if [[ -n "$Dracut" ]]; then
-                # If it is not empty then generate initramfs using dracut
+                # 如果非空，则使用 dracut 生成 initramfs
                 dracut --force --kver="$usr_version" /boot/initramfs-"$usr_version-gentoo-$TYPE".img || error "update_init" "Failed to create initramfs using dracut!"
             fi
             GenKernel=$(cat /var/lib/portage/world | grep -E '^sys-kernel\/genkernel-+:[0-9]+\.[0-9]+\.[0-9]+$')
-            # Need to check to see if the string is empty
+            # 需要检查字符串是否为空
             if [[ -n "$GenKernel" ]]; then
-                # If it is not empty then generate initramfs using genkernel
+                # 如果非空，则使用 genkernel 生成 initramfs
                 genkernel --kernel-config=/usr/src/linux-$usr_version-gentoo/.config initramfs --kerneldir=/usr/src/linux-$usr_version-gentoo || error "update_init" "Failed to create initramfs using genkernel!"
             else 
                 error "update_init" "Error: The 'Dracut' and 'GenKernel' variables are empty.\nThis indicates a bug in the script. Please file a bug report or submit a pull request to resolve the issue at: https://github.com/alphastigma101/BashScripts\n\nSteps to follow:\n1. Provide details of your environment (e.g., OS, Bash version).\n2. Describe how to reproduce the issue.\n3. Submit a pull request with a fix if possible.\n\nIf you are unable to submit a fix, please report the issue with as much detail as you can."
@@ -426,15 +435,15 @@ populate_data_structures() {
     local line=$(grep -oP 'title="\d+\.\d+\.\d+ [^"]+"' kernel_sources.html)
     while read -d '"' -r chunk; do
         if [[ $chunk =~ ^title= ]]; then
-            continue  # Skip the "title=" part
+            continue  # 跳过 "title=" 这个部分
         fi
         if [[ $chunk =~ ^([0-9]+\.[0-9]+\.[0-9]+)[[:space:]]is[[:space:]](testing|stable|unknown)[[:space:]]on[[:space:]]([a-z0-9]+)$ ]]; then
             version="${BASH_REMATCH[1]}"
             status="${BASH_REMATCH[2]}"
             architecture="${BASH_REMATCH[3]}"
-            # Initialize if empty
+            # 如果为空则初始化
             ARCH_DICT[$architecture]="${ARCH_DICT[$architecture]:-}"
-            # Append new value
+            # 附加新值
             ARCH_DICT[$architecture]+="$status:$version "
         fi
     done < <(echo "$line")
@@ -484,21 +493,21 @@ source ./helper_functions.sh
 source ./error_handling.sh
 DEBUG="$2"
 
-# Associative array to store compatible releases
+# 用于存储兼容版本的关联数组
 declare -A COMPATIBLE_RELEASES
 declare -a RANGES
-# Function to extract Linux kernel compatibility
+# 提取 Linux 内核兼容性的函数
 parse_linux_compatibility() {
     local url="$1"
     local release_name="$2"
     curl -s $url > $release_name".html"
-    # Use grep and sed to extract Linux kernel compatibility line
+    # 使用 grep 和 sed 提取 Linux 内核兼容性相关行
     local linux_line=$(grep -A10 "Supported Platforms:" "$release_name.html" | grep "Linux kernels" | sed -e 's/^\s*//; s/\s*$//')
-    # Check if Linux compatibility line exists
+    # 检查 Linux 兼容性相关行是否存在
     if [[ -z "$linux_line" ]]; then
         linux_line=$(grep -A10 "Supported Platforms" "$release_name.html" | grep -oP "Linux: compatible with [0-9.]+ - [0-9.]+ kernels" | sed -e 's/^\s*//; s/\s*$//')
     fi
-    # Extract the smallest and largest kernel versions using a regex
+    # 使用正则表达式提取最小和最大内核版本
     if [[ "$linux_line" =~ Linux:\ compatible\ with\ ([0-9.]+)\ -\ ([0-9.]+)\ kernels ]]; then
         min_version="${BASH_REMATCH[1]}"
         max_version="${BASH_REMATCH[2]}"
@@ -507,7 +516,7 @@ parse_linux_compatibility() {
         min_version="${BASH_REMATCH[1]}"
         max_version="${BASH_REMATCH[2]}"
     fi
-    # Store the result in RANGES and COMPATIBLE_RELEASES
+    # 将结果存储到 RANGES 和 COMPATIBLE_RELEASES 中
     RANGES[0]="$min_version"
     RANGES[1]="$max_version"
     COMPATIBLE_RELEASES["$release_name"]="${RANGES[0]}-${RANGES[1]}"
@@ -515,7 +524,7 @@ parse_linux_compatibility() {
 }
 
 populate_releases() {
-    # Fetch the releases page content
+    # 下载 releases 页面内容
     curl -s https://github.com/openzfs/zfs/releases > zfs_releases.html
     mapfile -t RELEASES_PAGE < <(
         awk 'BEGIN{RS="<div"; ORS="<div"} /class="Box-body"/{flag=1} flag; /<\/div>/{flag=0}' zfs_releases.html | \
@@ -523,12 +532,12 @@ populate_releases() {
     )
     for url in "${RELEASES_PAGE[@]}"; do
         release_name=$(echo $url | grep -oP 'zfs-.*$')
-        # Try to extract Linux kernel compatibility
+        # 试图解压 Linux 内核兼容性文件
         parse_linux_compatibility "https://github.com$url" "$release_name"
     done
 }
 debug_releases() {
-    # Print out the compatible releases
+    # 打印兼容性文件的 releases
     echo "Compatible ZFS Releases:"
     for release in "${!COMPATIBLE_RELEASES[@]}"; do
         echo "$release: Linux kernel ${COMPATIBLE_RELEASES[$release]}"
@@ -537,9 +546,9 @@ debug_releases() {
 remove_html() {
     rm -f *.html
 }
-# Check if DEBUG is set to 1
+# 检查 DEBUG 是否设置为 1
 if [[ "$DEBUG" -eq 1 ]]; then
-    # Call populate_releases function if DEBUG is enabled
+    # 如果启用 DEBUG，则调用函数 populate_releases 
     populate_releases
     debug_releases
 fi
@@ -646,12 +655,12 @@ debug_available_kernel() {
 ```sh
 #!/bin/bash
 
-# Function to compare if version is greater than or equal to the comparison version
+# 用于比较版本是否大于或等于指定版本的函数
 version_greater_than_equal() {
     [[ "$(echo -e "$1\n$2" | sort -V | head -n 1)" == "$2" ]]
 }
 
-# Function to compare if version is less than or equal to the comparison version
+# 用于比较版本是否小于或等于指定版本的函数
 version_less_than_equal() {
     [[ "$(echo -e "$1\n$2" | sort -V | tail -n 1)" == "$2" ]]
 }
@@ -659,14 +668,14 @@ version_less_than_equal() {
 
 #### 错误处理脚本
 
-如果在运行时发生问题，该脚本会记录发生异常行为的函数名的字符串字面量，以及简短的说明发生了什么。请注意，由于缺少文件夹或文件，有些错误可能是误报。这不是问题，仅意味着需要添加另一个 if 语句。
+如果在运行时发生问题，该脚本会记录发生异常行为的函数名的字符串字面量，以及简短的说明发生了什么。请注意，由于缺少文件夹或文件，有些错误可能是误报。这不是问题，仅意味着需要添加额外的 if 语句。
 
 错误处理脚本 `/etc/portage/postsync.d/error_handling.sh`：
 
 ```sh
 #!/bin/bash
 
-# Function that will output errors
+# 用于打印错误的函数
 error() {
     local x="$1"
     local y="$2"
