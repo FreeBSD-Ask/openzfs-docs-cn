@@ -19,3 +19,6 @@
   * [使用 ZFS 作为根文件系统的 Debian 11 (Bullseye)](Debian/Debian-Bullseye-11.md)
   * [使用 ZFS 作为根文件系统的 Debian 10 (Buster)](Debian/Debian-Buster-10.md)
   * [使用 ZFS 作为根文件系统的 Debian 9 (Stretch)](Debian/Debian-Stretch-9.md)
+* Fedora
+  * [在 Fedora 上获得 ZFS 支持](Fedora/index.md)
+  * [使用 ZFS 作为根文件系统的 Fedora](Fedora/fedora-Root-on-ZFS.md)
