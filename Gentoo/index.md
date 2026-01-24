@@ -1,6 +1,6 @@
 # 在 Gentoo 中启用 ZFS 支持
 
-- 原文地址：[ZFS](https://wiki.gentoo.org/wiki/ZFS)，此页面最后编辑于 2025 年 11 月 6 日 (星期四) 20:52。
+- 原文地址：[ZFS](https://wiki.gentoo.org/wiki/ZFS)，此页面最后编辑于 2026 年 1 月 24 日 (星期六) 22:17。
 
 
 **ZFS** 是一种由 Matthew Ahrens 和 Jeff Bonwick 创建的下一代 [文件系统](https://wiki.gentoo.org/wiki/Filesystem)。它围绕着几个核心理念进行设计：
