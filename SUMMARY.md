@@ -26,3 +26,5 @@
   * [FreeBSD 中的 ZFS 支持](FreeBSD.md)
 * Gentoo
   * [在 Gentoo 中启用 ZFS 支持](Gentoo/index.md)
+  * [构建以 ZFS 为根文件系统的 Gentoo](Gentoo/root-on-gentoo.md)
+  * [Gentoo ZFS 高级教程](Gentoo/Advanced.md)

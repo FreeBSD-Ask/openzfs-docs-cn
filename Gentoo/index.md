@@ -76,7 +76,7 @@ emerge --ask sys-fs/zfs
 
 >**重要**
 >
->每次重新编译内核后，都需要重新编译 sys-fs/zfs-kmod，即使内核的改动非常小，亦如此。在合并内核模块之后重新编译内核时，用户可能会遇到 ZFS 存储池进入不可中断睡眠状态（无法杀死的进程）或在执行时崩溃的问题。还可以配合 [Distribution Kernel](https://wiki.gentoo.org/wiki/Project:Distribution_Kernel#Trying_it_out "Project:Distribution Kernel") 设置 `USE=dist-kernel`。
+>每次重新编译内核后，都需要重新编译 sys-fs/zfs-kmod，即使内核的改动非常小，亦如此。在合并内核模块之后重新编译内核时，用户可能会遇到 ZFS 存储池进入不可中断睡眠状态（无法杀死的进程）或在执行时崩溃的问题。还可以配合 [Distribution Kernel](https://wiki.gentoo.org/wiki/Project:Distribution_Kernel) 设置 `USE=dist-kernel`。
 >
 >```sh
 >emerge -va @module-rebuild
@@ -1791,6 +1791,7 @@ zpool_test/testfsds1@snap1                            0B      -     4.50G  -
 
 *文件系统数据集 `zpool_test/testfsds1` 的大小（USED 列）为 4.50G。
 *文件系统数据集 `zpool_test/testfsds1` 引用的数据量（REFER 列）也是 4.50G。在此时 USED 和 REFER 两列显示相同的值，这是完全正常的。
+
 - 快照也引用完全相同的 4.50G 数据，因此它的大小为零（快照看到的数据与文件系统数据集 看到的完全相同，因此两者差异为零）。
 
 还记得之前看到的 `zfs get` 命令吗？我们在快照上查看：
@@ -2216,7 +2217,7 @@ zpool iostat 6
 
 #### ARC
 
-OpenZFS 使用 [ARC](https://en.wikipedia.org/wiki/Adaptive_replacement_cache "wikipedia:Adaptive replacement cache")（自适应替换缓存）页面替换算法，而不是其他文件系统使用的最近最少使用（LRU）算法。ARC 命中率更高，因此提供了更好的性能。ZFS 中 ARC 的实现与原论文有所不同：作为缓存使用的内存量是可变的。将能在系统内存紧张时通过内核的 shrinker 机制回收 ARC 内存，并在系统有空闲内存时扩展。ARC 分配的最小和最大内存量随系统内存而异。默认最小值为总内存的 1/32 或 64MB（取较大者），默认最大值为系统内存的 1/2 或 64MB（取较大者）。
+OpenZFS 使用 [ARC](https://en.wikipedia.org/wiki/Adaptive_replacement_cache)（自适应替换缓存）页面替换算法，而不是其他文件系统使用的最近最少使用（LRU）算法。ARC 命中率更高，因此提供了更好的性能。ZFS 中 ARC 的实现与原论文有所不同：作为缓存使用的内存量是可变的。将能在系统内存紧张时通过内核的 shrinker 机制回收 ARC 内存，并在系统有空闲内存时扩展。ARC 分配的最小和最大内存量随系统内存而异。默认最小值为总内存的 1/32 或 64MB（取较大者），默认最大值为系统内存的 1/2 或 64MB（取较大者）。
 
 Linux 对 ARC 使用的内存计量方式与页缓存不同。具体来说，ARC 使用的内存显示在 `free` 输出中的“used”项下，而非“cached”。这并不妨碍系统在内存不足时释放这些内存，但可能让人误以为 ARC（及 ZFS）会尽可能使用全部系统内存。
 
@@ -2248,13 +2249,13 @@ echo "options zfs zfs_arc_max=536870912" >> /etc/modprobe.d/zfs.conf
 
 ## ZFS 根文件系统
 
-本文为 [stub](https://wiki.gentoo.org/wiki/Category:Stub "Category:Stub")。请帮助 [扩展内容](https://wiki.gentoo.org/index.php?title=ZFS&action=edit) - [入门指南](https://wiki.gentoo.org/wiki/Gentoo_Wiki:Contributor%27s_guide "Gentoo Wiki:Contributor's guide")。
+本文为 [stub](https://wiki.gentoo.org/wiki/Category:Stub)。请帮助 [扩展内容](https://wiki.gentoo.org/index.php?title=ZFS&action=edit) - [入门指南](https://wiki.gentoo.org/wiki/Gentoo_Wiki:Contributor%27s_guide)。
 
-要从 ZFS 文件系统启动为根文件系统，需要一个支持 ZFS 的 [内核](https://wiki.gentoo.org/wiki/ZFS#Kernel "ZFS") 和包含 ZFS 用户空间工具的初始 ramdisk（initramfs）。最简单的设置方法如下。
+要从 ZFS 文件系统启动为根文件系统，需要一个支持 ZFS 的 [内核](https://wiki.gentoo.org/wiki/ZFS#Kernel) 和包含 ZFS 用户空间工具的初始 ramdisk（initramfs）。最简单的设置方法如下。
 
 ### 引导加载器
 
-[GRUB](https://wiki.gentoo.org/wiki/GRUB "GRUB") 应在编译时启用 USE 标志 libzfs，以便从 ZFS 数据集中启动系统：
+[GRUB](https://wiki.gentoo.org/wiki/GRUB) 应在编译时启用 USE 标志 libzfs，以便从 ZFS 数据集中启动系统：
 
 ```sh
 echo "sys-boot/grub libzfs" > /etc/portage/package.use/grub
@@ -2263,7 +2264,7 @@ emerge -av grub
 
 ### 准备磁盘
 
-虽然较新的 [GRUB](https://wiki.gentoo.org/wiki/GRUB "GRUB") 可以直接从 ZFS 存储池启动（即 `/boot` 位于 ZFS 上），但在维护 ZFS 本身时存在一些严重限制。此外，不建议将 swap 分区放在 ZFS 中，因为这可能导致死锁 <https://wiki.gentoo.org/wiki/ZFS#cite_note-4)>。总体而言，推荐使用 [Handbook 的默认分区方案](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks#Default_partitioning_scheme "Handbook:AMD64/Installation/Disks")（boot 和 swap 分区，其余空间用于 zpool）：
+虽然较新的 [GRUB](https://wiki.gentoo.org/wiki/GRUB) 可以直接从 ZFS 存储池启动（即 `/boot` 位于 ZFS 上），但在维护 ZFS 本身时存在一些严重限制。此外，不建议将 swap 分区放在 ZFS 中，因为这可能导致死锁 <https://wiki.gentoo.org/wiki/ZFS#cite_note-4)>。总体而言，推荐使用 [Handbook 的默认分区方案](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks#Default_partitioning_scheme)（boot 和 swap 分区，其余空间用于 zpool）：
 
 | 分区        | 意义               | 文件系统           |
 | :--------- | :---------------- | :-------------- |
@@ -2271,7 +2272,7 @@ emerge -av grub
 | `/dev/sda2` | swap 分区          | swap           |
 | `/dev/sda3` | ZFS              | 根 ZFS pool 的空间 |
 
-按照 [Handbook 指南](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks#Partitioning_the_disk_with_GPT_for_UEFI "Handbook:AMD64/Installation/Disks") 创建分区。准备好磁盘后，格式化 boot 分区并启用 swap，然后创建 ZFS 根数据集。OpenZFS 推荐使用唯一存储标识符（WWN）而非系统设备名。可通过运行以下命令获取 WWN：
+按照 [Handbook 指南](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks#Partitioning_the_disk_with_GPT_for_UEFI) 创建分区。准备好磁盘后，格式化 boot 分区并启用 swap，然后创建 ZFS 根数据集。OpenZFS 推荐使用唯一存储标识符（WWN）而非系统设备名。可通过运行以下命令获取 WWN：
 
 ```sh
 lsblk -o name,wwn
@@ -2330,7 +2331,7 @@ mkdir -p /mnt/gentoo/etc/zfs
 cp /etc/zfs/zpool.cache /mnt/gentoo/etc/zfs/
 ```
 
-对于新系统，请按照 [Gentoo Handbook 安装指南](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Stage "Handbook:AMD64/Installation/Stage") 操作至 [Linux 内核配置](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel "Handbook:AMD64/Installation/Kernel")。下一章将提供内核所需的额外配置。
+对于新系统，请按照 [Gentoo Handbook 安装指南](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Stage) 操作至 [Linux 内核配置](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Kernel)。下一章将提供内核所需的额外配置。
 
 ### 配置内核
 
@@ -2356,11 +2357,11 @@ sys-fs/zfs-kmod dist-kernel
 emerge --ask sys-kernel/gentoo-kernel
 ```
 
-[Dracut](https://wiki.gentoo.org/wiki/Dracut "Dracut") 会自动检测根文件系统上的 ZFS，并将必要模块添加到 initramfs 中。
+[Dracut](https://wiki.gentoo.org/wiki/Dracut) 会自动检测根文件系统上的 ZFS，并将必要模块添加到 initramfs 中。
 
 #### Genkernel
 
-在 chroot 环境下使用 [genkernel](https://wiki.gentoo.org/wiki/Genkernel "Genkernel") 时，为了在 initrd 中嵌入 `/etc/hostid`，先生成 `/etc/hostid`：
+在 chroot 环境下使用 [genkernel](https://wiki.gentoo.org/wiki/Genkernel) 时，为了在 initrd 中嵌入 `/etc/hostid`，先生成 `/etc/hostid`：
 
 ```sh
 zgenhostid
@@ -2454,8 +2455,8 @@ zfs mount -a
 
 ## 另请参阅
 
-- [ZFS/rootfs](https://wiki.gentoo.org/wiki/ZFS/rootfs "ZFS/rootfs") — 将 ZFS 用作根文件系统
-- [Btrfs](https://wiki.gentoo.org/wiki/Btrfs "Btrfs") — 面向 Linux 的写时复制（CoW）[文件系统](https://wiki.gentoo.org/wiki/Filesystem "Filesystem")，旨在实现高级功能，同时关注容错、自愈能力和易管理性
+- [ZFS/rootfs](https://wiki.gentoo.org/wiki/ZFS/rootfs) — 将 ZFS 用作根文件系统
+- [Btrfs](https://wiki.gentoo.org/wiki/Btrfs) — 面向 Linux 的写时复制（CoW）[文件系统](https://wiki.gentoo.org/wiki/Filesystem)，旨在实现高级功能，同时关注容错、自愈能力和易管理性
 
 ## 外部资源
 
