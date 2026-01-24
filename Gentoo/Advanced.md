@@ -68,7 +68,7 @@ chmod +x /etc/portage/postsync.d/zfs-check
 
 ```sh
 #!/bin/bash
-source ./compatiability.sh 
+source ./compatibility.sh 
 TYPE=$(uname -m)
 KEY=""
 ZFS_KEY=""
