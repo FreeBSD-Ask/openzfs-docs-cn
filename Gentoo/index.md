@@ -216,7 +216,7 @@ lddtree --copy-to-tree /usr/src/initramfs /sbin/zvol_wait
 
 ```sh
 cd /usr/src/initramfs
-find . -not -path "./lib/modules/6.1.118/*" -not -path "./lib/modules/6.1.118" -print0 | cpio --null --create --verbose --format=newc | gzip --best > gzip -9 > /boot/initramfs-custom.img
+find . -not -path "./lib/modules/6.1.118/*" -not -path "./lib/modules/6.1.118" -print0 | cpio --null --create --verbose --format=newc | gzip --best > /boot/initramfs-custom.img
 ```
 
 现在 initramfs 已创建完成，接下来请更新你的引导加载程序。
