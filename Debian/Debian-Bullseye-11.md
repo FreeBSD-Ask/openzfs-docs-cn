@@ -694,7 +694,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 17. 可选（但我们非常推荐）：安装 popcon
     `popularity-contest` 软件包会报告系统中已安装的软件包列表。显示 ZFS 的使用率可能有助于其在发行版中获得长期关注。
 
-    ```安装
+    ```sh
     apt install --yes popularity-contest
     ```
 
