@@ -4,11 +4,11 @@
 
 ## 概述
 
-本节深入探讨 ZFS 用户的高级主题，包括广泛的高级功能和优化技术。用户将学习自动化脚本以简化日常任务和系统维护，以及全面的 ZFS 调优策略，以在不同工作负载场景中最大化性能。内容包括高级数据集管理、用于监控和维护的自定义脚本、通过 ARC 和 ZIL 调优实现性能优化、复杂的备份与恢复流程，以及企业级高可用性配置。此外，本节还探讨高级加密方法、RAID-Z 扩展技术、特殊 VDEV 优化和容器集成策略。无论是管理家庭服务器还是企业存储基础设施，这些高级主题都将帮助用户通过适当的系统集成、自动化维护和性能监控充分发挥 ZFS 的潜力。特别关注实际场景和实践应用，确保用户能够将这些高级概念有效应用于其特定用例。
+本节将深入探讨 ZFS 用户的高级主题，包括广泛的高级功能和优化技术。用户将学习自动化脚本以简化日常任务和系统维护，以及全面的 ZFS 调优策略，以在不同工作负载场景中最大化性能。内容包括高级数据集管理、用于监控和维护的自定义脚本、通过 ARC 和 ZIL 调优实现性能优化、复杂的备份与恢复流程，以及企业级高可用性配置。此外，本节还探讨高级加密方法、RAID-Z 扩展技术、特殊 VDEV 优化和容器集成策略。无论是管理家庭服务器还是企业存储基础设施，这些高级主题都将帮助用户通过适当的系统集成、自动化维护和性能监控充分发挥 ZFS 的潜力。特别关注实际场景和实践应用，确保用户能够将这些高级概念有效应用于其特定用例。
 
 ## 自动化脚本
 
-**概述：** 手动更新 ZFS 内核模块可能耗时且容易出错，比如：
+**概述：** 手动更新 ZFS 内核模块可能耗时且易出错，比如：
 
 - 监控 OpenZFS GitHub 发布页面的更新
 - 检查每个新版本的内核兼容性
@@ -25,7 +25,7 @@
 
 #### 使用 eix post sync
 
-下面的脚本将由脚本 `system_update.sh` 触发。在每次更新系统时用户应执行它。如果根据提供的参数没有新更新，脚本将退出。这是为了确保脚本在 post-sync 后检查任何新内核版本。在 `postsync.d` 下创建你的 hook 脚本：
+下面的脚本将由脚本 `system_update.sh` 触发。在每次更新系统时用户都应执行它。如果根据提供的参数没有新更新，脚本将退出。这是为了确保脚本在 post-sync 后检查任何新内核版本。在 `postsync.d` 下创建你的 hook 脚本：
 
 ```sh
 sudo nano -w /etc/portage/postsync.d/zfs-check
@@ -40,7 +40,7 @@ sudo nano -w /etc/portage/postsync.d/zfs-check
 
 >**注意**
 >
->将 stable 替换为 testing 或 unknown，如需调试数据结构，将 0 改为 1，并将 `"/home/masterkuckles"` 改为你希望复制内核配置的路径。
+>将 `stable` 替换为 `testing` 或 `unknown`，如需调试数据结构，将 `0` 改为 `1`，并将 `"/home/masterkuckles"` 改为你希望复制内核配置的路径。
 
 现在使其可执行：
 
@@ -62,7 +62,7 @@ chmod +x /etc/portage/postsync.d/zfs-check
 >
 >截至 25 年 2 月 12 日，上述脚本仍在测试中。大部分已在 Gentoo 机器上测试过并可运行。它将根据 CLI 中传入的参数（如 stable、testing、unknown）安装新内核版本。仍存在一些需要解决的 bug，例如安装新的 ZFS 模块以及删除旧的内核目录。此外，该脚本仅用 stable 参数测试过。如果使用 testing 或 unknown，也应能正常工作。如脚本崩溃，你会知道如何处理。
 
-该脚本将从 Portage 树中安装最新可用内核版本，并删除任何过期内核。如果在内核安装、编译或安装新的 ZFS 模块过程中出现错误，脚本会捕获错误并退出。脚本功能依赖于提供的参数。
+该脚本将从 Portage 树中安装最新可用内核版本，并删除那些过期的内核。如果在内核安装、编译或安装新的 ZFS 模块过程中出现错误，脚本会捕获错误再退出。脚本功能依赖于提供的参数。
 
 系统更新文件 `/etc/hooks.d/zfs/system_update.sh`：
 
@@ -187,7 +187,7 @@ install_kernel() {
         version=$(echo "$build" | sed 's/^[^-]*-//')
         eselect kernel set $build
         cd /usr/src/linux || error "install_kernel" "Folder /usr/src/linux does not exist!"
-        # 注意：配置文件需要复制到除 home 之外的其他位置
+        # 注意：需要将配置文件复制到 home 以外的位置
         if [ "$copy_config" -ne 1 ]; then
             config=$(ls $CONFIG_PATH/*-config | head -n 1)
             cp -Prv $config ./.config
@@ -330,7 +330,7 @@ install_kernel_resources() {
                 if [[ ! "$build_str" =~ "linux-$available_version-gentoo" ]]; then
                     build_str+="linux-$available_version-gentoo "
                 fi
-                # 注意：配置文件需要复制到除 home 之外的其他位置
+                # 注意：需要将配置文件复制到 home 之外的位置
                 if [ "$copy_config" -ne 1 ]; then
                     copy_config=1
                     kernel_update=1
@@ -478,10 +478,11 @@ fi
 
 #### 兼容脚本
 
-该脚本通过网页抓取 [此页面](https://github.com/openzfs/zfs/releases) 来查找最新更新的 ZFS 模块及其支持的内核版本。请注意，GitHub 上 OpenZFS 支持的最新 ZFS 模块版本通常高于 Gentoo 当前的版本。明智的做法是使用 Gentoo 标记为 stable 的 ZFS 模块。
+该脚本通过网页抓取 [此页面](https://github.com/openzfs/zfs/releases) 来查找最新更新的 ZFS 模块及其支持的内核版本。请注意，GitHub 上 OpenZFS 支持的最新 ZFS 模块版本通常高于 Gentoo 当前的版本。明智的做法是使用被 Gentoo 标记为 stable 的 ZFS 模块。
 
-**注意**
-其函数和数据结构在另一个脚本中使用，该脚本将在本节后面进一步说明。
+>**注意**
+>
+>其函数和数据结构在另一个脚本中使用，该脚本将在本节后面进一步说明。
 
 兼容性脚本：
 
