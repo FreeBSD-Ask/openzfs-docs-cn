@@ -2,7 +2,6 @@ name: 🔗 从 SUMMARY.md 更新一级标题
 
 on:
   push:
-    branches: [ main, master ]
   workflow_run:
     workflows: [🔗 从 SUMMARY.md 更新目录]
     types:
@@ -20,7 +19,6 @@ jobs:
 
       - name: Sync headers
         id: sync
-        shell: bash
         run: |
           export LC_ALL=C.UTF-8
           CHANGED="false"
@@ -28,7 +26,7 @@ jobs:
           # 读取 SUMMARY.md 中的 Markdown 链接
           while IFS= read -r line; do
             # 使用正则提取标题和路径，允许空格
-            if [[ $line =~ ^\*\s*\[(.+?)\]\(([^)]+)\) ]]; then
+            if [[ $line =~ \*\ *\[(.+)\]\((.+)\) ]]; then
               title="${BASH_REMATCH[1]}"
               path="${BASH_REMATCH[2]}"
 
@@ -37,7 +35,7 @@ jobs:
 
               # 获取文件第一行并清理格式
               first_line=$(head -n 1 "$path" | sed 's/^#*//; s/^[[:space:]]*//; s/[[:space:]]*$//')
-              clean_title=$(printf '%s\n' "$title" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+              clean_title=$(echo "$title" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 
               # 比较并更新
               if [ "$first_line" != "$clean_title" ]; then
@@ -57,7 +55,7 @@ jobs:
       - name: Commit changes
         if: steps.sync.outputs.changed == 'true'
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "ykla"
+          git config --global user.email "yklaxds@gmail.com"
           git commit -m "chore: sync headers with SUMMARY.md"
           git push
