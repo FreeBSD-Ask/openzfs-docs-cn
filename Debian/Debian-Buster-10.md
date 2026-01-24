@@ -1,4 +1,4 @@
-# 以 ZFS 为根文件系统的 Debian 10 (Buster)
+# 构建以 ZFS 为根文件系统的 Debian 10 (Buster)
 
 ## 概述
 

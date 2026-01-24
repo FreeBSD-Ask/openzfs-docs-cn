@@ -1,4 +1,4 @@
-# 以 ZFS 为根文件系统的 Debian 12 (Bookworm)
+# 构建以 ZFS 为根文件系统的 Debian 12 (Bookworm)
 
 ## 概述
 
