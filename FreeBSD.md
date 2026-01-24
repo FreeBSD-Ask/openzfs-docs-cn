@@ -30,7 +30,7 @@ ZFS 工具将安装在 `/usr/local/sbin/`，请确保相应地调整你的 PATH�
   git clone -b stable/12 https://git.FreeBSD.org/src.git /usr/src
   ```
 
-  FreeBSD Current 源码：
+  FreeBSD -CURRENT 源码：
 
   ```bash
   git clone https://git.FreeBSD.org/src.git /usr/src
