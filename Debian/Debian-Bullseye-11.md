@@ -138,7 +138,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    mdadm --zero-superblock --force ${DISK}-part2
    ```
 
-   如果该磁盘曾用于 zfs：
+   如果该磁盘曾用于 ZFS：
 
    ```sh
    wipefs -a $DISK
