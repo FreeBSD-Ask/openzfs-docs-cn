@@ -22,3 +22,5 @@
 * Fedora
   * [在 Fedora 上启用 ZFS 支持](Fedora/index.md)
   * [构建以 ZFS 为根文件系统的 Fedora](Fedora/fedora-Root-on-ZFS.md)
+* FreeBSD
+  * [FreeBSD 中的 ZFS 支持](FreeBSD.md)
