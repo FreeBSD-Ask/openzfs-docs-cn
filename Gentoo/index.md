@@ -1791,6 +1791,7 @@ zpool_test/testfsds1@snap1                            0B      -     4.50G  -
 
 *文件系统数据集 `zpool_test/testfsds1` 的大小（USED 列）为 4.50G。
 *文件系统数据集 `zpool_test/testfsds1` 引用的数据量（REFER 列）也是 4.50G。在此时 USED 和 REFER 两列显示相同的值，这是完全正常的。
+
 - 快照也引用完全相同的 4.50G 数据，因此它的大小为零（快照看到的数据与文件系统数据集 看到的完全相同，因此两者差异为零）。
 
 还记得之前看到的 `zfs get` 命令吗？我们在快照上查看：
