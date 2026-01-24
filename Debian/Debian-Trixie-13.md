@@ -81,7 +81,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    sudo systemctl restart ssh
    ```
 
->**提示：** 
+>**提示：**
 >
 >你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后在主机上使用 `ssh 用户名@IP地址` 进行连接。
 
@@ -226,7 +226,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
        bpool ${DISK}-part3
    ```
 
->*注意：* 
+>*注意：*
 >
 >GRUB 未支持所有的 ZFS 存储池特性（参见位于 `grub-core/fs/zfs/zfs.c` 的  `spa_feature_names`）。此处单独为 `/boot` 创建一个 ZFS 存储池，并指定了属性 `-o compatibility=grub2`，将该池限制为仅使用 GRUB 支持的特性，从而让 根存储池可使用任意/全部特性。
 >
@@ -234,7 +234,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    **提示：**
 
-   * 如果你要创建 mirror 拓扑，可以使用：
+* 如果你要创建 mirror 拓扑，可以使用：
 
      ```sh
      zpool create \
@@ -244,8 +244,8 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
          /dev/disk/by-id/scsi-SATA_disk2-part3
      ```
 
-   * 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，再列出来自其他磁盘的分区。
-   * 存储池名称是任意的。如果更改了名称，必须在后续步骤中保持一致。`bpool` 这一约定源自本教程。
+* 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，再列出来自其他磁盘的分区。
+* 存储池名称是任意的。如果更改了名称，必须在后续步骤中保持一致。`bpool` 这一约定源自本教程。
 
 5. 创建根存储池：
 

@@ -1050,14 +1050,18 @@ cannot import 'rpool': pool is formatted using an unsupported ZFS version
 创建上述 zpool `oldpool` 的步骤如下：
 
 - 安装 app-emulation/qemu（本例使用 QEMU 8.0），确保变量 `QEMU_SOFTMMU_TARGETS` 至少包含 `sparc64`，以构建完整的 SPARC64 系统模拟器：
+
 ```sh
 emerge --ask app-emulation/qemu
 ```
+
 - 从镜像站下载 FreeBSD 10/SPARC64 DVD ISO 镜像（FreeBSD 9 在 QEMU 下启动会崩溃，因此最小版本为 FreeBSD 10；FreeBSD 12 在加载所需模块时可能有问题）
 - 为未来的 vdev 创建虚拟磁盘镜像（本例三个，每个 4G）：
+
 ```sh
 for i in {0..2}; do qemu-img create -f raw /tmp/fbsd-sparc64-ada${i}.raw 4G; done;
 ```
+
 - 启动 QEMU（使用 `-nographic` 避免 FreeBSD 卡住，同时 Sun4u 机器有 2 条 IDE 通道，因此分配 3 个硬盘 + 1 个 ATAPI CD/DVD ROM 驱动器）：
 
 ```sh
@@ -1069,9 +1073,11 @@ qemu-system-sparc64 -nographic -m 2G \
 ```
 
 - 在 OpenBIOS 提示符 `0 >` 下输入：
+
 ```sh
 boot cdrom:f
 ```
+
 - FreeBSD 应该开始启动，由于模拟较慢，启动过程可能需要一些时间。启动完成后，检查所有虚拟磁盘（`ada*X*`）是否被识别。
 
 ```sh
