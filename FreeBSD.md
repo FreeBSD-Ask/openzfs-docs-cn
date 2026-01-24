@@ -35,6 +35,7 @@ ZFS 工具将安装在 `/usr/local/sbin/`，请确保相应地调整你的 PATH�
   ```bash
   git clone https://git.FreeBSD.org/src.git /usr/src
   ```
+
 * 构建所需软件包：
 
   ```bash
@@ -45,12 +46,14 @@ ZFS 工具将安装在 `/usr/local/sbin/`，请确保相应地调整你的 PATH�
       git \
       gmake
   ```
+
 * 可选构建软件包：
 
   ```bash
   pkg install python
   pkg install devel/py-sysctl  # 用于 arcstat、arc_summary、dbufstat
   ```
+
 * 测试与检查软件包：
 
   ```bash
