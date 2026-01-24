@@ -13,9 +13,9 @@
 
 ZFS 的开发始于 2001 年的 Sun Microsystems。2005 年，作为 OpenSolaris 的一部分，ZFS 在 [CDDL](https://opensource.org/licenses/CDDL-1.0) 许可下发布。2007 年，Pawel Jakub Dawidek 将 ZFS 移植到了 FreeBSD。2008 年，LLNL 的 Brian Behlendorf 启动了 ZFSOnLinux 项目，将 ZFS 移植到 Linux，用于高性能计算。2010 年，Oracle 收购了 Sun Microsystems，并在当年晚些时候终止了 OpenSolaris。
 
-illumos 项目启动了，旨在取代 OpenSolaris。大约三分之二的 ZFS 核心团队成员辞职了，其中就有 Matthew Ahrens 和 Jeff Bonwick。许多人加入了后续开发 OpenZFS 的团队，最初是作为 Illumos 项目的一部分。Oracle 内部未辞职的 1/3 ZFS 核心团队则继续在 Oracle Solaris 中开发不兼容的专有 ZFS 分支。
+illumos 项目启动了，旨在取代 OpenSolaris。大约三分之二的 ZFS 核心团队成员辞职了，其中就有 Matthew Ahrens 和 Jeff Bonwick。许多人加入了后续开发 OpenZFS 的团队，最初是作为 illumos 项目的一部分。Oracle 内部未辞职的 1/3 ZFS 核心团队则继续在 Oracle Solaris 中开发不兼容的专有 ZFS 分支。
 
-Solaris 的首个版本包含了一些在大规模辞职之前就已在开发中的创新改动。Solaris 的后续版本中所包含的改动则较少，英雄迟暮。如今，一个不断壮大的社区在多个平台上持续开发着 OpenZFS，如 FreeBSD、Illumos、Linux 和 Mac OS X。
+Solaris 的首个版本包含了一些在大规模辞职之前就已在开发中的创新改动。Solaris 的后续版本中所包含的改动则较少，英雄迟暮。如今，一个不断壮大的社区在多个平台上持续开发着 OpenZFS，如 FreeBSD、illumos、Linux 和 Mac OS X。
 
 >**注意**
 >
