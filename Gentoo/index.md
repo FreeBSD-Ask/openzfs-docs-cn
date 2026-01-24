@@ -1328,7 +1328,7 @@ du -sh --apparent-size /zpool_test/fds4
 8.5G    /zpool_test/fds4
 ```
 
-### 销毁文件系统数据集（Destroying a 文件系统数据集）
+### 销毁文件系统数据集（Destroying a filesystem dataset）
 
 基础知识掌握后，现在可以销毁 `zpool_test/fds4`：
 
