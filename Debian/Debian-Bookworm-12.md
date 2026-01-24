@@ -138,7 +138,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    mdadm --zero-superblock --force ${DISK}-part2
    ```
 
-   如果该磁盘曾用于 zfs：
+   如果该磁盘曾用于 ZFS：
 
    ```sh
    wipefs -a $DISK
@@ -1030,7 +1030,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 ### MPT2SAS 控制器
 
-本教程的大多数问题报告大多和硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
+本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
 基本问题是，这类控制器上的磁盘在 Linux 内核启动后才可见，而 ZoL 不会热插入池成员。详细说明见 [https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
 
