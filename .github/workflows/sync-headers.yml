@@ -54,9 +54,10 @@ jobs:
           echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
       - name: Commit changes
-        if: steps.sync.outputs.changed == 'true'
+        if: ${{ steps.sync.outputs.changed == 'true' }}
         run: |
           git config --global user.name "ykla"
           git config --global user.email "yklaxds@gmail.com"
           git commit -m "chore: sync headers with SUMMARY.md"
           git push
+
