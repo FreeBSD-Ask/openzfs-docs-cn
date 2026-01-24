@@ -227,8 +227,7 @@ make -j$(nproc) && make modules_install
 安装 zfs 包（如果出现内核版本错误，请使用前一个版本）
 
 ```sh
-emerge --ask emerge zfs
-```
+emerge --ask sys-fs/zfs
 
 然后在 dracut 中添加 zfs 内核模块，如前所述，同时将 `root=ZFS=tank/os/gentoo` 写入 `/etc/cmdline`，否则 initramfs 将无法构建。现在构建并安装，为简便起见使用 installkernel（已启用 USE 标志 dracut 和 grub）
 
