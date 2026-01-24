@@ -8,13 +8,14 @@
 
 * Alpine Linux
   * [Alpine Linux 概述](AlpineLinux/index.md)
-  * [根文件系统基于 ZFS 的 Alpine Linux](AlpineLinux/RootonZFS.md)
+  * [使用 ZFS 作为根文件系统的 Alpine Linux](AlpineLinux/RootonZFS.md)
 * Arch Linux
   * [Arch Linux 概述](ArchLinux/index.md)
-  * [根文件系统基于 ZFS 的 Arch Linux](ArchLinux/ArchLinuxRoot.md)
+  * [使用 ZFS 作为根文件系统的 Arch Linux](ArchLinux/ArchLinuxRoot.md)
 * Debian
   * [Debian 概述](Debian/index.md)
-  * [根文件系统使用 ZFS 的 Debian 12 Bookworm](Debian/Debian-Bookworm-12.md)
-  * [根文件系统使用 ZFS 的 Debian 11 Bullseye](Debian/Debian-Bullseye-11.md)
-  * [根文件系统使用 ZFS 的 Debian 10 Buster](Debian/Debian-Buster-10.md)
-  * [根文件系统使用 ZFS 的 Debian 9 Stretch](Debian/Debian-Stretch-9.md)
+  * [使用 ZFS 作为根文件系统的 Debian 13 (Trixie)](Debian/Debian-Bookworm-12.md)
+  * [使用 ZFS 作为根文件系统的 Debian 12 (Bookworm)](Debian/Debian-Bookworm-12.md)
+  * [使用 ZFS 作为根文件系统的 Debian 11 (Bullseye)](Debian/Debian-Bullseye-11.md)
+  * [使用 ZFS 作为根文件系统的 Debian 10 (Buster)](Debian/Debian-Buster-10.md)
+  * [使用 ZFS 作为根文件系统的 Debian 9 (Stretch)](Debian/Debian-Stretch-9.md)
