@@ -27,9 +27,10 @@ jobs:
           # 读取 SUMMARY.md 中的 Markdown 链接
           while IFS= read -r line; do
             # 使用正则提取标题和路径，允许空格
-            if [[ $line =~ ^\*\s*\[(.+?)\]\(([^)]+)\) ]]; then
+            if [[ $line =~ ^\*\s*\[(.+)\]\(([^)]+)\) ]]; then
               title="${BASH_REMATCH[1]}"
               path="${BASH_REMATCH[2]}"
+
 
               # 如果文件不存在则跳过
               [ ! -f "$path" ] && continue
