@@ -4,7 +4,7 @@
 
 ### 提供了更新的版本
 
-* 新安装请参阅《[根文件系统使用 ZFS 的 Debian 11 Buster](Debian-Bullseye-11.md)》。
+* 新安装请参阅《[根文件系统使用 ZFS 的 Debian 10 Buster](Debian-Buster-10.md)》。
 
 ### 注意事项
 
