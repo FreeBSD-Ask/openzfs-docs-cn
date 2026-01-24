@@ -2066,7 +2066,7 @@ zpool_test/testfsds1  origin    -           -
 
 此时的结构可以用下图总结：
 
-![ZFS 克隆工作流 1.png](.gitbook/assets/ZFS_clone_flow_1.png)
+![ZFS 克隆工作流 1.png](../.gitbook/assets/ZFS_clone_flow_1.png)
 
 由于克隆是可写的，为什么不向其中添加一些内容呢？
 
@@ -2138,7 +2138,7 @@ zpool_test/testfsds1_clone@snap1  origin    -                                 - 
 
 这一结构同样可以通过下图示意说明：
 
-![ZFS 克隆工作流 2.png](.gitbook/assets/ZFS_clone_flow_2.png)
+![ZFS 克隆工作流 2.png](../.gitbook/assets/ZFS_clone_flow_2.png)
 
 尽管由于克隆提升导致了层级关系发生变化，但所有这些实体本身依然完全相同。两个 ZFS 实体在生命周期上保留了相互的链接，并且可以各自拥有独立快照。
 
