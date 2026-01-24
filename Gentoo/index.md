@@ -536,7 +536,7 @@ zpool_test  autotrim  on        local
 
 ```sh
 zpool set feature@zstd_compress=active zpool_test
-cannot set property for 'zpool_test': property 'feature@zstd_compress' can only be set to 'enabled' or 'disabled|output=<pre>
+cannot set property for 'zpool_test': property 'feature@zstd_compress' can only be set to 'enabled' or 'disabled
 ```
 
 确实如此，即便该 feature 在 zpool 上已经被 `enabled`，也不能通过这种方式直接将其激活。真正的激活方式是：在数据集或 zvolume 层级，通过某个“魔法命令”修改相关属性。一旦这个“魔法命令”被执行，ZSTD 压缩算法才会真正投入使用（即变为 `active`）：
