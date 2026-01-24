@@ -1225,7 +1225,7 @@ NAME       SIZELIMIT OFFSET AUTOCLEAR RO BACK-FILE                  DIO LOG-SEC
 - 克隆（clones）是快照的可写“视图”，可以像文件系统一样挂载到系统 VFS。其特点是引入了父子依赖关系：一旦克隆被创建，原始数据集在克隆存在期间不能被销毁。可以通过 *promote* 操作将克隆提升为父数据集，从而使原始文件系统成为子数据集（同时影响原始文件系统的快照，也会被“反转”）。
 - zvolume 是模拟块设备，可像任何物理硬盘一样使用，在目录 `/dev/zvol/zpoolname` 下作为特殊块设备条目访问。
 
-### 文件系统数据集（Filesystem datasets）
+### 文件系统数据集
 
 每当创建一个 zpool 时，同名的第一个文件系统数据集也会被自动创建。这个根数据集除非销毁整个 zpool，否则无法被删除。之后创建的所有数据集都通过“路径”唯一标识，并始终位于该根数据集的某个位置。之所以说“某个位置”，是因为后续创建的文件系统数据集可以嵌套，从而形成层级结构。
 
@@ -1354,7 +1354,7 @@ zfs destroy -r zpool_test/fdsX
 zfs destroy -nv zpool_test/fdsX
 ```
 
-### 文件系统数据集属性（Filesystem 数据集 properties）
+### 文件系统数据集属性
 
 与 zpool 一样，数据集也有属性。在文件系统数据集的情况下，属性分为两类：
 
@@ -1405,19 +1405,19 @@ zfs get all zpool_test
 | mounted           | 指示该文件系统数据集当前是否已挂载到 VFS 中（可通过 `mount` 命令查看）。                                                                              |
 | referenced        | 数据集在 zpool 上可访问的数据量（物理大小）。当前数据集仅有元数据，数值与 *used* 类似。随着克隆和快照的出现，该值会变化。如果启用压缩，*referenced* 可能小于 *logicalreferenced*。        |
 | logicalreferenced | 数据集在 zpool 上可访问的表观数据量（表观大小）。当前数据集仅有元数据，数值与 *used* 类似。随着克隆和快照的出现，该值会变化。如果启用压缩，*logicalreferenced* 可能大于 *referenced*。      |
-| version           | 指示数据集使用的 ZFS 磁盘格式版本，而非数据集自身版本。十多年来，该值一直为 5，即使在 Solaris 11.4（2017 年 9 月退役）中亦是如此。未来若 ZFS 磁盘格式规范升级，版本号将递增。请勿与 zpool 旧版本号混淆。 |
+| version           | 指示数据集使用的 ZFS 磁盘格式版本，而非数据集自身版本。十多年来，该值一直为 `5`，即使在 Solaris 11.4（2017 年 9 月退役）中亦是如此。后续，若 ZFS 磁盘格式规范升级，版本号将递增。请勿与 zpool 旧版本号混淆。 |
 | written           | 自上一个快照以来写入的数据量，即前一个数据集快照所引用的数据量。                                                                                         |
 
 | 属性          | 可选值                                             | 功能                                                                                                                                                                                                             |
 | ----------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| mountpoint  | path|legacy|none                                | 指定数据集的挂载点为 *path*。设置为 *none* 时，数据集将无法挂载。设置为 *legacy* 时，挂载信息会在 /etc/fstab 中查找，同时可使用传统的 mount 命令挂载数据集（`mount -t path/to/the/dataset /where/to/mount/it`）。这是最常修改的属性之一（与 *recordsize*、*quota* 和 *compression* 一起）。 |
+| mountpoint  | path|legacy|none                                | 指定数据集的挂载点为 *path*。设置为 *none* 时，数据集将无法挂载。设置为 *legacy* 时，会在 `/etc/fstab` 中查找挂载信息，同时可使用传统的 mount 命令挂载数据集（`mount -t path/to/the/dataset /where/to/mount/it`）。这是最常修改的属性之一（与 *recordsize*、*quota* 和 *compression* 一起）。 |
 | canmount    | yes|no                                          | 指定数据集是否可以挂载（`yes` 表示可挂载，`no` 表示不可挂载）。此属性可用于“隐藏”数据集而不改变其 *mountpoint* 属性的当前值。(`canmount=no` 等效于 `mountpoint=none`)。                                                                                             |
 | quota       | quota_value|none                                | 设置数据集及其子数据集的最大空间使用量（参见 *refquota*）。例如，`zfs set quota=4G` 设置 4GB 的空间限制。值为 *none* 时表示无限制。ZFS 支持用户配额、组配额和项目配额。                                                                                                    |
 | recordsize  | recordsize_size                                 | 指定文件块大小为 *recordsize_size*。此属性在数据库等对文件系统 I/O 对齐有严格要求的场景中非常有用。默认块大小为 128K。                                                                                                                                      |
 | compression | on|off|lzjb|lz4|zle|gzip{,-N}|zstd{,-fast}{,-N} | 指定数据集内容是否启用实时压缩和解压。*off* 表示不压缩，*on* 表示使用默认压缩方法（lz4，如果 zpool 启用了 `feature@lz4_compress`，否则使用 lzjb）。*zstd* 需启用 `feature@zstd_compress`，gzip 和 zstd 可指定压缩等级。压缩/解压过程透明处理，可显著减少 I/O 操作，但消耗 CPU。                     |
-| sharenfs    | on|off|nfsoptions                               | 通过 NFS 共享数据集（自动修改 /etc/exports 并调用 *exportfs*）。                                                                                                                                                                |
-| sharesmb    | on|off|smboptions                               | 通过 Samba 共享数据集（自动修改 /etc/samba/smb.conf）。                                                                                                                                                                      |
-| exec        | on|off                                          | 控制是否允许在数据集上执行程序以及加载共享库（.so 文件）。值为 `off` 相当于 `mount -o noexec ...`。                                                                                                                                             |
+| sharenfs    | on|off|nfsoptions                               | 通过 NFS 共享数据集（自动修改 `/etc/exports` 并调用 *exportfs*）。                                                                                                                                                                |
+| sharesmb    | on|off|smboptions                               | 通过 Samba 共享数据集（自动修改 `/etc/samba/smb.conf`）。                                                                                                                                                                      |
+| exec        | on|off                                          | 控制是否允许在数据集上执行程序以及加载共享库（`.so` 文件）。值为 `off` 相当于 `mount -o noexec ...`。                                                                                                                                             |
 | setuid      | on|off                                          | 控制 SUID/SGID 位是否生效。值为 `off` 相当于 `mount -o nosuid ...`。                                                                                                                                                         |
 | readonly    | on|off                                          | 控制文件系统是否只读（`on`）或可写（`off`）。                                                                                                                                                                                    |
 | atime       | on|off                                          | 控制是否更新文件访问时间。若无需访问时间，可关闭以减少大量文件访问时的额外开销。                                                                                                                                                                       |
