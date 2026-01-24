@@ -36,7 +36,7 @@ Solaris 的首个版本包含了一些在大规模辞职之前就已在开发中
 
 >**注意**
 >
->所有对 git 仓库的进行更改都会由 [LLNL](https://www.llnl.gov/) 进行回归测试。
+>所有对 git 仓库进行的更改都会由 [LLNL](https://www.llnl.gov/) 进行回归测试。
 
 ### USE 标志
 
