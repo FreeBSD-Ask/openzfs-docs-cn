@@ -1,4 +1,4 @@
-# Fedora 概述
+# 在 Fedora 上获得 ZFS 支持
 
 ## 安装
 
