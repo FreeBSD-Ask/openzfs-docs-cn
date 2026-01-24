@@ -7,18 +7,18 @@
 ## 入门
 
 * Alpine Linux
-  * [在 Alpine Linux 上获得 ZFS 支持](AlpineLinux/index.md)
+  * [在 Alpine Linux 上启用 ZFS 支持](AlpineLinux/index.md)
   * [以 ZFS 为根文件系统的 Alpine Linux](AlpineLinux/RootonZFS.md)
 * Arch Linux
-  * [在 Arch Linux 上获得 ZFS 支持](ArchLinux/index.md)
+  * [在 Arch Linux 上启用 ZFS 支持](ArchLinux/index.md)
   * [以 ZFS 为根文件系统的 Arch Linux](ArchLinux/ArchLinuxRoot.md)
 * Debian
-  * [在 Debian 上获得 ZFS 支持](Debian/index.md)
+  * [在 Debian 上启用 ZFS 支持](Debian/index.md)
   * [以 ZFS 为根文件系统的 Debian 13 (Trixie)](Debian/Debian-Trixie-13.md)
   * [以 ZFS 为根文件系统的 Debian 12 (Bookworm)](Debian/Debian-Bookworm-12.md)
   * [以 ZFS 为根文件系统的 Debian 11 (Bullseye)](Debian/Debian-Bullseye-11.md)
   * [以 ZFS 为根文件系统的 Debian 10 (Buster)](Debian/Debian-Buster-10.md)
   * [以 ZFS 为根文件系统的 Debian 9 (Stretch)](Debian/Debian-Stretch-9.md)
 * Fedora
-  * [在 Fedora 上获得 ZFS 支持](Fedora/index.md)
+  * [在 Fedora 上启用 ZFS 支持](Fedora/index.md)
   * [以 ZFS 为根文件系统的 Fedora](Fedora/fedora-Root-on-ZFS.md)
