@@ -14,7 +14,7 @@
   * [使用 ZFS 作为根文件系统的 Arch Linux](ArchLinux/ArchLinuxRoot.md)
 * Debian
   * [Debian 概述](Debian/index.md)
-  * [使用 ZFS 作为根文件系统的 Debian 13 (Trixie)](Debian/Debian-Bookworm-12.md)
+  * [使用 ZFS 作为根文件系统的 Debian 13 (Trixie)](Debian/Debian-Trixie-13.md)
   * [使用 ZFS 作为根文件系统的 Debian 12 (Bookworm)](Debian/Debian-Bookworm-12.md)
   * [使用 ZFS 作为根文件系统的 Debian 11 (Bullseye)](Debian/Debian-Bullseye-11.md)
   * [使用 ZFS 作为根文件系统的 Debian 10 (Buster)](Debian/Debian-Buster-10.md)
