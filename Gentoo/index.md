@@ -1459,7 +1459,7 @@ zpool_test/fds1/fds1_1             compression  on   inherited from zpool_test
 zpool_test/fds1/fds1_1/fds1_1_1_1  compression  on   inherited from zpool_test/fds1/fds1_1
 ```
 
-对于根数据集 `zpool_test|，`local` 表示这里覆盖了默认值。而 `zpool_test/fds1` 及其所有子数据集继承了该值，ZFS 会智能地显示继承来源。
+对于根数据集 `zpool_test`，`local` 表示这里覆盖了默认值。而 `zpool_test/fds1` 及其所有子数据集继承了该值，ZFS 会智能地显示继承来源。
 
 将 `zpool_test/fds1/fds1_1` 的 compression 属性设置为 `off`：
 
