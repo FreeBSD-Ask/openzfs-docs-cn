@@ -1,4 +1,4 @@
-# Debian 概述
+# 在 Debian 上获得 ZFS 支持
 
 ## 安装
 

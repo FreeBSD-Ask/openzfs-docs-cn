@@ -1,4 +1,4 @@
-# Arch Linux 概述
+# 在 Arch Linux 上获得 ZFS 支持
 
 ## 支持
 
