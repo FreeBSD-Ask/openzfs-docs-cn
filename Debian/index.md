@@ -1,4 +1,4 @@
-# 在 Debian 上获得 ZFS 支持
+# 在 Debian 上启用 ZFS 支持
 
 ## 安装
 
