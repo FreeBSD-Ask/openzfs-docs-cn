@@ -930,7 +930,7 @@ zpool history -l rpool
 - 版本为 28（legacy）或更早
 - 对于版本号为 5000 的 zpool，所使用的 ZFS 实现至少支持该 zpool 指定的特性。
 
-下面的例子中，一个名为 *oldpool* 的 zpool 曾在使用 <span data-type="inline-memo" data-inline-memo-content="External link for the app-emulation/qemu package.">app-emulation/qemu</span> 模拟的 FreeBSD 10/SPARC64 环境中创建。该 zpool 使用 legacy 版本 28 创建（`zpool create -o version=28`），这与运行 Solaris 10 的 SPARC64 机器所做的基本一致：
+下面的例子中，一个名为 *oldpool* 的 zpool 曾在使用 app-emulation/qemu 模拟的 FreeBSD 10/SPARC64 环境中创建。该 zpool 使用 legacy 版本 28 创建（`zpool create -o version=28`），这与运行 Solaris 10 的 SPARC64 机器所做的基本一致：
 
 ```sh
 zpool import
@@ -1052,7 +1052,7 @@ cannot import 'rpool': pool is formatted using an unsupported ZFS version
 
 创建上述 zpool `oldpool` 的步骤如下：
 
-- 安装<span data-type="inline-memo" data-inline-memo-content="External link for the app-emulation/qemu package.">app-emulation/qemu</span>（本例使用 QEMU 8.0），确保变量 `QEMU_SOFTMMU_TARGETS` 至少包含 `sparc64`，以构建完整的 SPARC64 系统模拟器：
+- 安装 app-emulation/qemu（本例使用 QEMU 8.0），确保变量 `QEMU_SOFTMMU_TARGETS` 至少包含 `sparc64`，以构建完整的 SPARC64 系统模拟器：
   `emerge --ask app-emulation/qemu`
 - 从镜像站下载 FreeBSD 10/SPARC64 DVD ISO 镜像（FreeBSD 9 在 QEMU 下启动会崩溃，因此最小版本为 FreeBSD 10；FreeBSD 12 在加载所需模块时可能有问题）
 - 为未来的 vdev 创建虚拟磁盘镜像（本例三个，每个 4G）：
@@ -1619,13 +1619,13 @@ Zvol 只是 ZFS 上的一个模拟块设备，可以像任何其他块设备一�
 - 普通 zvol（空间全部预分配）：
 
 ```bash
-zfs create -V <zvol_size> <zpool>/<zvol_name>
+zfs create -V <zvol_容量> <zpool>/<zvol_名称>
 ```
 
 - 稀疏 zvol（薄分配）：
 
 ```bash
-zfs create -s -V <zvol_size> <zpool>/<zvol_name>
+zfs create -s -V <zvol_容量> <zpool>/<zvol_名称>
 ```
 
 示例：创建一个 1G 的 zvol `zpool_test/zvol1`（全部预分配），以及一个 2G 的稀疏 zvol `zpool_test/zvol2`：
@@ -1660,7 +1660,7 @@ zpool_test/VM/zvol1                         1.37G  3.54G     74.6K  -
 zpool_test/VM/zvol2                         74.6K  2.17G     74.6K  -
 ```
 
-无论 zvol 的组织方式如何，都会在 `/dev` 和 `/dev/zvol/<zpool_name>` 下创建多个块设备节点：
+无论 zvol 的组织方式如何，都会在 `/dev` 和 `/dev/zvol/<ZFS存储池_名称>` 下创建多个块设备节点：
 
 ```bash
 ls -l /dev/zvol/zpool_test/VM
