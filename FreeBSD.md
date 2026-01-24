@@ -1,6 +1,6 @@
 # FreeBSD 中的 ZFS 支持
 
-![FreeBSD 上的 ZFS 支持](.gitbook/assets/zof-logo.png)
+![FreeBSD 中的 ZFS 支持](.gitbook/assets/zof-logo.png)
 
 ## FreeBSD 上的安装
 
