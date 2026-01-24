@@ -717,7 +717,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    * 对于传统（BIOS）启动，将 GRUB 安装到 MBR：
 
-     ```命令
+     ```sh
      grub-install $DISK
      ```
 
