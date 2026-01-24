@@ -253,7 +253,7 @@ ZFS 存储池（或 zpool）是由一到多个虚拟设备（vdev）聚合而成
 - ZFS 可能具有极高的 I/O 强度：
   - 在 NAS 设备中，非常流行的方案是使用二手 SAS HBA 连接多块 SATA 机械硬盘（在更大规模下，推荐使用近线 SATA 硬盘）
   - 如果 ZFS 存储池使用 NVMe 模块创建，**请确保这些模块不是无 DRAM 的**（请查看数据手册）。原因有二：既可以避免明显的瓶颈，也可以避免硬件崩溃，因为某些无 DRAM 模块在 I/O 请求过载时容易卡死 <https://wiki.gentoo.org/wiki/ZFS#cite_note-1>
-  - 不要在 ZFS 存储池中使用所谓的 SMR（Shingled Magnetic Drives, 叠瓦式磁记录）磁盘，这类磁盘写入速度极慢，并且在 ZFS 存储池 resilver 过程中可能发生超时，从而妨碍恢复。**应始终在 ZFS 中使用 CMR（传统磁记录）磁盘。**
+  - 不要在 ZFS 存储池中使用所谓的 SMR（Shingled Magnetic Recording, 叠瓦式磁记录）磁盘，这类磁盘写入速度极慢，并且在 ZFS 存储池 resilver 过程中可能发生超时，从而妨碍恢复。**应始终在 ZFS 中使用 CMR（传统磁记录）磁盘。**
 - 除非存储由不间断电源（UPS）保护或电力来源极其可靠，否则应考虑使用具备掉电保护的 NVMe/SSD（即带有板载电容）
 - 应避免使用 SATA 端口倍增器，除非没有其他选择，因为它会在已连接的磁盘之间复用流量，造成严重瓶颈，实际上会分割可用带宽，同时也会增加 I/O 延迟
 - ZFS 能够利用 X86/64 处理器中的 SSE/AVX 向量化指令来加速校验和计算，并会自动选择最快的实现。在 Linux 下，可以在 `/proc/spl/kstat/zfs/fletcher_4_bench` 和 `vdev_raidz_bench` 中查看微基准测试结果。例如：
