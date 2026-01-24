@@ -26,7 +26,6 @@ jobs:
           # 读取 SUMMARY.md 中的 Markdown 链接
           while IFS= read -r line; do
             # 使用正则提取标题和路径，允许空格
-            # 锚定行首，使用非贪婪匹配标题，并限制路径为下一个右括号之前的内容
             if [[ $line =~ ^\*\s*\[(.+?)\]\(([^)]+)\) ]]; then
               title="${BASH_REMATCH[1]}"
               path="${BASH_REMATCH[2]}"
@@ -38,8 +37,8 @@ jobs:
               first_line=$(head -n 1 "$path" | sed 's/^#*//; s/^[[:space:]]*//; s/[[:space:]]*$//')
               clean_title=$(printf '%s\n' "$title" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
 
-              # 比较并更新
-              if [ "$first_line" != "$clean_title" ]; then
+              # 比较并更新，使用 [[ ]] 防止特殊字符报错
+              if [[ "$first_line" != "$clean_title" ]]; then
                 echo "Updating $path: '$first_line' -> '$clean_title'"
                 temp_file=$(mktemp)
                 echo "# $clean_title" > "$temp_file"
@@ -51,6 +50,7 @@ jobs:
             fi
           done < SUMMARY.md
 
+          # 输出变量给 GitHub Actions
           echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
       - name: Commit changes
@@ -60,4 +60,3 @@ jobs:
           git config --global user.email "yklaxds@gmail.com"
           git commit -m "chore: sync headers with SUMMARY.md"
           git push
-
