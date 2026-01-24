@@ -43,7 +43,7 @@
    sensible-browser _build/html/index.html
    ```
 
-5. 使用 `git commit --signoff` 提交到分支，`git push`，并创建 pull request 再 @rlaager。
+5. 使用 `git commit --signoff` 提交到分支，`git push`，并创建 pull request，@rlaager。
 
 ### 加密
 
