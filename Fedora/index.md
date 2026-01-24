@@ -52,13 +52,13 @@
    dnf install -y kernel-longterm kernel-longterm-devel
    ```
 
-   重启到新 LTS 内核后，再加载内核模块：
+   重启到新的 LTS 内核后，再加载内核模块：
 
    ```sh
    modprobe zfs
    ```
 
-6. 在默认情况下，当检测到存储池时，会自动加载 ZFS 内核模块。若要在开机时始终加载模块：
+6. 在默认情况下，当检测到存储池时，将自动加载 ZFS 内核模块。若要在开机时始终加载模块：
 
    ```sh
    echo zfs > /etc/modules-load.d/zfs.conf
