@@ -16,3 +16,4 @@
   * [Debian 概述](Debian/index.md)
   * [根文件系统使用 ZFS 的 Debian 12 Bookworm](Debian/Debian-Bookworm-12.md)
   * [根文件系统使用 ZFS 的 Debian 11 Bullseye](Debian/Debian-Bullseye-11.md)
+  * [根文件系统使用 ZFS 的 Debian 10 Buster](Debian/Debian-Buster-10.md)
