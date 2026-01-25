@@ -32,6 +32,7 @@
    # 将 ~/.local/bin 添加到你的 $PATH，例如通过将以下内容添加到 ~/.bashrc：
    PATH=$HOME/.local/bin:$PATH
    ```
+
 3. 进行你的修改。
 4. 测试：
 
@@ -40,6 +41,7 @@
    make html
    sensible-browser _build/html/index.html
    ```
+
 5. 在分支上执行 `git commit --signoff`，然后 `git push`，并创建 pull request。
 
 ### 加密
@@ -61,6 +63,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    sudo zypper addrepo https://download.opensuse.org/repositories/filesystems/openSUSE_Tumbleweed/filesystems.repo
    sudo zypper refresh   # 刷新所有软件仓库
    ```
+
 3. 可选：在 Live CD 环境中安装并启动 OpenSSH 服务器：
    如果你有第二台系统，使用 SSH 访问目标系统会更加方便：
 
@@ -79,11 +82,13 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```sh
    gsettings set org.gnome.desktop.media-handling automount false
    ```
+
 5. 切换为 root：
 
    ```sh
    sudo -i
    ```
+
 6. 在 Live CD 环境中安装 ZFS：
 
    ```sh
@@ -101,7 +106,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
    在 ZFS 中始终使用长别名 `/dev/disk/by-id/*`。直接使用设备节点 `/dev/sd*` 可能导致偶发的导入失败，尤其是在系统中存在多个存储池时。
-   
+
    **提示：**
 
    * `ls -la /dev/disk/by-id` 会列出别名。
@@ -164,6 +169,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
      ```sh
      sgdisk     -n4:0:0        -t4:BF00 $DISK
      ```
+
    * LUKS：
 
      ```sh
@@ -197,10 +203,10 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
    对启动池无需自定义选项。
-   
+
    GRUB 不支持全部的 zpool 功能。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
    此步骤为 `/boot` 创建单独的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB “支持”。
-   
+
    **提示：**
 
    * 如果创建镜像拓扑，请使用：
@@ -212,6 +218,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
          /dev/disk/by-id/scsi-SATA_disk1-part3 \
          /dev/disk/by-id/scsi-SATA_disk2-part3
      ```
+
    * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
    * 池名称可自定义。若更改，新名称必须保持一致使用。`bpool` 命名约定来源于本教程。
 
@@ -237,6 +244,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
          -O xattr=sa -O mountpoint=/ -R /mnt \
          rpool ${DISK}-part4
      ```
+
    * ZFS 原生加密：
 
      ```sh
@@ -250,6 +258,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
          -O xattr=sa -O mountpoint=/ -R /mnt \
          rpool ${DISK}-part4
      ```
+
    * LUKS：
 
      ```sh
@@ -289,6 +298,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
       /dev/disk/by-id/scsi-SATA_disk1-part4 \
       /dev/disk/by-id/scsi-SATA_disk2-part4
   ```
+
 * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
 * 使用 LUKS 配合镜像或 raidz 拓扑时，请使用 `/dev/mapper/luks1`、`/dev/mapper/luks2` 等，这些需要通过 `cryptsetup` 创建。
 * 可自定义存储池名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根池默认命名为 `rpool`。
@@ -419,7 +429,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
    此数据集布局的主要目标是将操作系统与用户数据分离，从而可回滚根文件系统而不影响用户数据。
-   
+
    如果不做额外操作，`/tmp` 将作为根文件系统的一部分存储。或者，可以如上创建独立的 `/tmp` 数据集，将 `/tmp` 数据排除在根文件系统快照之外。同时，可对 `rpool/tmp` 设置配额以限制最大使用空间。否则，可在后续使用 tmpfs（内存文件系统）。
 
 5. 复制 `zpool.cache`：
@@ -467,6 +477,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
       ```sh
       zypper --root /mnt install -t pattern base
       ```
+
    2. 使用 zypper 安装 openSUSE Tumbleweed 的增强基础包（推荐桌面环境）：
 
       ```sh
@@ -742,7 +753,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    >
    >在某些安装中，LUKS 分区可能无法被 dracut 识别，会出现报错 “Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
    解决方法：检查 cryptsetup 安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
-   
+
    >**注意：**
    >
    >即使已将 zfs 配置添加到系统模块 `/etc/modules.d`，若 dracut 未识别，仍需强制添加：
@@ -751,7 +762,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    dracut --kver $(uname -r) --force --add-drivers "zfs"
    ```
 
-## 第 7 步：安装 Grub2 
+## 第 7 步：安装 Grub2
 
 1. 验证 ZFS 启动文件系统是否被识别：
 
@@ -799,11 +810,11 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    >**注意：**
    >
    >如果出现 `os-prober` 错误可忽略。
-   
+
    >**注意：**
    >
    >如果安装 grub2 时出现问题，可考虑使用 systemd-boot。
-   
+
    >**注意：**
    >
    >如果命令无输出，可使用经典的 `grub.cfg` 生成：
