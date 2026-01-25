@@ -42,9 +42,6 @@ NixOS Live 镜像默认内置了 ZFS 支持。
    reboot
    ```
 
-## ZFS 作为根文件系统
-
-* [NixOS 上的 ZFS 根文件系统](https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS.html)
 
 ## 贡献
 
