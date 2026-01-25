@@ -14,7 +14,7 @@
 
 NixOS Live 镜像默认包含 ZFS 支持。
 
-请注意，即使你不需要从 ZFS 启动，也必须应用这些设置。在完成这些更改并重启之前，将无法通过 modprobe 使用内核模块 “zfs.ko”。
+请注意，即使你不需要从 ZFS 启动，也必须应用这些设置。在完成这些更改并重启之前，将无法通过 modprobe 使用内核模块“zfs.ko”。
 
 1. 编辑 `/etc/nixos/configuration.nix`，添加以下选项：
 
