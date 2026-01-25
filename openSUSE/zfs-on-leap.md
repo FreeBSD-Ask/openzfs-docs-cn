@@ -7,7 +7,7 @@
 * 本教程使用整块物理磁盘。
 * 本教程不适用于双系统。
 * 备份你的数据。一切既有数据都将丢失。
-* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 Root on ZFS 的支持，本文档将会更新。此外，[openSUSE 的默认系统安装器 Yast2 不支持 zfs](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程在不使用 Yast2 的情况下通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
+* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 Root on ZFS 的支持，本文档将会更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 zfs](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程在不使用 YaST2 的情况下通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
 
 ### 系统要求
 
@@ -522,11 +522,11 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zypper --root /mnt install zypper
    ```
 
-5. 推荐：在 chroot 中安装 openSUSE yast2 系统：
+5. 推荐：在 chroot 中安装 openSUSE YaST2 系统：
 
    ```sh
-   zypper --root /mnt install yast2
-   zypper --root /mnt install -t pattern yast2_basis
+   zypper --root /mnt install YaST2
+   zypper --root /mnt install -t pattern YaST2_basis
    ```
 
    这将方便初学者配置网络及其他系统设置。
@@ -566,7 +566,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    cp /etc/resolv.conf /mnt/etc/
    ```
 
-   后续将使用 yast2 重新配置网络。
+   后续将使用 YaST2 重新配置网络。
 
 3. 将 LiveCD 环境的虚拟文件系统绑定到新系统并进入 chroot：
 
@@ -901,7 +901,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 >**警告：**
 >
->这将破坏你的 Yast2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 池而提供的替代方案。
+>这将破坏你的 YaST2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 池而提供的替代方案。
 
 1. 安装 systemd-boot：
 
