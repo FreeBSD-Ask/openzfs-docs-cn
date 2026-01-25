@@ -4,6 +4,7 @@
   - 新增“NixOS”
   - 新增“openSUSE”
   - 新增“RHEL”
+  - 新增“Slackware”
 - 2026.1.24
   - 新增“Debian”
   - 新增“Fedora”
