@@ -16,35 +16,6 @@
 
 在内存小于 2 GiB 的计算机上运行 ZFS 时，性能将严重下降。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication）功能，则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
 
-### 支持
-
-如果你需要帮助，可以通过 [邮件列表](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/Mailing%20Lists.html#mailing-lists) 或在 [Libera Chat](https://libera.chat/) 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请[提交新的 issue 并 @rlaager](https://github.com/openzfs/openzfs-docs/issues/new?body=@rlaager,%20I%20have%20the%20following%20issue%20with%20the%20Debian%20Bookworm%20Root%20on%20ZFS%20HOWTO:)。
-
-### 贡献
-
-1. 复刻并克隆：[https://github.com/openzfs/openzfs-docs](https://github.com/openzfs/openzfs-docs)
-2. 安装工具：
-
-   ```sh
-   sudo apt install python3-pip
-
-   pip3 install -r docs/requirements.txt
-
-   # 将 ~/.local/bin 添加到你的 $PATH，例如把下面这行加入 ~/.bashrc：
-   PATH=$HOME/.local/bin:$PATH
-   ```
-
-3. 进行你的修改。
-4. 测试：
-
-   ```sh
-   cd docs
-   make html
-   sensible-browser _build/html/index.html
-   ```
-
-5. 使用 `git commit --signoff` 提交到分支，`git push`，并创建 pull request，@rlaager。
-
 ### 加密
 
 本指南支持三种不同的加密方案：不加密、ZFS 原生加密、以及 LUKS。无论选择何种，都能完整使用全部的 ZFS 特性。

@@ -17,33 +17,6 @@
 
 在内存少于 2 GiB 的计算机运行 ZFS 时，存在严重的性能瓶颈。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，将需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
 
-### 支持
-
-如果你需要帮助，可以通过 [邮件列表](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/Mailing%20Lists.html#mailing-lists) 或在 [Libera Chat](https://libera.chat/) 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请提交新的 issue，并 [@Zaryob](https://github.com/Zaryob)。
-
-### 贡献
-
-1. 复刻然后克隆：[https://github.com/openzfs/openzfs-docs](https://github.com/openzfs/openzfs-docs)
-2. 安装工具：
-
-   ```sh
-   sudo zypper install python3-pip
-   pip3 install -r docs/requirements.txt
-   # 将 ~/.local/bin 添加到你的 $PATH，例如通过将以下内容添加到 ~/.bashrc：
-   PATH=$HOME/.local/bin:$PATH
-   ```
-
-3. 进行你的修改。
-4. 测试：
-
-   ```sh
-   cd docs
-   make html
-   sensible-browser _build/html/index.html
-   ```
-
-5. 在分支上执行 `git commit --signoff`，然后 `git push`，并创建 pull request。
-
 ### 加密
 
 本指南支持三种不同的加密方案：未加密、ZFS 原生加密、以及 LUKS。无论选择哪一种，都能完全使用一切 ZFS 特性。
