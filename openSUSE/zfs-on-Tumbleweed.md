@@ -7,7 +7,7 @@
 * 本教程使用整块物理磁盘。
 * 本教程不适用于双系统。
 * 备份你的数据。一切既有数据都将丢失。
-* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 Root on ZFS 的支持，本文档将会更新。此外，[openSUSE 的默认系统安装器 Yast2 不支持 zfs](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程在不使用 Yast2 的情况下通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
+* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 Root on ZFS 的支持，本文档将会更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 zfs](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程在不使用 YaST2 的情况下通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
 
 ### 系统要求
 
