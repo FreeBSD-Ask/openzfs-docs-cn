@@ -11,7 +11,7 @@
 
 ### 系统要求
 
-* [64 位 openSUSE Tumbleweed Live CD，带 GUI（例如 gnome iso）](https://software.opensuse.org/distributions/leap)
+* [64 位 openSUSE Tumbleweed Live CD，带 GUI（例如 gnome iso）](https://software.opensuse.org/distributions/tumbleweed)
 * [强烈建议使用 64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)
 * 在提供 4 KiB 逻辑扇区（“4Kn”）的驱动器上进行的安装仅在使用 UEFI 启动时可行。这并非 ZFS 独有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作。](http://savannah.gnu.org/bugs/?46700)
 
@@ -490,10 +490,10 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zypper --root /mnt install zypper
    ```
 
-5. 推荐：在 chroot 中安装 openSUSE yast2 系统：
+5. 推荐：在 chroot 中安装 openSUSE YaST2 系统：
 
    ```sh
-   zypper --root /mnt install yast2
+   zypper --root /mnt install YaST2
    ```
 
    >**注意**
@@ -540,7 +540,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    cp /etc/resolv.conf /mnt/etc
    ```
 
-   将使用 yast2 重新配置网络。
+   将使用 YaST2 重新配置网络。
 
    >**注意**
    >
@@ -850,7 +850,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 >**警告：**
 >
->这将破坏你的 Yast2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 池而提供的替代方案。
+>这将破坏你的 YaST2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 池而提供的替代方案。
 
 1. 安装 systemd-boot：
 
