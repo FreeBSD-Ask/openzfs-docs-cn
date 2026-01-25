@@ -3,6 +3,7 @@
 - 2026.1.25
   - 新增“NixOS”
   - 新增“openSUSE”
+  - 新增“RHEL”
 - 2026.1.24
   - 新增“Debian”
   - 新增“Fedora”
