@@ -1,4 +1,4 @@
-# # 构建以 ZFS 为根文件系统的 openSUSE Leap
+# 构建以 ZFS 为根文件系统的 openSUSE Leap
 
 ## 概览
 
