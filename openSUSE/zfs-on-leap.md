@@ -7,7 +7,7 @@
 * 本教程使用整块物理磁盘。
 * 本教程不适用于双系统。
 * 备份你的数据。一切既有数据都将丢失。
-* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 Root on ZFS 的支持，本文档将会更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 zfs](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程在不使用 YaST2 的情况下通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
+* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 根文件系统的 ZFS 支持，本文档将进行更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 ZFS](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程将在不使用 YaST2 的情况下，通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
 
 ### 系统要求
 
@@ -15,7 +15,7 @@
 * [强烈建议使用 64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)
 * 在提供 4 KiB 逻辑扇区（“4Kn”）的驱动器上进行的安装仅在使用 UEFI 启动时可行。这并非 ZFS 独有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作。](http://savannah.gnu.org/bugs/?46700)
 
-在内存少于 2 GiB 的计算机运行 ZFS 时，将存在严重的性能瓶颈。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，将需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
+在内存少于 2 GiB 的计算机运行 ZFS 时，存在严重的性能瓶颈。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，将需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
 
 ### 支持
 
@@ -50,7 +50,7 @@
 
 未加密当然不会加密任何内容。在没有进行任何加密的情况下，该方案自然具有最佳性能。
 
-ZFS 原生加密会对根池中的数据和大多数元数据进行加密。它不会加密 dataset 或 snapshot 的名称或属性。启动池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）系统在未在控制台输入口令的情况下无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
+ZFS 原生加密会对根池中的数据和大多数元数据进行加密。它不会加密数据集或快照的名称或属性。启动池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）系统在未在控制台输入口令的情况下无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
 
 LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kernel 和 initrd。系统在未在控制台输入口令的情况下无法启动。性能良好，但 LUKS 位于 ZFS 底层，因此如果使用了多个磁盘（mirror 或 raidz 拓扑），数据需要在每个磁盘上各加密一次。
 
@@ -216,7 +216,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    对启动池无需自定义选项。
 
-   GRUB 不支持全部的 zpool 功能。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
+   GRUB 不支持所有的 zpool 功能。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
    此步骤为 `/boot` 创建单独的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB“支持”。
 
    **提示：**
@@ -238,8 +238,8 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    * `allocation_classes` 功能安全可用。但除非使用它（如 `special` vdev），否则启用它无意义。几乎不会有人在启动池使用该功能。如果关注启动池速度，将整个池放在更快的磁盘上比使用 `special` vdev 更合理。
    * `project_quota` 功能经过测试，安全可用。对启动池而言几乎无实际意义。
-   * `resilver_defer` 功能安全，但启动池较小，通常无需使用。
-   * `spacemap_v2` 功能经过测试，安全可用。启动池较小，实际影响不大。
+   * `resilver_defer` 功能安全，但启动池容量较小，通常无需使用。
+   * `spacemap_v2` 功能经过测试，安全可用。启动池容量较小，实际影响不大。
    * 作为只读兼容功能，`userobj_accounting` 理论上兼容，但在实践中 GRUB 可能报错“invalid dnode type”。此功能对 `/boot` 无关紧要。
 
 7. 创建根池：
@@ -313,7 +313,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
 * 使用 LUKS 配合镜像或 raidz 拓扑时，请使用 `/dev/mapper/luks1`、`/dev/mapper/luks2` 等，这些需要通过 `cryptsetup` 创建。
-* 可自定义存储池名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根池默认命名为 `rpool`。
+* 可自定义存储池的名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根池默认命名为 `rpool`。
 * 如果想使用 grub 引导加载器，必须为根池设置：
 
   ```sh
@@ -367,7 +367,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zfs create                                 rpool/var/spool
    ```
 
-   以下数据集为可选，取决于你的偏好和/或软件选择。
+   以下数据集为可选，取决于你的偏好及软件选择。
    如果希望这些数据集不被快照：
 
    ```sh
@@ -502,7 +502,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
 3. 使用 zypper 安装 openSUSE Leap：
-   如果只安装 base pattern，zypper 会安装 busybox-grep，从而屏蔽默认内核包。因此建议新手安装 enhanced_base pattern。但 enhanced_base 包含的冗余包可能会在服务器环境中带来困扰。你需要根据用途选择：
+   如果只安装基本的 pattern，zypper 会安装 busybox-grep，从而屏蔽默认内核包。因此建议新手安装 enhanced_base pattern。但 enhanced_base 包含的冗余包可能会在服务器环境中带来困扰。你需要根据用途选择：
 
    1. 使用 zypper 安装 openSUSE Leap 的基础包（推荐服务器环境）：
 
@@ -536,10 +536,10 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 ## 第 5 步：系统配置
 
 1. 配置主机名：
-   将 `HOSTNAME` 替换为你希望使用的主机名：
+   将 `主机名` 替换为你希望使用的主机名：
 
    ```sh
-   echo HOSTNAME > /mnt/etc/hostname
+   echo 主机名 > /mnt/etc/hostname
    vi /mnt/etc/hosts
    ```
 
@@ -636,7 +636,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zypper install zfs zfs-kmp-default
    ```
 
-   如果系统使用 UEFI 和安全启动，自 openSUSE Leap 15.2 起，内核要求所有内核模块必须签名。`filesystems` 项目中的 ZFS 内核模块已签名，但不是系统首次启动时自动注册的官方 openSUSE 密钥。为了确保系统信任该签名密钥，请安装：
+   如果系统使用 UEFI 和安全启动，自 openSUSE Leap 15.2 起，内核要求所有内核模块必须进行签名。`filesystems` 项目中的 ZFS 内核模块已签名，但不是系统首次启动时自动注册的官方 openSUSE 密钥。为了确保系统信任该签名密钥，请安装：
 
    ```sh
    zypper install zfs-ueficert
@@ -727,7 +727,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 15. 启用 bpool 导入：
 
-    确保 `bpool` 始终被导入，无论 `/etc/zfs/zpool.cache` 是否存在，或 `zfs-import-scan.service` 是否启用。
+    确保始终能导入 `bpool`，无论是否存在 `/etc/zfs/zpool.cache`，是否启用 `zfs-import-scan.service`。
 
     ```sh
     vi /etc/systemd/system/zfs-import-bpool.service
@@ -796,12 +796,12 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    >**注意：**
    >
-   >在某些安装中，LUKS 分区可能无法被 dracut 识别，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
-   解决方法：检查 cryptsetup 安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
+   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
+   解决方法：检查 cryptsetup 的安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
 
    >**注意：**
    >
-   >即使已将 zfs 配置添加到系统模块 `/etc/modules.d`，若 dracut 未识别，仍需强制添加：
+   >即使已将 zfs 配置添加到系统模块 `/etc/modules.d`，若 dracut 未识别，还需强制添加：
 
    ```sh
    dracut --kver $(uname -r) --force --add-drivers "zfs"
@@ -1251,7 +1251,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 基本问题是，这些控制器上的磁盘在 Linux 内核启动时不可见，而 ZoL 不支持热插拔池成员。详见：[https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
 
-大多数 LSI 卡完全兼容 ZoL。如果你的卡存在此问题，可在 `/etc/default/zfs` 中设置：
+大多数 LSI 卡完全兼容 ZoL。如果你的 LSI 卡存在此问题，可在 `/etc/default/zfs` 中设置：
 
 ```ini
 ZFS_INITRD_PRE_MOUNTROOT_SLEEP=X
@@ -1271,7 +1271,7 @@ sudo zypper install ovmf
 sudo vi /etc/libvirt/qemu.conf
 ```
 
-取消注释以下行：
+取消对以下行的注释：
 
 ```ini
 nvram = [
