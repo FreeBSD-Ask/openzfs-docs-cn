@@ -3,7 +3,7 @@
 
 **自定义**
 
-除非另有说明，否则不建议在重启之前自定义系统配置。
+除非另有说明，否则不建议在重启到新系统之前进行自定义系统配置。
 
 **仅支持 UEFI**
 
@@ -210,7 +210,7 @@
    nano "${MNT}"/etc/nixos/hardware-configuration.nix
    ```
 
-3. 设置 networking.hostId：
+3. 设置 `networking.hostId`：
 
    ```sh
    networking.hostId = "abcd1234";

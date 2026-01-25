@@ -38,3 +38,6 @@
 * Slackware
   * [在 Slackware 中启用 ZFS 支持](Slackware/index.md)
   * [构建以 ZFS 为根文件系统的 Slackware](Slackware/zfs-on-Slackware.md)  
+* Ubuntu
+  * [在 Ubuntu 中启用 ZFS 支持](Ubuntu/index.md)
+  * [构建以 ZFS 为根文件系统的 Ubuntu 18.04](Ubuntu/18.04-zfs.md)
