@@ -60,7 +60,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 ## 第 1 步：准备安装环境
 
-1. 启动 openSUSE Live CD。如果出现提示提示，请使用用户名 `linux` 登录，空密码。根据需要将系统连接到互联网（例如加入你的 WiFi 网络）。打开终端。
+1. 启动 openSUSE Live CD。如果出现提示时，请使用用户名 `linux` 登录，空密码。根据需要将系统连接到互联网（例如加入你的 WiFi 网络）。打开终端。
 2. 检查你的 openSUSE Leap 发行版：
 
    ```sh
