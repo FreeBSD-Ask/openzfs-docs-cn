@@ -28,6 +28,7 @@
 
    dd if=input-file of=output-file bs=1M
    ```
+
 3. 以 root 用户登录，初始无密码。
 
 4. 配置网络
@@ -42,6 +43,7 @@
    <此处按回车完成安装>
    manual netconfig:  n
    ```
+
 5. 如果使用无线网络但未显示，请参考 [Alpine Linux wiki](https://wiki.alpinelinux.org/wiki/Wi-Fi#wpa_supplicant) 获取更多信息。`wpa_supplicant` 可通过 `apk add wpa_supplicant` 安装，无需网络连接。
 
 6. 配置 SSH 服务器
@@ -53,6 +55,7 @@
    allow root:        "prohibit-password" 或 "yes"
    ssh key:           "none" 或 "<公钥>"
    ```
+
 7. 设置 root 密码或配置 `/root/.ssh/authorized_keys`。
 
 8. 从其他计算机连接
@@ -60,6 +63,7 @@
    ```sh
    ssh root@192.168.1.91
    ```
+
 9. 配置 NTP 客户端以同步时间
 
    ```sh
@@ -71,6 +75,7 @@
     ```sh
     setup-apkrepos
     ```
+
 11. 本指南中使用 udev 生成的可预测磁盘名称
 
     ```sh
@@ -78,6 +83,7 @@
     apk add eudev
     setup-devd udev
     ```
+
 12. 目标磁盘
     列出可用磁盘
 
@@ -101,11 +107,13 @@
     ```sh
     DISK='/dev/disk/by-id/disk1'
     ```
+
 13. 设置挂载点
 
     ```sh
     MNT=$(mktemp -d)
     ```
+
 14. 设置分区大小：
 
     设置 swap 大小（GB），如果不希望 swap 占用过多空间，可设为 1
@@ -119,11 +127,13 @@
     ```sh
     RESERVE=1
     ```
+
 16. 从 live 系统安装 ZFS 支持
 
     ```sh
     apk add zfs
     ```
+
 17. 安装分区工具
 
     ```sh
@@ -156,6 +166,7 @@
       partition_disk "${i}"
    done
    ```
+
 3. 为本次安装设置临时加密 swap（仅用于安装）。当可用内存较小时非常有用：
 
    ```sh
@@ -165,11 +176,13 @@
       swapon /dev/mapper/"${i##*/}"-part3
    done
    ```
+
 4. 加载 ZFS 内核模块
 
    ```sh
    modprobe zfs
    ```
+
 5. 创建根池
 
    * 未加密示例：
@@ -193,6 +206,7 @@
            printf '%s ' "${i}-part2";
           done)
      ```
+
 6. 创建根系统容器
 
    ```sh
@@ -207,6 +221,7 @@
    zfs mount rpool/root
    mount -o X-mount.mkdir -t zfs rpool/home "${MNT}"/home
    ```
+
 7. 格式化并挂载 ESP。只使用其中一个作为 /boot，其余可稍后设置镜像：
 
    ```sh
@@ -242,12 +257,14 @@
 
    tar x  -C "${MNT}" -af rootfs.tar.gz
    ```
+
 2. 启用社区仓库
 
    ```sh
    sed -i '/edge/d' /etc/apk/repositories
    sed -i -E 's/#(.*)community/\1community/' /etc/apk/repositories
    ```
+
 3. 生成 fstab
 
    ```sh
@@ -257,6 +274,7 @@
    | sed "s|vfat.*rw|vfat rw,x-systemd.idle-timeout=1min,x-systemd.automount,noauto,nofail|" \
    > "${MNT}"/etc/fstab
    ```
+
 4. chroot 进入安装环境
 
    ```sh
@@ -264,16 +282,19 @@
    for i in /dev /proc /sys; do mkdir -p "${MNT}"/"${i}"; mount --rbind "${i}" "${MNT}"/"${i}"; done
    chroot "${MNT}" /usr/bin/env DISK="${DISK}" bash
    ```
+
 5. 取消所有 shell 别名，以免干扰安装
 
    ```sh
    unalias -a
    ```
+
 6. 安装基础软件包
 
    ```sh
    dnf -y install --allowerasing @core kernel-core kernel-modules
    ```
+
 7. 安装 ZFS 软件包
 
    ```sh
@@ -282,12 +303,14 @@
    dnf config-manager --enable zfs-kmod
    dnf install -y zfs zfs-dracut
    ```
+
 8. 将 ZFS 模块添加到 dracut
 
    ```sh
    echo 'add_dracutmodules+=" zfs "' >> /etc/dracut.conf.d/zfs.conf
    echo 'force_drivers+=" zfs "' >> /etc/dracut.conf.d/zfs.conf
    ```
+
 9. 将其他驱动添加到 dracut
 
    ```sh
@@ -298,11 +321,13 @@
      echo 'filesystems+=" virtio_blk "' >> /etc/dracut.conf.d/zfs.conf
    fi
    ```
+
 10. 生成 hostid
 
     ```sh
     zgenhostid -f -o /etc/hostid
     ```
+
 11. 构建 initrd
 
     ```sh
@@ -314,16 +339,19 @@
        dracut --verbose --force --kver "${kernel}";
      fi' sh {} \;
     ```
+
 12. 对 SELinux，在重启时重新标记文件系统
 
     ```sh
     fixfiles -F onboot
     ```
+
 13. 安装语言包（例如英文）
 
     ```sh
     dnf install -y glibc-minimal-langpack glibc-langpack-en
     ```
+
 14. 设置语言、键盘布局、时区和主机名
 
     ```sh
@@ -335,6 +363,7 @@
     --hostname=testhost \
     --keymap=us
     ```
+
 15. 设置 root 密码
 
     ```sh
@@ -357,6 +386,7 @@
    | xargs -0I{} mv {} /boot/EFI/BOOT/BOOTX64.EFI
    rm -rf refind.zip refind-bin-0.14.0.2
    ```
+
 2. 添加启动项：
 
    ```sh
@@ -364,22 +394,26 @@
    "Rocky Linux" "root=ZFS=rpool/root"
    EOF
    ```
+
 3. 退出 chroot：
 
    ```sh
    exit
    ```
+
 4. 卸载文件系统并创建初始系统快照（稍后可从此快照创建启动环境，参考 [Root on ZFS 维护页面](https://openzfs.github.io/openzfs-docs/Getting%20Started/zfs_root_maintenance.html)）：
 
    ```sh
    umount -Rl "${MNT}"
    zfs snapshot -r rpool@initial-installation
    ```
+
 5. 导出所有 ZFS 存储池：
 
    ```sh
    zpool export -a
    ```
+
 6. 重启系统：
 
    ```sh
@@ -394,5 +428,6 @@
    dnf group list --hidden -v       # 查询可用软件包组
    dnf group install gnome-desktop
    ```
+
 2. 添加新用户并配置 swap。
 3. 挂载其他 EFI 系统分区，然后设置服务以同步其内容。
