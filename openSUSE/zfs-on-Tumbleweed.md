@@ -13,9 +13,9 @@
 
 * [64 位 openSUSE Tumbleweed Live CD，带 GUI（例如 gnome iso）](https://software.opensuse.org/distributions/tumbleweed)
 * [强烈建议使用 64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)
-* 在提供 4 KiB 逻辑扇区（“4Kn”）的驱动器上进行的安装仅在使用 UEFI 启动时可行。这并非 ZFS 独有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作。](http://savannah.gnu.org/bugs/?46700)
+* 在提供 4 KiB 逻辑扇区（“4Kn”）的驱动器上进行的安装仅在使用 UEFI 启动时可行。这并非 ZFS 独有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作](http://savannah.gnu.org/bugs/?46700)。
 
-在内存少于 2 GiB 的计算机运行 ZFS 时，将存在严重的性能瓶颈。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，将需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
+在内存少于 2 GiB 的计算机运行 ZFS 时，存在严重的性能瓶颈。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，将需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
 
 ### 支持
 
@@ -50,7 +50,7 @@
 
 未加密当然不会加密任何内容。在没有进行任何加密的情况下，该方案自然具有最佳性能。
 
-ZFS 原生加密会对根池中的数据和大多数元数据进行加密。它不会加密 dataset 或 snapshot 的名称或属性。启动池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）系统在未在控制台输入口令的情况下无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
+ZFS 原生加密会对根池中的数据和大多数元数据进行加密。它不会加密数据集或快照的名称或属性。启动池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）系统在未在控制台输入口令的情况下无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
 
 LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kernel 和 initrd。系统在未在控制台输入口令的情况下无法启动。性能良好，但 LUKS 位于 ZFS 底层，因此如果使用了多个磁盘（mirror 或 raidz 拓扑），数据需要在每个磁盘上各加密一次。
 
@@ -205,7 +205,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    对启动池无需自定义选项。
 
    GRUB 不支持全部的 zpool 功能。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
-   此步骤为 `/boot` 创建单独的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB“支持”。
+   此步骤为 `/boot` 创建了独立的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB“支持”。
 
    **提示：**
 
@@ -226,8 +226,8 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    * `allocation_classes` 功能安全可用。但除非使用它（如 `special` vdev），否则启用它无意义。几乎不会有人在启动池使用该功能。如果关注启动池速度，将整个池放在更快的磁盘上比使用 `special` vdev 更合理。
    * `project_quota` 功能经过测试，安全可用。对启动池而言几乎无实际意义。
-   * `resilver_defer` 功能安全，但启动池较小，通常无需使用。
-   * `spacemap_v2` 功能经过测试，安全可用。启动池较小，实际影响不大。
+   * `resilver_defer` 功能安全，但启动池容量较小，通常无需使用。
+   * `spacemap_v2` 功能经过测试，安全可用。启动池容量较小，实际影响不大。
    * 作为只读兼容功能，`userobj_accounting` 理论上兼容，但在实践中 GRUB 可能报错“invalid dnode type”。此功能对 `/boot` 无关紧要。
 
 7. 创建根池：
@@ -303,7 +303,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 * 使用 LUKS 配合镜像或 raidz 拓扑时，请使用 `/dev/mapper/luks1`、`/dev/mapper/luks2` 等，这些需要通过 `cryptsetup` 创建。
 * 可自定义存储池名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根池默认命名为 `rpool`。
 
-## 第 3 步：系统安装
+## 第 3 步：安装系统
 
 1. 创建用于容器的文件系统数据集：
 
@@ -337,7 +337,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zfs create                                 rpool/var/spool
    ```
 
-   以下数据集为可选，取决于你的偏好和/或软件选择。
+   以下数据集为可选，取决于你的偏好及软件选择。
    如果希望这些数据集不被快照：
 
    ```sh
@@ -470,7 +470,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
 3. 使用 zypper 安装 openSUSE Tumbleweed：
-   如果只安装 base pattern，zypper 会安装 busybox-grep，从而屏蔽默认内核包。因此建议新手安装 enhanced_base pattern。但 enhanced_base 包含的冗余包可能会在服务器环境中带来困扰。你需要根据用途选择：
+   如果只安装基本的 pattern，zypper 会安装 busybox-grep，从而屏蔽默认内核包。因此建议新手安装 enhanced_base pattern。但 enhanced_base 包含的冗余包可能会在服务器环境中带来困扰。你需要根据用途选择：
 
    1. 使用 zypper 安装 openSUSE Tumbleweed 的基础包（推荐服务器环境）：
 
@@ -564,7 +564,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    >**注意：**
    >
-   >这里使用的是 `--rbind` 而非 `--bind`。
+   >此处使用的是 `--rbind` 而非 `--bind`。
 
 4. 配置基本系统环境：
 
@@ -593,7 +593,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
 5. 可选：重新安装以增强稳定性：
-   安装后可能需要重新安装某些软件包以修复小问题。openSUSE 没有类似 `dpkg-reconfigure` 的命令，可用 `zypper install -f` 作为替代：
+   安装后可能需要重新安装某些软件包以修复小问题。openSUSE 没有类似 `dpkg-reconfigure` 的命令，可用 `zypper install -f` 替代：
 
    ```sh
    zypper install -f permissions-config iputils ca-certificates ca-certificates-mozilla pam shadow dbus-1 libutempter0 suse-module-tools util-linux
@@ -617,7 +617,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zypper install zfs
    ```
 
-   如果系统使用 UEFI 和安全启动，自 Linux 5.4 起，内核要求所有内核模块必须签名。`filesystems` 项目中的 ZFS 内核模块已签名，但不是系统首次启动时自动注册的官方 openSUSE 密钥。为了确保系统信任该签名密钥，请安装：
+   如果系统使用 UEFI 和安全启动，自 Linux 5.4 起，内核要求所有内核模块必须经过签名。`filesystems` 项目中的 ZFS 内核模块已签名，但不是系统首次启动时自动注册的官方 openSUSE 密钥。为了确保系统信任该签名密钥，请安装：
 
    ```sh
    zypper install zfs-ueficert
@@ -670,7 +670,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
       **注意：**
 
       * 对于 4Kn 驱动器，`-s 1` 是为满足 FAT32 最小簇大小（512 MiB 分区）要求。512 B 扇区的驱动器也可正常使用。
-      * 对于 mirror 或 raidz 拓扑，这一步只在第一块磁盘上安装 GRUB，其他磁盘稍后处理。
+      * 对于 mirror 或 raidz 拓扑，这一步只在第一块磁盘上安装 GRUB，其他磁盘在稍后处理。
 
 11. 可选：移除 os-prober：
 
@@ -688,7 +688,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 13. 启用 bpool 导入：
 
-    确保 `bpool` 始终被导入，无论 `/etc/zfs/zpool.cache` 是否存在，或 `zfs-import-scan.service` 是否启用。
+    确保始终导入 `bpool`，无论是否存在 `/etc/zfs/zpool.cache`，是否启用 `zfs-import-scan.service`。
 
     ```sh
     vi /etc/systemd/system/zfs-import-bpool.service
@@ -727,8 +727,6 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
     systemctl enable tmp.mount
     ```
 
----
-
 ## 第 6 步：内核安装
 
 1. 将 zfs 模块添加到 dracut：
@@ -751,8 +749,8 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    >**注意：**
    >
-   >在某些安装中，LUKS 分区可能无法被 dracut 识别，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
-   解决方法：检查 cryptsetup 安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
+   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
+   解决方法：检查 cryptsetup 的安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
 
    >**注意：**
    >
@@ -764,7 +762,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 ## 第 7 步：安装 Grub2
 
-1. 验证 ZFS 启动文件系统是否被识别：
+1. 验证 ZFS 启动文件系统的识别情况：
 
    ```sh
    grub2-probe /boot
@@ -1188,11 +1186,11 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 ### MPT2SAS
 
-本教程中大多数问题报告都涉及 `mpt2sas` 硬件，这类硬件会延迟异步初始化驱动器，例如某些 IBM M1015 或已刷回参考 LSI 固件的 OEM 卡。
+本教程中大多数问题报告都与 `mpt2sas` 硬件相关，这类硬件会延迟异步初始化驱动器，例如某些 IBM M1015 或已刷回参考 LSI 固件的 OEM 卡。
 
 基本问题是，这些控制器上的磁盘在 Linux 内核启动时不可见，而 ZoL 不支持热插拔池成员。详见：[https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
 
-大多数 LSI 卡完全兼容 ZoL。如果你的卡存在此问题，可在 `/etc/default/zfs` 中设置：
+大多数 LSI 卡完全兼容 ZoL。如果你的 LSI 卡存在此问题，可在 `/etc/default/zfs` 中设置：
 
 ```ini
 ZFS_INITRD_PRE_MOUNTROOT_SLEEP=X
@@ -1212,7 +1210,7 @@ sudo zypper install ovmf
 sudo vi /etc/libvirt/qemu.conf
 ```
 
-取消注释以下行：
+取消对以下行的注释：
 
 ```ini
 nvram = [
