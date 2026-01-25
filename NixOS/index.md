@@ -24,7 +24,7 @@ NixOS Live 镜像默认包含 ZFS 支持。
    networking.hostId = "yourHostId";
    ```
 
-   其中可通过以下方式生成 hostID：
+   其中可通过以下方式生成 hostId：
 
    ```sh
    head -c4 /dev/urandom | od -A none -t x4
