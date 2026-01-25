@@ -10,5 +10,5 @@ openSUSE 主要通过 3 条发行分支进行演进，分别是 Tumbleweed、Lea
 
 ## 外部链接
 
-* [openSUSE OpenZFS 页面]([https://en.opensuse.org/OpenZFS](https://en.opensuse.org/OpenZFS))
+* [openSUSE OpenZFS 页面](https://en.opensuse.org/OpenZFS)
 
