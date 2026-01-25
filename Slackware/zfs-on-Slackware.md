@@ -2,11 +2,11 @@
 
 本页展示了一些将 Slackware 配置为使用 ZFS 作为根文件系统的可能方法。
 
-实现这种设置的方法多种多样，特别是考虑到 ZFS 提供的灵活性。这里仅展示一个简单方案，并提供进一步自定义的指引。
+实现这种设置的方法多种多样，特别是考虑到 ZFS 提供的灵活性。这里仅展示一种简单方案，还提供了进一步自定义的指引。
 
 ## 内核考虑
 
-在这个简单的教程中，我们将使用通用内核（generic kernel）并自定义默认的 initrd。
+在这个简要的教程中，我们将使用通用内核（generic kernel）并自定义默认的 initrd。
 
 如果你使用的是大页内核，你可能需要先切换到通用内核，再安装软件包 `kernel-generic` 和 `mkinitrd`。这会更方便，因为我们需要使用 initrd。
 
@@ -14,7 +14,7 @@
 
 ## 问题空间
 
-为了将根文件系统设置为 ZFS 上，需要解决两个问题：
+为了将根文件系统设置为 ZFS，需要解决两个问题：
 
 1. 引导加载程序必须能够加载内核及其 initrd。
 2. 内核（或者说 initrd）必须能够挂载 ZFS 根文件系统并运行 `/sbin/init`。
@@ -33,11 +33,11 @@
 
 ## 分区布局
 
-重新分区现有系统磁盘以为 ZFS 根分区腾出空间留给读者自行操作（这与 ZFS 本身无关）。
+对现有系统磁盘重新分区，为 ZFS 根分区腾出空间，请读者自行操作（这与 ZFS 本身无涉）。
 
 >**提示**
 >
->如果你从完整的 ext4 文件系统开始，可以使用 `resize2fs` 将其缩小到磁盘大小的一半，然后用 `sfdisk` 将其移动到磁盘的后半部分。之后，你可以在前半部分创建 ZFS 分区，并使用 `cp` 或 `rsync` 复制数据。这种方法的好处是，如果出现问题，仍有一定的恢复机制。当你对最终设置满意后，可以删除 ext4 分区来扩展 ZFS 分区。
+>如果你从完整的 ext4 文件系统开始，可以使用 `resize2fs` 将其缩小到磁盘大小的一半，然后用 `sfdisk` 将其移动到磁盘的后半部分。之后，你可以在前半部分创建 ZFS 分区，并使用 `cp` 或 `rsync` 复制数据。这种方法的好处是，如果出现问题，仍有一定的恢复手段。当你对最终设置满意后，可以删除 ext4 分区来扩展 ZFS 分区。
 
 无论如何，建议准备救援 CD，并且该 CD 需要原生支持 ZFS。Ubuntu Live CD 即可满足需求。
 
@@ -48,9 +48,9 @@
 /dev/sda2 # ZFS 池（包含“根”文件系统）
 ```
 
-由于我们是在磁盘分区内创建 zpool（而不是占用整个磁盘），请确保分区类型设置正确（GPT 下，54 或 67 都是合适的选择）。
+由于我们是在磁盘分区内创建 zpool（而不是占用整个磁盘），请确保分区类型设置正确（GPT 下，54、67 都是合适的选择）。
 
-创建 ZFS 文件系统时，应设置 `mountpoint=legacy`，以便文件系统能以传统方式通过 `mount` 挂载；Slackware 的启动和关机脚本依赖这种方式。
+当创建 ZFS 文件系统时，应设置 `mountpoint=legacy`，以便文件系统能以传统方式通过 `mount` 挂载；Slackware 的启动和关机脚本就依赖这种方式。
 
 回到本教程，这是一个可用的示例：
 
@@ -63,7 +63,7 @@ zfs create -o mountpoint=legacy -o compression=zstd tank/root
 # zfs create -o mountpoint=legacy [..] tank/opt
 ```
 
-可以根据个人需求调整选项；虽然根文件系统必须设置 `mountpoint=legacy`，但其他文件系统并非必需。上述示例中，我们对所有文件系统都应用了该选项，这只是个人偏好问题。同样，将 zpool 本身设置为 `mountpoint=none` 以默认不挂载也可根据需求选择（注意 zpool 的 `mountpoint=none` 需要大写 `-O`）。
+可以根据个人需求调整选项；虽然必须为根文件系统设置 `mountpoint=legacy`，但这对其他文件系统并非必需。在上述示例中，我们对所有文件系统都应用了该选项，这只是个人偏好问题。同样，可根据需求选择，将 zpool 本身设置为 `mountpoint=none`，即默认不挂载（注意 zpool 的 `mountpoint=none` 需要大写 `-O`）。
 
 可以通过以下命令检查设置：
 
@@ -82,7 +82,7 @@ tank/root    /       zfs   defaults   0   0
 # tank/opt     /opt    zfs   defaults   0   0
 ```
 
-这样，一旦使用 `zpool import tank` 导入池后，我们就可以像平常一样挂载和卸载这些文件系统。接下来就是…
+这样，在使用 `zpool import tank` 导入池后，我们就可以像平常一样挂载和卸载这些文件系统。接下来就是…
 
 ## 修补并重建 initrd
 
@@ -157,7 +157,7 @@ chroot /boot/initrd-tree /sbin/zpool --help
 
 如果使用 elilo，配置示例如下：
 
-```sh
+```ini
 image=vmlinuz
   label=linux
   initrd=initrd.gz
