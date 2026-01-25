@@ -205,7 +205,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    对启动池无需自定义选项。
 
    GRUB 不支持全部的 zpool 功能。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
-   此步骤为 `/boot` 创建单独的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB “支持”。
+   此步骤为 `/boot` 创建单独的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB“支持”。
 
    **提示：**
 
@@ -751,7 +751,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    >**注意：**
    >
-   >在某些安装中，LUKS 分区可能无法被 dracut 识别，会出现报错 “Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
+   >在某些安装中，LUKS 分区可能无法被 dracut 识别，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
    解决方法：检查 cryptsetup 安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
 
    >**注意：**
@@ -986,7 +986,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    adduser 用户名
 
    cp -a /etc/skel/. /home/用户名
-   chown -R 用户名:用户名 /home/用户名
+   chown -R 用户名：用户名 /home/用户名
    usermod -a -G audio,cdrom,dip,floppy,netdev,plugdev,sudo,video 用户名
    ```
 
