@@ -31,3 +31,8 @@
 * NixOS
   * [在 NixOS 中启用 ZFS 支持](NixOS/index.md)
   * [构建以 ZFS 为根文件系统的 NixOS](NixOS/NixOS-Root-on-ZFS.md)
+* openSUSE
+  * [在 openSUSE 中启用 ZFS 支持](openSUSE/index.md)
+  * [构建以 ZFS 为根文件系统的 openSUSE Leap](openSUSE/zfs-on-leap.md)
+  * [构建以 ZFS 为根文件系统的 openSUSE Tumbleweed](openSUSE/zfs-on-Tumbleweed.md)
+  
