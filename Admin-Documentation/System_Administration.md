@@ -17,13 +17,13 @@ ZFS 本身由三层主要结构组成。最底层是存储池分配器（Storage
 
 SPA 在池中对磁盘的组织形式是一个由 vdev（虚拟设备）构成的树。树的顶层是根 vdev。它的直接子节点可以是除自身之外的任意 vdev 类型。主要的 vdev 类型有：
 
-* mirror（支持 n 路镜像）
-* raidz
-  * raidz1（1 磁盘校验，类似 RAID 5）
-  * raidz2（2 磁盘校验，类似 RAID 6）
-  * raidz3（3 磁盘校验，无 RAID 类比）
-* disk
-* file（不建议在生产环境中使用，因为其他的文件系统会增加不必要的层）
+- mirror（支持 n 路镜像）
+- raidz
+  - raidz1（1 磁盘校验，类似 RAID 5）
+  - raidz2（2 磁盘校验，类似 RAID 6）
+  - raidz3（3 磁盘校验，无 RAID 类比）
+- disk
+- file（不建议在生产环境中使用，因为其他的文件系统会增加不必要的层）
 
 任意数量的这些 vdev 都可以作为根 vdev 的子节点，被称为顶级 vdev。此外，其中一些也可能有子节点，例如 mirror vdev 和 raidz vdev。命令行工具不支持将 raidz 作为 mirror 的子节点或 mirror 作为 raidz 的子节点，尽管这种配置在开发者测试中有使用。
 
@@ -33,9 +33,9 @@ SPA 在池中对磁盘的组织形式是一个由 vdev（虚拟设备）构成�
 
 还有三种特殊类型：
 
-* spare
-* cache
-* log
+- spare
+- cache
+- log
 
 spare 设备在磁盘故障时用于替换，前提是池的 autoreplace 属性已启用且你的平台支持该功能。它不会替换 cache 设备或 log 设备。
 
@@ -47,15 +47,15 @@ log 设备能让 ZFS Intent Log（ZIL，ZFS 意图日志）记录写入到不同
 
 ZFS 通过多种机制尝试提供数据完整性：
 
-* 已提交的数据存储在一个 Merkle 树中，该树在每次事务组提交时以原子方式更新。
-* Merkle 树使用存储在块指针中的 256 位校验和来防止错误写入，包括那些对较弱校验和可能发生碰撞的写入。支持将 sha256 用于加密强保证，尽管默认是 fletcher4。
-* 每个 disk/file vdev 包含四个磁盘标签（每端两个），以确保即使一端由于磁头掉落丢失数据，也不会擦除标签。
-* 事务组提交使用两个阶段来确保在事务组被视为已提交之前，所有数据都已写入存储。这就是为什么每个磁盘两端都有两个标签。在机械存储上执行事务组提交需要完整的磁头扫描，并使用刷新（flush）操作以确保后半部分不会在其他操作之前执行。
-* 用于同步 IO 的 ZIL 记录存储待更改的数据，这些记录是自检块，仅在系统在上一个事务组提交之前进行更改时，在池导入时读取。
-* 默认情况下，所有元数据存储两份，其中包含池在特定事务组状态的对象（标签指向的对象）会写入三次。ZFS 尽量将元数据存储在相距至少 1/8 磁盘的位置，以防磁头掉落导致不可恢复的损坏。
-* 标签包含一个 uberblock 历史，这能在最坏情况下将整个池回滚到近期的某一点。使用此恢复机制需要特殊命令，因为通常不需要。
-* uberblocks 包含所有 vdev GUID 的总和。只有当总和匹配时，uberblocks 才被视为有效。这可以防止已损坏的旧池的 uberblocks 被误认为是有效的。
-* 支持 N 路镜像和 raidz 的最多 3 级校验，这样在使用适当冗余时，越来越常见的 2 磁盘故障[[1]](https://queue.acm.org/detail.cfm?id=1670144) 不会在恢复过程中破坏 RAID 5 或双镜像，从而避免 ZFS 池被损坏。
+- 已提交的数据存储在一个 Merkle 树中，该树在每次事务组提交时以原子方式更新。
+- Merkle 树使用存储在块指针中的 256 位校验和来防止错误写入，包括那些对较弱校验和可能发生碰撞的写入。支持将 sha256 用于加密强保证，尽管默认是 fletcher4。
+- 每个 disk/file vdev 包含四个磁盘标签（每端两个），以确保即使一端由于磁头掉落丢失数据，也不会擦除标签。
+- 事务组提交使用两个阶段来确保在事务组被视为已提交之前，所有数据都已写入存储。这就是为什么每个磁盘两端都有两个标签。在机械存储上执行事务组提交需要完整的磁头扫描，并使用刷新（flush）操作以确保后半部分不会在其他操作之前执行。
+- 用于同步 IO 的 ZIL 记录存储待更改的数据，这些记录是自检块，仅在系统在上一个事务组提交之前进行更改时，在池导入时读取。
+- 默认情况下，所有元数据存储两份，其中包含池在特定事务组状态的对象（标签指向的对象）会写入三次。ZFS 尽量将元数据存储在相距至少 1/8 磁盘的位置，以防磁头掉落导致不可恢复的损坏。
+- 标签包含一个 uberblock 历史，这能在最坏情况下将整个池回滚到近期的某一点。使用此恢复机制需要特殊命令，因为通常不需要。
+- uberblocks 包含所有 vdev GUID 的总和。只有当总和匹配时，uberblocks 才被视为有效。这可以防止已损坏的旧池的 uberblocks 被误认为是有效的。
+- 支持 N 路镜像和 raidz 的最多 3 级校验，这样在使用适当冗余时，越来越常见的 2 磁盘故障[[1]](https://queue.acm.org/detail.cfm?id=1670144) 不会在恢复过程中破坏 RAID 5 或双镜像，从而避免 ZFS 池被损坏。
 
 在 FreeNAS 论坛上曾流传一种错误信息，称在未使用 ECC 内存时，ZFS 的数据完整性功能不如其他文件系统[[2]](https://forums.freenas.org/index.php?threads/ecc-vs-non-ecc-ram-and-zfs.15449/)。这一说法已被彻底驳斥[[3]](http://jrs-s.net/2015/02/03/will-zfs-and-non-ecc-ram-kill-your-data/)。为了可靠运行，所有软件都需要 ECC 内存[[4]](http://open-zfs.org/wiki/Hardware#ECC_Memory)，在这方面 ZFS 与其他文件系统并无不同。
 
@@ -141,41 +141,41 @@ ZFS 具有自我调优能力，但有一些参数可优化特定应用。这些�
 
 ### 第三方工具
 
-* [bdrewery/zfstools](https://github.com/bdrewery/zfstools) 提供快照管理工具，使用 Ruby 编写。
-* [fearedbliss/bliss-zfs-scripts](https://github.com/fearedbliss/bliss-zfs-scripts) 提供“ZFS 快照与备份管理”工具，遵循 MPL 2.0，针对 Gentoo Linux 设计。
-* [jimsalterjrs/sanoid](https://github.com/jimsalterjrs/sanoid) 基于策略的快照管理和复制工具，遵循 GPL，在 Linux 和 FreeBSD 上测试过。
-* [Rudd-O/zfs-tools](https://github.com/Rudd-O/zfs-tools) 提供快照管理和复制工具，使用 Python 编写。
-* [ZFS Watcher](http://zfswatcher.damicon.fi/) 是一个池监控与通知守护进程。
+- [bdrewery/zfstools](https://github.com/bdrewery/zfstools) 提供快照管理工具，使用 Ruby 编写。
+- [fearedbliss/bliss-zfs-scripts](https://github.com/fearedbliss/bliss-zfs-scripts) 提供“ZFS 快照与备份管理”工具，遵循 MPL 2.0，针对 Gentoo Linux 设计。
+- [jimsalterjrs/sanoid](https://github.com/jimsalterjrs/sanoid) 基于策略的快照管理和复制工具，遵循 GPL，在 Linux 和 FreeBSD 上测试过。
+- [Rudd-O/zfs-tools](https://github.com/Rudd-O/zfs-tools) 提供快照管理和复制工具，使用 Python 编写。
+- [ZFS Watcher](http://zfswatcher.damicon.fi/) 是一个池监控与通知守护进程。
 
 ### 一般文档
 
-* [功能](https://openzfs.org/wiki/Features)
-* [出版物与会议演讲](https://openzfs.org/wiki/Publications)
-* [历史](https://openzfs.org/wiki/History "History")
-* [性能调优](https://openzfs.org/wiki/Performance_tuning)
-* 手册页：[zdb](http://illumos.org/man/1m/zdb) | [zfs](http://illumos.org/man/1m/zfs) | [zpool](http://illumos.org/man/1m/zpool) | [zpool-features](http://illumos.org/man/5/zpool-features) | [zstreamdump](http://illumos.org/man/1m/zstreamdump) – *来自 illumos；更好的渲染页面会更好*
-* [Oracle Solaris ZFS 管理指南](http://docs.oracle.com/cd/E26505_01/html/E37384/index.html) – 大部分内容适用
-* [ZFS – 文件系统的最后方案](http://www.snia.org/sites/default/files2/sdc_archives/2008_presentations/monday/JeffBonwick-BillMoore_ZFS.pdf) – 来自 SNIA 2008 的概览
-* [Aaron Toponce 关于 ZFS 的系列博客文章](https://pthree.org/2012/04/17/install-zfs-on-debian-gnulinux/)
-* [Kateley Co 视频教程](http://kateleyco.com/?page_id=783)
-* [RAID-Z 条带宽度](http://blog.delphix.com/matt/2014/06/06/zfs-stripe-width/)
-* [RAID-Z 计算工具](http://wintelguy.com/raidcalc.pl) – 包含 RAID-Z1/Z2/Z3 计算
+- [功能](https://openzfs.org/wiki/Features)
+- [出版物与会议演讲](https://openzfs.org/wiki/Publications)
+- [历史](https://openzfs.org/wiki/History "History")
+- [性能调优](https://openzfs.org/wiki/Performance_tuning)
+- 手册页：[zdb](http://illumos.org/man/1m/zdb) | [zfs](http://illumos.org/man/1m/zfs) | [zpool](http://illumos.org/man/1m/zpool) | [zpool-features](http://illumos.org/man/5/zpool-features) | [zstreamdump](http://illumos.org/man/1m/zstreamdump) – *来自 illumos；更好的渲染页面会更好*
+- [Oracle Solaris ZFS 管理指南](http://docs.oracle.com/cd/E26505_01/html/E37384/index.html) – 大部分内容适用
+- [ZFS – 文件系统的最后方案](http://www.snia.org/sites/default/files2/sdc_archives/2008_presentations/monday/JeffBonwick-BillMoore_ZFS.pdf) – 来自 SNIA 2008 的概览
+- [Aaron Toponce 关于 ZFS 的系列博客文章](https://pthree.org/2012/04/17/install-zfs-on-debian-gnulinux/)
+- [Kateley Co 视频教程](http://kateleyco.com/?page_id=783)
+- [RAID-Z 条带宽度](http://blog.delphix.com/matt/2014/06/06/zfs-stripe-width/)
+- [RAID-Z 计算工具](http://wintelguy.com/raidcalc.pl) – 包含 RAID-Z1/Z2/Z3 计算
 
 ### 平台/发行版文档
 
 #### FreeBSD
 
-* 手册页：[zdb](http://www.freebsd.org/cgi/man.cgi?query=zdb&manpath=FreeBSD+8.4-RELEASE) | [zfs](http://www.freebsd.org/cgi/man.cgi?query=zfs&manpath=FreeBSD+8.4-RELEASE) | [zpool](http://www.freebsd.org/cgi/man.cgi?query=zpool&manpath=FreeBSD+8.4-RELEASE) | [zpool-features](http://www.freebsd.org/cgi/man.cgi?query=zpool-features&manpath=FreeBSD+8.4-RELEASE) | [zstreamdump](http://www.freebsd.org/cgi/man.cgi?query=zstreamdump&manpath=FreeBSD+8.4-RELEASE)
-* *FreeBSD 手册* 的 [ZFS 章节](https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/zfs.html)
-* [FreeBSD ZFS Wiki](https://wiki.freebsd.org/ZFS)
+- 手册页：[zdb](http://www.freebsd.org/cgi/man.cgi?query=zdb&manpath=FreeBSD+8.4-RELEASE) | [zfs](http://www.freebsd.org/cgi/man.cgi?query=zfs&manpath=FreeBSD+8.4-RELEASE) | [zpool](http://www.freebsd.org/cgi/man.cgi?query=zpool&manpath=FreeBSD+8.4-RELEASE) | [zpool-features](http://www.freebsd.org/cgi/man.cgi?query=zpool-features&manpath=FreeBSD+8.4-RELEASE) | [zstreamdump](http://www.freebsd.org/cgi/man.cgi?query=zstreamdump&manpath=FreeBSD+8.4-RELEASE)
+- *FreeBSD 手册* 的 [ZFS 章节](https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/zfs.html)
+- [FreeBSD ZFS Wiki](https://wiki.freebsd.org/ZFS)
 
 #### Gentoo
 
-* [Wiki 页面](https://wiki.gentoo.org/wiki/ZFS)
-* [Richard Yao 的 Gentoo 安装笔记](https://github.com/ryao/zfs-overlay/blob/master/zfs-install)
+- [Wiki 页面](https://wiki.gentoo.org/wiki/ZFS)
+- [Richard Yao 的 Gentoo 安装笔记](https://github.com/ryao/zfs-overlay/blob/master/zfs-install)
 
 #### illumos
 
-* 手册页：[zdb](http://www.illumos.org/man/1m/zdb) | [zfs](http://illumos.org/man/1m/zfs) | [zpool](https://www.illumos.org/man/1M/zpool) | [zpool-features](https://www.illumos.org/man/5/zpool-features) | [zstreamdump](http://illumos.org/man/1m/zstreamdump)
-* [Wiki 页面](http://wiki.illumos.org/display/illumos/ZFS)
-* OpenIndiana [ZFS 管理指南](http://wiki.openindiana.org/oi/ZFS)
+- 手册页：[zdb](http://www.illumos.org/man/1m/zdb) | [zfs](http://illumos.org/man/1m/zfs) | [zpool](https://www.illumos.org/man/1M/zpool) | [zpool-features](https://www.illumos.org/man/5/zpool-features) | [zstreamdump](http://illumos.org/man/1m/zstreamdump)
+- [Wiki 页面](http://wiki.illumos.org/display/illumos/ZFS)
+- OpenIndiana [ZFS 管理指南](http://wiki.openindiana.org/oi/ZFS)
