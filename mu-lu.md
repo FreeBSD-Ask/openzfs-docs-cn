@@ -6,6 +6,7 @@
 
 ## 安装指引
 
+* [概述](GettingStarted.md)
 * Alpine Linux
   * [在 Alpine Linux 中启用 ZFS 支持](AlpineLinux/index.md)
   * [构建以 ZFS 为根文件系统的 Alpine Linux](AlpineLinux/RootonZFS.md)
@@ -45,3 +46,9 @@
   * [构建以 ZFS 为根文件系统的 Ubuntu 20.04](Ubuntu/20.04-zfs.md)
   * [在树莓派上构建以 ZFS 为根文件系统的 Ubuntu 20.04](Ubuntu/20.04-rpi.md)
   * [构建以 ZFS 为根文件系统的 Ubuntu 18.04](Ubuntu/18.04-zfs.md)
+
+## 项目与社区
+
+* [概述](Project-and-Community.md)
+* [系统管理](Admin-Documentation/index.md)
+  * [OpenZFS 系统管理](Admin-Documentation/System_Administration.md)

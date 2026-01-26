@@ -2,6 +2,7 @@
 
 - 2026.1.26
   - 新增“Ubuntu”
+  - 新增“OpenZFS 系统管理”
 - 2026.1.25
   - 新增“NixOS”
   - 新增“openSUSE”
