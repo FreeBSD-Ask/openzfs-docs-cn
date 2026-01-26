@@ -4,7 +4,7 @@
 * [编辑日志](CHANGELOG.md)
 * [目录](mu-lu.md)
 
-## 安装指引
+## [安装指引](GettingStarted.md)
 
 * Alpine Linux
   * [在 Alpine Linux 中启用 ZFS 支持](AlpineLinux/index.md)
