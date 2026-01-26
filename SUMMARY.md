@@ -6,6 +6,7 @@
 
 ## 安装指引
 
+* [概述](GettingStarted.md)
 * Alpine Linux
   * [在 Alpine Linux 中启用 ZFS 支持](AlpineLinux/index.md)
   * [构建以 ZFS 为根文件系统的 Alpine Linux](AlpineLinux/RootonZFS.md)
