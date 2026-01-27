@@ -1,6 +1,6 @@
 # 签名密钥
 
-所有带标签的 ZFS on Linux [版本](https://github.com/zfsonlinux/zfs/releases) 都由该分支的官方维护者签名。这些签名会被 GitHub 自动验证，也可以通过下载维护者的公钥在本地进行验证。
+所有带 Tag 的 ZFS on Linux [RELEASE](https://github.com/zfsonlinux/zfs/releases) 都由该分支的官方维护者签名。这些签名会被 GitHub 自动验证，也可以通过下载维护者的公钥在本地进行验证。
 
 ## 维护者
 
