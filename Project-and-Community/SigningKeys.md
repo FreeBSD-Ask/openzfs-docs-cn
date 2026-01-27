@@ -44,7 +44,7 @@ gpg: Total number processed: 1
 gpg:              unchanged: 1
 ```
 
-公钥导入后，可以按如下方式验证 git 标签的签名。
+导入公钥后，可以按如下方式验证 git 标签的签名。
 
 ```sh
 $ git tag --verify zfs-0.6.5
