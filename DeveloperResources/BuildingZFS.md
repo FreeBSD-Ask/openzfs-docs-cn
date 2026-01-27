@@ -22,7 +22,7 @@ sudo yum install epel-release gcc make autoconf automake libtool rpm-build libti
 sudo yum install --enablerepo=epel python-packaging dkms
 ```
 
-* **RHEL/CentOS 8、Fedora**：
+* **RHEL/CentOS 8, Fedora**：
 
 ```sh
 sudo dnf install --skip-broken epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python3 python3-devel python3-setuptools python3-cffi libffi-devel git ncompress libcurl-devel
@@ -113,14 +113,14 @@ make native-deb # 构建用于 Debian/Ubuntu 的原生 DEB 软件包
 
 如果你希望运行 ZFS 测试套件（ZTS），则必须安装 `ksh` 以及一些额外的工具。
 
-* **RHEL/CentOS 7：**
+* **RHEL/CentOS 7:**
 
 ```sh
 sudo yum install ksh bc bzip2 fio acl sysstat mdadm lsscsi parted attr nfs-utils samba rng-tools pax perf
 sudo yum install --enablerepo=epel dbench
 ```
 
-* **RHEL/CentOS 8、Fedora：**
+* **RHEL/CentOS 8, Fedora:**
 
 ```sh
 sudo dnf install --skip-broken ksh bc bzip2 fio acl sysstat mdadm lsscsi parted attr nfs-utils samba rng-tools pax perf
