@@ -54,3 +54,9 @@
   * [OpenZFS 系统管理](Project-and-Community/System_Administration.md)
 * [捐赠](Project-and-Community/Donate.md)
 * [常见问题解答](Project-and-Community/FAQ.md)
+* [邮件列表](Project-and-Community/MailingLists.md)
+* [签名密钥](Project-and-Community/SigningKeys.md)
+
+## 开发资源
+
+* [自定义软件包](DeveloperResources/CustomPackages.md)
