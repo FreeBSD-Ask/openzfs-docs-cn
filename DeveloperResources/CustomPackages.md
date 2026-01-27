@@ -86,7 +86,7 @@ $ sudo rpm -e --nodeps zfs-fuse
 
 ### kABI-tracking kmod
 
-构建 kABI-tracking kmod 的过程与构建普通 kmod 几乎相同。然而，仅在该发行版支持稳定 kABI 的情况下，才会生成可被多个内核使用的二进制文件。要请求 kABI-tracking 软件包，必须在 configure 时传入选项 *–with-spec=redhat*。
+构建 kABI-tracking kmod 的过程与构建普通 kmod 几乎相同。然而，仅在该发行版支持稳定 kABI 的情况下，才会生成可被多个内核使用的二进制文件。要请求 kABI-tracking 软件包，必须在 configure 时传入选项 *–-with-spec=redhat*。
 
 请注意，这些软件包并不完全遵循 Red Hat 的规则，因此有小概率在新内核上无法使用。我们建议在生产服务器上使用这些构建时禁用自动内核更新。
 
@@ -160,7 +160,7 @@ sudo apt install alien autoconf automake build-essential debhelper-compat dh-dkm
 
 ### kmod
 
-构建 kmod 软件包时需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用 *–with-linux* 和 *–with-linux-obj* 选项指定确切路径。
+构建 kmod 软件包时需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用 *-–with-linux* 和 *-–with-linux-obj* 选项指定确切路径。
 
 要构建 RPM 转换的 Debian 软件包：
 
