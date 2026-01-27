@@ -2,18 +2,18 @@
 
 ## GitHub 仓库
 
-OpenZFS 的官方源代码由 [openzfs](https://github.com/openzfs/) 组织在 GitHub 上维护。该项目的主要 git 仓库是 [zfs](https://github.com/openzfs/zfs) 仓库。
+OpenZFS 的官方源代码由 [openzfs](https://github.com/openzfs/) 组织在 GitHub 上维护。该项目的主要 git 仓库是 [zfs](https://github.com/openzfs/zfs)。
 
 该仓库中有两个主要组成部分：
 
-* **ZFS**：ZFS 仓库包含一份上游 OpenZFS 代码的副本，该代码已针对 Linux 和 FreeBSD 进行了适配和扩展。绝大多数核心 OpenZFS 代码是自包含的，可以无需修改直接使用。
-* **SPL**：SPL 是一个薄的 shim 层，负责实现 OpenZFS 所需的基础接口。正是这一层使 OpenZFS 能够在多个平台上使用。SPL 以前在单独的仓库中维护，但在 `0.8` 主版本中被合并进 [zfs](https://github.com/openzfs/zfs) 仓库。
+* **ZFS**：ZFS 仓库是上游的 OpenZFS 代码，该代码已针对 Linux 和 FreeBSD 进行了适配和扩展。绝大多数核心 OpenZFS 代码是自包含的，可以无需修改直接使用。
+* **SPL**：SPL 是个轻的 shim 层，负责实现 OpenZFS 所需的基础接口。正是这一层使 OpenZFS 能够在多个平台上使用。SPL 以前在单独的仓库中维护，但在 `0.8` 主版本中被合并进 [zfs](https://github.com/openzfs/zfs) 仓库。
 
-## 安装依赖项
+## 安装依赖
 
 首先需要通过安装完整的开发工具链来准备你的环境。此外，还必须具备内核以及以下软件包的开发头文件。需要注意的是，如果当前运行内核的开发内核头文件未安装，模块将无法正确编译。
 
-构建最新 ZFS 2.1 版本需要安装以下依赖项。
+要构建最新 ZFS 2.1 版本需要安装以下依赖。
 
 * **RHEL/CentOS 7**：
 
@@ -43,12 +43,12 @@ pkg install autoconf automake autotools git gmake python devel/py-sysctl sudo
 
 ## 构建选项
 
-构建 OpenZFS 有两种选项；正确的选择在很大程度上取决于你的需求。
+构建 OpenZFS 有两种方案；如何选择在很大程度上取决于你的需求。
 
-* **软件包**：通常，从 git 构建可安装到系统上的自定义软件包是很有用的。这是进行与 systemd、dracut 和 udev 集成测试的最佳方式。使用软件包的缺点是会大大增加构建、安装和测试一次更改所需的时间。
-* **树内**：开发可以完全在 SPL/ZFS 源码树内完成。这通过允许开发者快速迭代补丁来加快开发速度。在树内工作时，开发者可以利用增量构建、加载 / 卸载内核模块、执行工具，并使用 ZFS 测试套件验证所有更改。
+* **软件包**：通常，从 git 构建可安装到系统上的自定义软件包是很有用的。这是进行与 systemd、dracut 和 udev 集成测试的最佳方式。使用软件包的缺点是会大大增加构建、安装和测试每次更改所需的时间。
+* **树内**：开发可以完全在 SPL/ZFS 源码树内完成。这通过赋能开发者快速迭代补丁来加快开发速度。在树内工作时，开发者可以利用增量构建、加载/卸载内核模块、执行工具，然后使用 ZFS 测试套件验证所有更改。
 
-本页其余部分重点介绍 **树内** 选项，这是大多数更改推荐的开发方法。有关构建自定义软件包的更多信息，请参阅 [custom packages](https://openzfs.github.io/openzfs-docs/Developer%20Resources/Custom%20Packages.html) 页面。
+本页其余部分重点介绍 **树内** 方案，这是大多数修改推荐的开发方法。有关构建自定义软件包的更多信息，请参阅 [自定义软件包](https://openzfs.github.io/openzfs-docs/Developer%20Resources/Custom%20Packages.html) 页面。
 
 ## 树内开发
 
@@ -62,9 +62,9 @@ git clone https://github.com/openzfs/zfs
 
 ### 配置与构建
 
-对于正在进行更改的开发者，始终基于 master 创建一个新的主题分支。这样可以方便你之后为更改打开一个 pull request。master 分支通过在每个 pull request 合并前后进行广泛的 [回归测试](http://build.zfsonlinux.org/) 来保持稳定。我们尽一切努力尽早发现缺陷，并将其排除在源码树之外。开发者应当习惯于频繁地将自己的工作 rebase 到最新的 master 分支之上。
+对于那些正在进行修改的开发者，应始终基于 master 创建新的主题分支。这样可以方便你之后为更改打开 pull request。master 分支通过在每个 pull request 合并前后进行海量的 [回归测试](http://build.zfsonlinux.org/) 来保持稳定。我们尽一切努力尽早发现缺陷，并将其排除在源码树之外。开发者应当习惯于频繁地将自己的工作 rebase 到最新的 master 分支之上。
 
-在本示例中，我们将使用 master 分支，并演示一次标准的 **树内** 构建。首先检出所需的分支，然后以传统的 autotools 方式构建 ZFS 和 SPL 源码。
+在本示例中，我们将使用 master 分支，演示标准的 **树内** 构建。首先检出所需的分支，然后以传统的 autotools 方式构建 ZFS 和 SPL 源码。
 
 ```sh
 cd ./zfs
@@ -74,11 +74,16 @@ sh autogen.sh
 make -s -j$(nproc)
 ```
 
-**提示：** 可以向 configure 传递 `--with-linux=PATH` 和 `--with-linux-obj=PATH`，以指定安装在非默认位置的内核。
 
-**提示：** 可以向 configure 传递 `--enable-debug`，以启用所有 ASSERT 以及额外的正确性测试。
+>**提示：**
+>
+>可以向 configure 传递 `--with-linux=PATH` 和 `--with-linux-obj=PATH`，来指定安装在非默认位置的内核。
 
-**可选** 构建软件包
+>**提示：**
+>
+> 可以向 configure 传递 `--enable-debug`，来启用所有 ASSERT 以及额外的正确性测试。
+
+可选：构建软件包
 
 ```sh
 make rpm # 构建用于 CentOS/Fedora 的 RPM 软件包
@@ -86,11 +91,11 @@ make deb # 构建由 RPM 转换而来的 Debian/Ubuntu 的 DEB 软件包
 make native-deb # 构建用于 Debian/Ubuntu 的原生 DEB 软件包
 ```
 
->**提示：**
+>**技巧**
 >
 >原生 Debian 软件包使用为 Debian 和 Ubuntu 预配置的路径进行构建。最好不要在 configure 阶段覆盖这些路径。
 
->**提示：**
+>**技巧**
 >
 >对于原生 Debian 软件包，可以导出 `KVERS`、`KSRC` 和 `KOBJ` 环境变量，以指定安装在非默认位置的内核。
 
@@ -100,7 +105,7 @@ make native-deb # 构建用于 Debian/Ubuntu 的原生 DEB 软件包
 
 ### 安装
 
-你可以在不安装 ZFS 的情况下运行 `zfs-tests.sh`，见下文。如果你在构建之后有理由安装 ZFS，请注意你的发行版是如何处理内核模块的。例如，在 Ubuntu 上，该仓库中的模块会安装到 `extra` 内核模块路径中，而该路径不在标准的 `depmod` 搜索路径内。因此，在测试期间，需要编辑 `/etc/depmod.d/ubuntu.conf`，并将 `extra` 添加到搜索路径的开头。
+你可以在不安装 ZFS 的情况下运行 `zfs-tests.sh`，见下文。如果你在构建之后有理由安装 ZFS，请注意你的发行版是如何处理内核模块的。例如，在 Ubuntu 上，该仓库中的模块会安装到内核模块路径 `extra` 中，而该路径不在标准的 `depmod` 搜索路径内。因此，在测试期间，需要编辑 `/etc/depmod.d/ubuntu.conf`，并将 `extra` 添加到搜索路径的开头。
 
 随后你可以使用 `sudo make install; sudo ldconfig; sudo depmod` 进行安装。卸载则使用 `sudo make uninstall; sudo ldconfig; sudo depmod`。你也可以仅安装内核模块，使用 `sudo make -C modules/ install`。
 
@@ -140,27 +145,27 @@ sudo apt install ksh bc bzip2 fio acl sysstat mdadm lsscsi parted attr dbench nf
 pkg install base64 bash checkbashisms fio hs-ShellCheck ksh93 pamtester devel/py-flake8 sudo
 ```
 
-在顶层 scripts 目录中提供了一些辅助脚本，用于帮助开发者进行树内构建开发。
+在顶层 scripts 目录中提供了一些辅助脚本，可帮助开发者进行树内构建开发。
 
-* **zfs-helper.sh：** 某些功能（例如 `/dev/zvol/`）依赖于系统中已安装的 ZFS 提供的 udev 辅助脚本。该脚本可用于在系统中从安装位置到树内辅助脚本创建符号链接。要成功运行 ZFS 测试套件，必须存在这些链接。可以使用 **-i** 和 **-r** 选项来安装和移除这些符号链接。
+* **zfs-helper.sh** 某些功能（例如 `/dev/zvol/`）依赖于系统中已安装的 ZFS 提供的 udev 辅助脚本。该脚本可用于在系统中从安装位置到树内辅助脚本创建符号链接。要成功运行 ZFS 测试套件，必须存在这些链接。可以使用选项 **-i** 和 **-r** 来安装和移除这些符号链接。
 
 ```sh
 sudo ./scripts/zfs-helpers.sh -i
 ```
 
-* **zfs.sh：** 新构建的内核模块可以使用 `zfs.sh` 加载。之后可以使用 **-u** 选项通过该脚本卸载内核模块。
+* **zfs.sh** 可以使用 `zfs.sh` 加载新构建的内核模块。之后可以使用选项 **-u** 通过该脚本卸载内核模块。
 
 ```sh
 sudo ./scripts/zfs.sh
 ```
 
-* **zloop.sh：** 一个用于使用随机参数反复运行 ztest 的封装脚本。ztest 命令是一个用户空间压力测试工具，通过并发运行一组随机测试用例来检测正确性问题。如果发生崩溃，将收集 ztest 日志、任何相关的 vdev 文件以及 core 文件（如果存在），并将其移动到输出目录以供分析。
+* **zloop.sh** 用于使用随机参数反复运行 ztest 的封装脚本。ztest 命令是用户空间的压力测试工具，通过并发运行一组随机测试用例来检测正确性问题。如果发生崩溃，将收集 ztest 日志、一切相关的 vdev 文件以及转储文件（如有），然后将其移动到输出目录以供分析。
 
 ```sh
 sudo ./scripts/zloop.sh
 ```
 
-* **zfs-tests.sh：** 一个用于启动 ZFS 测试套件的封装脚本。在 `/var/tmp/` 中的稀疏文件之上创建三个回环设备，并用于回归测试。有关 ZFS 测试套件的详细说明，可在顶层 tests 目录中的 [README](https://github.com/openzfs/zfs/tree/master/tests) 中找到。
+* **zfs-tests.sh** 用于启动 ZFS 测试套件的封装脚本。在 `/var/tmp/` 中的稀疏文件之上创建三个回环设备，并用于回归测试。有关 ZFS 测试套件的详细说明，可在顶层 tests 目录中的 [README](https://github.com/openzfs/zfs/tree/master/tests) 中找到。
 
 ```sh
 ./scripts/zfs-tests.sh -vx
