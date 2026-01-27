@@ -67,7 +67,7 @@ $ sudo dnf install *.$(uname -m).rpm *.noarch.rpm
 
 ### kmod
 
-在构建 kmod 软件包时，需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用选项 *–with-linux* 和 *–with-linux-obj* 指定确切路径。
+在构建 kmod 软件包时，需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用选项 *-–with-linux* 和 *-–with-linux-obj* 指定确切路径。
 
 ```sh
 $ cd zfs
