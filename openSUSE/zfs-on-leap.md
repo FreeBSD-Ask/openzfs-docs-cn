@@ -1061,7 +1061,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 >**注意**：
 >
->在内存压力极高的系统上，使用 zvol 作为 swap 设备可能导致系统锁死，无论 swap 空间剩余多少。[上游已有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
+>在内存压力极高的系统上，无论 swap 空间剩余多少，使用 zvol 作为 swap 设备都可能导致系统锁死。[上游已有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
 1. 创建用于 swap 的 zvol（卷数据集）：
 
