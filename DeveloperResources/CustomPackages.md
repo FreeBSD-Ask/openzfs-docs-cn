@@ -1,6 +1,6 @@
 # 自定义软件包
 
-以下说明假定你是从官方的 [ tar 发行版压缩包](https://github.com/zfsonlinux/zfs/releases/latest)（版本 0.8.0 或更新）或直接从 [git 仓库](https://github.com/zfsonlinux/zfs) 进行构建。大多数用户不需要这样做，应优先使用发行版提供的软件包。一般而言，发行版的软件包集成度更高、经过广泛测试、支持更完善。然而，如果你选择的发行版未提供软件包，或者你是开发者并想自己构建，下面是操作方法。
+以下说明假定你是从官方的 [tar 发行版压缩包](https://github.com/zfsonlinux/zfs/releases/latest)（版本 0.8.0 或更新）或直接从 [git 仓库](https://github.com/zfsonlinux/zfs) 进行构建。大多数用户不需要这样做，应优先使用发行版提供的软件包。一般而言，发行版的软件包集成度更高、经过广泛测试、支持更完善。然而，如果你选择的发行版未提供软件包，或者你是开发者并想自己构建，下面是操作方法。
 
 首先需要注意的是，构建系统能够生成几种不同类型的软件包。要选择的软件包类型取决于你的平台支持情况以及具体需求。
 
@@ -67,7 +67,7 @@ $ sudo dnf install *.$(uname -m).rpm *.noarch.rpm
 
 ### kmod
 
-在构建 kmod 软件包时，需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用选项 *–with-linux* 和 *–with-linux-obj* 指定确切路径。
+在构建 kmod 软件包时，需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用选项 *--with-linux* 和 *--with-linux-obj* 指定确切路径。
 
 ```sh
 $ cd zfs
@@ -86,7 +86,7 @@ $ sudo rpm -e --nodeps zfs-fuse
 
 ### kABI-tracking kmod
 
-构建 kABI-tracking kmod 的过程与构建普通 kmod 几乎相同。然而，仅在该发行版支持稳定 kABI 的情况下，才会生成可被多个内核使用的二进制文件。要请求 kABI-tracking 软件包，必须在 configure 时传入选项 *–with-spec=redhat*。
+构建 kABI-tracking kmod 的过程与构建普通 kmod 几乎相同。然而，仅在该发行版支持稳定 kABI 的情况下，才会生成可被多个内核使用的二进制文件。要请求 kABI-tracking 软件包，必须在 configure 时传入选项 *--with-spec=redhat*。
 
 请注意，这些软件包并不完全遵循 Red Hat 的规则，因此有小概率在新内核上无法使用。我们建议在生产服务器上使用这些构建时禁用自动内核更新。
 
@@ -160,7 +160,7 @@ sudo apt install alien autoconf automake build-essential debhelper-compat dh-dkm
 
 ### kmod
 
-构建 kmod 软件包时需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用 *–with-linux* 和 *–with-linux-obj* 选项指定确切路径。
+构建 kmod 软件包时需要注意的关键点是必须指定特定的 Linux 内核。在配置阶段，构建系统会根据经验猜测你希望针对哪个内核构建。然而，如果 configure 找不到你的内核开发头文件，或者你想针对不同内核构建，则必须使用 *--with-linux* 和 *--with-linux-obj* 选项指定确切路径。
 
 要构建 RPM 转换的 Debian 软件包：
 

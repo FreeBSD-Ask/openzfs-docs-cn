@@ -60,3 +60,4 @@
 ## 开发资源
 
 * [自定义软件包](DeveloperResources/CustomPackages.md)
+* [构建 ZFS](DeveloperResources/BuildingZFS.md)
