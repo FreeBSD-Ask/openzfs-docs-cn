@@ -147,7 +147,7 @@ pkg install base64 bash checkbashisms fio hs-ShellCheck ksh93 pamtester devel/py
 
 在顶层 scripts 目录中提供了一些辅助脚本，可帮助开发者进行树内构建开发。
 
-* **zfs-helper.sh** 某些功能（例如 `/dev/zvol/`）依赖于系统中已安装的 ZFS 提供的 udev 辅助脚本。该脚本可用于在系统中从安装位置到树内辅助脚本创建符号链接。要成功运行 ZFS 测试套件，必须存在这些链接。可以使用选项 **-i** 和 **-r** 来安装和移除这些符号链接。
+* **zfs-helpers.sh** 某些功能（例如 `/dev/zvol/`）依赖于系统中已安装的 ZFS 提供的 udev 辅助脚本。该脚本可用于在系统中从安装位置到树内辅助脚本创建符号链接。要成功运行 ZFS 测试套件，必须存在这些链接。可以使用选项 **-i** 和 **-r** 来安装和移除这些符号链接。
 
 ```sh
 sudo ./scripts/zfs-helpers.sh -i
