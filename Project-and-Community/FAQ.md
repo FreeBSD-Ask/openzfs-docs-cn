@@ -351,7 +351,7 @@ ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_FS_TYPE}=="zfs_member", ENV{ID_PART_ENT
 
 ## 报告问题
 
-你可以使用公开的 [issue tracker](https://github.com/zfsonlinux/zfs/issues) 打开新问题、搜索现有问题。问题跟踪器用于组织未解决的 bug 报告、功能请求及其他开发任务。任何人在注册 GitHub 账号后都发表评论。
+你可以使用公开的 [issue tracker](https://github.com/zfsonlinux/zfs/issues) 打开新问题、搜索现有问题。问题跟踪器用于组织未解决的 bug 报告、功能请求及其他开发任务。任何人在注册 GitHub 账号后都可以发表评论。
 
 请确保你实际遇到的是 bug，而不是支持问题。如有疑问，请先在邮件列表上咨询，如果之后被要求提交问题，再进行提交。
 
