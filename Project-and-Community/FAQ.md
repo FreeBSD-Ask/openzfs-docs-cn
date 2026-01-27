@@ -6,7 +6,7 @@ OpenZFS 是卓越的存储平台，拥有传统文件系统、卷管理器等功
 
 ## 硬件需求
 
-由于 ZFS 最初是为 Sun Solaris 设计的，长期以来，ZFS 被认为是面向大型服务器的、能够负担得起当时最优、最强硬件的公司的文件系统。但自从 ZFS 被移植到众多开源平台（BSD、Illumos 以及 Linux——统一在 “OpenZFS” 这一组织框架下）之后，上述要求已经降低。
+由于 ZFS 最初是为 Sun Solaris 设计的，长期以来，ZFS 被认为是面向大型服务器的、能够负担得起当时最优、最强硬件的公司的文件系统。但自从 ZFS 被移植到众多开源平台（BSD、Illumos 以及 Linux——统一在“OpenZFS”这一组织框架下）之后，上述要求已经降低。
 
 推荐的硬件需求是：
 
@@ -76,7 +76,7 @@ vmap allocation for size 4198400 failed: use vmalloc=<size> to increase size.
   * 缺点：此方法依赖于 `/etc/zfs/vdev_id.conf` 文件针对你的系统被正确配置。要配置此文件，请参阅章节 [设置 /etc/zfs/vdev_id.conf 文件](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#setting-up-the-etc-zfs-vdev-id-conf-file)。与优点一样，缺点也可能取决于所采用的命名方法，并可能涉及 `/dev/disk/by-id` 或 `/dev/disk/by-path` 的局限性。
   * 示例：`zpool create tank mirror A1 B1 mirror A2 B2`
 * **/dev/disk/by-uuid/** 不是个足够理想的方案
-  * 概要：可能有人会认为使用 “UUID” 是理想选项——然而实际上，这只会为每个 **pool** ID 列出一个设备，这对于导入包含多块磁盘的池并不十分有用。
+  * 概要：可能有人会认为使用“UUID”是理想选项——然而实际上，这只会为每个 **pool** ID 列出一个设备，这对于导入包含多块磁盘的池并不十分有用。
 * **/dev/disk/by-partuuid/** / **/dev/disk/by-partlabel/**：仅适用于已有分区
   * 概要：分区 UUID 在创建时方生成，因此使用受限
   * 缺点：对于未分区的磁盘，无法在 `zpool replace`、`add` 或 `attach` 中引用其分区唯一 ID，且如果没有事先记录映射，也无法轻松找到故障磁盘。
@@ -245,7 +245,7 @@ CEPH filestore 后端高度依赖 xattrs，为获得最佳性能，所有 CEPH �
 
 此外，CEPH 会根据底层文件系统内部设置各种值以处理 xattrs。由于 CEPH 官方仅支持/检测 XFS 和 BTRFS，对于其他所有文件系统，它将回退到相对 [有限的“安全”值](https://github.com/ceph/ceph/blob/4fe7e2a458a1521839bc390c2e3233dd809ec3ac/src/common/config_opts.h#L1125-L1148)。在新版本中，对较大 xattrs 的需求甚至会阻止 OSD 启动。
 
-官方推荐的解决方法（[见此处](https://tracker.ceph.com/issues/16187#note-3)）有一些严重缺点，尤其是针对支持 xattr “有限”的文件系统，如 ext4。
+官方推荐的解决方法（[见此处](https://tracker.ceph.com/issues/16187#note-3)）有一些严重缺点，尤其是针对支持 xattr“有限”的文件系统，如 ext4。
 
 ZFS 内部对 xattrs 长度没有限制，因此我们可以将其视作 CEPH 对待 XFS 的方式。我们可以设置覆盖，将 3 个内部值设置为与 XFS 使用的相同值（[见此处](https://github.com/ceph/ceph/blob/9b317f7322848802b3aab9fec3def81dddd4a49b/src/os/filestore/FileStore.cc#L5714-L5737) 和 [此处](https://github.com/ceph/ceph/blob/4fe7e2a458a1521839bc390c2e3233dd809ec3ac/src/common/config_opts.h#L1125-L1148)），从而能够正常使用而不受“官方”解决方法的严重限制。
 
