@@ -4,8 +4,8 @@
 
 * [ZFS 专家](https://openzfs.org/wiki/Contributors)
 * [邮件列表](https://openzfs.org/wiki/Mailing_list)
-* IRC：[ #openzfs ](ircs://irc.libera.chat/#openzfs) 于 [Libera.chat](https://libera.chat/)
-* Twitter：[ @openzfs ](https://twitter.com/OpenZFS)
+* IRC：[#openzfs](ircs://irc.libera.chat/#openzfs) 于 [Libera.chat](https://libera.chat/)
+* Twitter：[@openzfs](https://twitter.com/OpenZFS)
 * [OpenZFS 办公时间](https://openzfs.org/wiki/OpenZFS_Office_Hours)：轮流由负责人 / 所有者主持
 * 指向其他邮件列表和仓库的指引？
 
