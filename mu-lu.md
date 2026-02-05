@@ -68,3 +68,4 @@
 
 * [硬件](Performance-Tuning/Hardware.md)
 * [模块参数](Performance-Tuning/ModuleParameters.md)
+* [工作负载调优](Performance-Tuning/WorkloadTuning.md)
