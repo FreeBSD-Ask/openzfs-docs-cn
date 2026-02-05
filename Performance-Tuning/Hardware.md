@@ -294,7 +294,7 @@ PSU 电容老化会降低保持时间，可能导致设备随时间可靠性下�
 
 脚注
 
-- [[1](http://lkcl.net/reports/ssd_analysis.html)] [SSD 电源故障分析报告](http://lkcl.net/reports/ssd_analysis.html)
-- [[2](https://www.usenix.org/system/files/conference/fast13/fast13-final80.pdf)] [USENIX FAST 2013 SSD 电源测试论文](https://www.usenix.org/system/files/conference/fast13/fast13-final80.pdf)
-- [[3](https://engineering.nordeus.com/power-failure-testing-with-ssds)] [Nordeus SSD 电源故障测试](https://engineering.nordeus.com/power-failure-testing-with-ssds)
-- [[4](https://www.apc.com/us/en/faqs/FA158934/)] [APC 关于 UPS 电池更换的常见问题](https://www.apc.com/us/en/faqs/FA158934/)
+* [[1](http://lkcl.net/reports/ssd_analysis.html)] [SSD 电源故障分析报告](http://lkcl.net/reports/ssd_analysis.html)
+* [[2](https://www.usenix.org/system/files/conference/fast13/fast13-final80.pdf)] [USENIX FAST 2013 SSD 电源测试论文](https://www.usenix.org/system/files/conference/fast13/fast13-final80.pdf)
+* [[3](https://engineering.nordeus.com/power-failure-testing-with-ssds)] [Nordeus SSD 电源故障测试](https://engineering.nordeus.com/power-failure-testing-with-ssds)
+* [[4](https://www.apc.com/us/en/faqs/FA158934/)] [APC 关于 UPS 电池更换的常见问题](https://www.apc.com/us/en/faqs/FA158934/)
