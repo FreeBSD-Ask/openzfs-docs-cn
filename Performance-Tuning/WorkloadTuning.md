@@ -157,7 +157,7 @@ ZFS 顶层 vdev 被划分为 metaslab，从中可以独立分配块，以便并�
 
 保持存储池的可用空间在 10% 以上，避免许多 metaslab 达到 4% 的空闲空间阈值，从而从首次适配（first-fit）切换到最佳适配（best-fit）分配策略。当达到该阈值时，[Metaslab 分配器](https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Workload%20Tuning.html#metaslab-allocator) 会消耗大量 CPU 尝试保护自身免受碎片影响。这会降低 IOPS——尤其是当更多 metaslab 达到 4% 阈值时。
 
-推荐使用 10% 而非 5%，因为 metaslab 选择会同时考虑位置和空闲空间，除非全局可调参数 `metaslab_lba_weighting_enabled` 设置为 `0`。当该可调参数为` 0` 时，ZFS 仅考虑空闲空间，因此通过保持可用空间高于 5% 可以避免最佳适配分配器的开销。该设置应仅在存储池全部由固态硬盘组成的系统上使用，因为在机械硬盘上会降低顺序 IO 性能。
+推荐使用 10% 而非 5%，因为 metaslab 选择会同时考虑位置和空闲空间，除非全局可调参数 `metaslab_lba_weighting_enabled` 设置为 `0`。当该可调参数为`0` 时，ZFS 仅考虑空闲空间，因此通过保持可用空间高于 5% 可以避免最佳适配分配器的开销。该设置应仅在存储池全部由固态硬盘组成的系统上使用，因为在机械硬盘上会降低顺序 IO 性能。
 
 ### LZ4 压缩
 
