@@ -81,3 +81,7 @@
 * [故障排除](Basic-Concepts/Troubleshooting.md)
 * [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
 * [分布式 RAID（dRAID）](Basic-Concepts/dRAID.md)
+
+## 许可证
+
+* [许可证](License-ZFS.md)
