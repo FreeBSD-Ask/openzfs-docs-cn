@@ -5,6 +5,7 @@
   - 新增“ZFS I/O（ZIO）调度器”
   - 新增“Async Write I/O 调度”
   - 新增“基础概念”
+  - 当前版本 [93ac90cde77c8bd1ac92fb67c075d008110ddb36](https://github.com/openzfs/openzfs-docs/commit/93ac90cde77c8bd1ac92fb67c075d008110ddb36)
 - 2026.2.5
   - 新增“硬件”
   - 新增“模块参数”（为空，不具有翻译意义）
