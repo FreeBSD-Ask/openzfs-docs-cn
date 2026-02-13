@@ -236,7 +236,11 @@ Bit torrent 执行 16 KB 的随机读/写。16 KB 的写操作会引发读-修�
 
 ### PostgreSQL
 
-为 PostgreSQL 的数据和 WAL 创建单独的数据集。在两者上设置 `compression=lz4` 和 `recordsize=32K`（64K 也可，128K 默认值也可）。为 PostgreSQL 配置 `full_page_writes = off`，因为 ZFS 永远不会提交部分写入。对于更新量大的数据库，可以在 PostgreSQL 的数据上尝试设置 `logbias=throughput` 以避免双写，但需注意，使用此设置时较小的更新可能导致严重碎片化。
+为 PostgreSQL 的数据和 WAL 创建独立的数据集。在两个数据集上设置 `compression=lz4` 和 `recordsize=32K`（64K 也可以，128K 默认值也适用）。在启用 `compression=lz4` 之前的建议是将 `recordsize` 设置为 8K，以期匹配 PostgreSQL 的 8K 页面大小，从而避免写放大，但压缩通常会带来更大的性能提升，而且压缩只有在使用较大 `recordsize` 时才有效 [1](https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Workload%20Tuning.html#compression-larger-block-size)。
+
+将 PostgreSQL 的 `full_page_writes = off` 配置为关闭，因为 ZFS 永远不会提交部分写入。但如果因某种原因将 `recordsize` 设置为小于 8K，或者存在将此数据库配置复制到非 ZFS 系统的可能性，则不要关闭此选项，因为在文件系统无法提供至少与 PostgreSQL 页面大小一致的原子写入时，断电可能会导致 PostgreSQL 数据损坏 [2](https://openzfs.github.io/openzfs-docs/Performance%20and%20Tuning/Workload%20Tuning.html#postgres-full-page-writes)。
+
+对于更新量大的数据库，可以在 PostgreSQL 数据上尝试 `logbias=throughput`，以避免重复写入，但请注意，此设置在较小更新时可能导致严重的碎片化。
 
 ### SQLite
 

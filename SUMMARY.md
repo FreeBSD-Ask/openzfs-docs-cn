@@ -36,6 +36,9 @@
   * [在 openSUSE 中启用 ZFS 支持](openSUSE/index.md)
   * [构建以 ZFS 为根文件系统的 openSUSE Leap](openSUSE/zfs-on-leap.md)
   * [构建以 ZFS 为根文件系统的 openSUSE Tumbleweed](openSUSE/zfs-on-Tumbleweed.md)
+* 基于 RHEL 的衍生发行版
+  * [在 RHEL 及其衍生版中启用 ZFS 支持](RHEL/index.md)
+  * [构建以 ZFS 为根文件系统的 Rocky Linux](RHEL/zfs-root-on-rockylinux.md)
 * Slackware
   * [在 Slackware 中启用 ZFS 支持](Slackware/index.md)
   * [构建以 ZFS 为根文件系统的 Slackware](Slackware/zfs-on-Slackware.md)  
@@ -81,6 +84,16 @@
 * [故障排除](Basic-Concepts/Troubleshooting.md)
 * [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
 * [分布式 RAID (dRAID)](Basic-Concepts/dRAID.md)
+
+## ZFS 消息
+
+* [消息 ID：ZFS-8000-14](msg/ZFS-8000-14.md)
+* [消息 ID：ZFS-8000-2Q](msg/ZFS-8000-2Q.md)
+* [消息 ID：ZFS-8000-3C](msg/ZFS-8000-3C.md)
+* [消息 ID：ZFS-8000-4J](msg/ZFS-8000-4J.md)
+* [消息 ID：ZFS-8000-5E](msg/ZFS-8000-5E.md)
+* [消息 ID：ZFS-8000-6X](msg/ZFS-8000-6X.md)
+* [消息 ID：ZFS-8000-72](msg/ZFS-8000-72.md)
 
 ## 许可证
 
