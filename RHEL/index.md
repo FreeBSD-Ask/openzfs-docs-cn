@@ -1,4 +1,4 @@
-# 在 RHEL 及其衍生版中启用 ZFS 支持
+<img width="1249" height="428" alt="%MU`UZ30D)M}X28A 569MHA" src="https://github.com/user-attachments/assets/38815020-896b-41be-a352-e51d5f6f8a19" /># 在 RHEL 及其衍生版中启用 ZFS 支持
 
 针对基于 x86_64 的 RHEL 和 CentOS 发行版，OpenZFS 仓库提供了 [DKMS](https://en.wikipedia.org/wiki/Dynamic_Kernel_Module_Support) 和 [kABI 跟踪 kmod](https://elrepoproject.blogspot.com/2016/02/kabi-tracking-kmod-packages.html) 风格的软件包。这些软件包会随着新版本发布而更新。每个当前主版本中，只有对应的当前点版本仓库会更新新软件包。
 
@@ -88,7 +88,7 @@ echo zfs >/etc/modules-load.d/zfs.conf
 
 ## 以前的 EL 点版本
 
-当前发行版软件包使用 `${releasever}`，而不是像以前的发行版软件包那样指定特定的点版本。通常会将 `${releasever}` 解析为主版本号（例如 `8`），生成的仓库 URL 会被别名为当前点版本（例如 8.7），但可以通过指定 `–releasever` 使用以前的仓库。
+当前发行版软件包使用 `${releasever}`，而不是像以前的发行版软件包那样指定特定的点版本。通常会将 `${releasever}` 解析为主版本号（例如 `8`），生成的仓库 URL 会被别名为当前点版本（例如 8.7），但可以通过指定 `--releasever` 使用以前的仓库。
 
 ```sh
 [vagrant@localhost ~]$ dnf list available --showduplicates kmod-zfs
