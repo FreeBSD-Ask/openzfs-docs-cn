@@ -38,7 +38,7 @@ sudo apt install alien autoconf automake build-essential debhelper-compat dh-aut
 * **FreeBSD**：
 
 ```sh
-pkg install autoconf automake autotools git gmake python devel/py-sysctl sudo
+pkg install autoconf automake autotools gettext git gmake python devel/py-sysctl sudo
 ```
 
 ## 构建选项
