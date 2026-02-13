@@ -19,3 +19,7 @@
 - 错误追踪：<https://github.com/openzfs/zfs/issues>
 - 发行产物：<https://github.com/openzfs/zfs/releases>
 - 路线图：<https://github.com/openzfs/zfs/milestones>
+
+## 许可证
+
+[OpenZFS Documentation](https://openzfs.github.io/openzfs-docs/index.html) 原文采用 CC BY 3.0 授权，因此本项目采用 BSD 和 CC BY 3.0 双许可证进行授权，读者可以选择任一许可证。
