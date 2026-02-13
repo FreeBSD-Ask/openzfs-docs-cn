@@ -44,28 +44,4 @@ I/O 队列统计信息包含大多数 I/O 类，可通过命令 `zpool iostat -q
 
 ZIO 调度器并非尽可能快地处理 I/O，而是根据存储池中的脏数据量动态调整活动 async write I/O 的最大数量。由于向物理设备发出的并发操作数量增加通常会同时提升吞吐量和延迟，减少并发操作数量的突发性也有助于稳定其他队列操作的响应时间。这对于 sync read 和 sync write 队列尤为重要，因为 txg 同步的周期性 async write 突发可能导致设备级争用。概括而言，当存储池中的脏数据增多时，ZIO 调度器会从 async write 队列发出更多并发操作。
 
-## Async Write I/O 调度
 
-为 async write I/O 类发出的并发操作数量遵循一个分段线性函数，该函数由若干可调节点定义：
-
-```
-|                   o---------| <-- zfs_vdev_async_write_max_active
-  ^    |                  /^         |
-  |    |                 / |         |
-active |                /  |         |
- I/O   |               /   |         |
-count  |              /    |         |
-       |             /     |         |
-       |------------o      |         | <-- zfs_vdev_async_write_min_active
-      0|____________^______|_________|
-       0%           |      |        100% of zfs_dirty_data_max
-                    |      |
-                    |      `-- zfs_vdev_async_write_active_max_dirty_percent
-                    `--------- zfs_vdev_async_write_active_min_dirty_percent
-```
-
-在脏数据量未超过存储池允许脏数据最小百分比之前，I/O 调度器会将并发操作数量限制为最小值。当超过该阈值后，发出的并发操作数量会随脏数据量线性增加，并在达到所指定的允许脏数据最大百分比时达到最大值。
-
-理想情况下，繁忙存储池中的脏数据量应保持在 `zfs_vdev_async_write_active_min_dirty_percent` 与 `zfs_vdev_async_write_active_max_dirty_percent` 之间的函数斜坡区间内。如果超过最大百分比，则表明传入数据速率大于后端存储能够处理的速率。在这种情况下，必须进一步对传入写入进行节流。详见 ZIO Transaction Delay。
-
-参考代码： [vdev_queue.c](https://github.com/openzfs/zfs/blob/master/module/zfs/vdev_queue.c#L42)
