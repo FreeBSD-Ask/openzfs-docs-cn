@@ -83,7 +83,7 @@ OpenZFS 特性标志——作为传统版本编号的替代——**可为磁盘�
 **注释**
 
 1. [FreeBSD 在内置 OpenZFS 2.1 版本之前未启用 Edonr 支持](https://github.com/openzfs/zfs/pull/12735)
-2. [虽然 Illumos 的加密逻辑几乎相同，但其格式与 OpenZFS 加密格式并非 100% 兼容，因此跨平台加密可能存在问题](https://illumos.topicbox.com/groups/discuss/Ta2162fbb2358fa0e)
+2. 对于 `com.datto:encryption`，[虽然 Illumos 的加密逻辑几乎相同，但其格式与 OpenZFS 加密格式并非 100% 兼容，因此跨平台加密可能存在问题](https://illumos.topicbox.com/groups/discuss/Ta2162fbb2358fa0e)
 
 此表格由解析特性标志手册页生成，完全依赖于良好且准确的文档。
 
