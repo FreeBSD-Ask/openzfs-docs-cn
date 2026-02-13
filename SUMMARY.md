@@ -72,3 +72,12 @@
 * [OpenZFS 事务延迟](Performance-Tuning/Transaction0-Delay.md)
 * [ZFS I/O（ZIO）调度器](Performance-Tuning/ZIO-Scheduler.sh)
 * [Async Write I/O 调度](Performance-Tuning/Async-Write.md)
+
+## 基础概念
+
+* [校验和](Basic-Concepts/Checksums.md)
+* [特性标志](Basic-Concepts/Feature-Flags.md)
+* [RAIDZ（ZFS RAID）](Basic-Concepts/RAIDZ.md)
+* [故障排除](Basic-Concepts/Troubleshooting.md)
+* [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
+* [分布式 RAID（dRAID）](Basic-Concepts/dRAID.md)
