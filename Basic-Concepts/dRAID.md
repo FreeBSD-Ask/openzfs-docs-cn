@@ -1,4 +1,4 @@
-# 分布式 RAID（dRAID）
+# 分布式 RAID (dRAID)
 
 >**注意**
 >
