@@ -36,6 +36,9 @@
   * [在 openSUSE 中启用 ZFS 支持](openSUSE/index.md)
   * [构建以 ZFS 为根文件系统的 openSUSE Leap](openSUSE/zfs-on-leap.md)
   * [构建以 ZFS 为根文件系统的 openSUSE Tumbleweed](openSUSE/zfs-on-Tumbleweed.md)
+* 基于 RHEL 的衍生发行版
+  * [在 RHEL 及其衍生版中启用 ZFS 支持](RHEL/index.md)
+  * [构建以 ZFS 为根文件系统的 Rocky Linux](RHEL/zfs-root-on-rockylinux.md)
 * Slackware
   * [在 Slackware 中启用 ZFS 支持](Slackware/index.md)
   * [构建以 ZFS 为根文件系统的 Slackware](Slackware/zfs-on-Slackware.md)  
