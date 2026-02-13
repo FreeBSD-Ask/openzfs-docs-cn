@@ -6,7 +6,7 @@
 
 **密钥位置：** `/etc/pki/rpm-gpg/RPM-GPG-KEY-openzfs`（之前为 `-zfsonlinux`）
 
-**当前发行版软件包：** [EL7](https://zfsonlinux.org/epel/zfs-release-2-3.el7.noarch.rpm)、[EL8](https://zfsonlinux.org/epel/zfs-release-2-3.el8.noarch.rpm)、[EL9](https://zfsonlinux.org/epel/zfs-release-2-3.el9.noarch.rpm)
+**当前发行版软件包：** [EL7](https://zfsonlinux.org/epel/zfs-release-2-3.el7.noarch.rpm)、[EL8](https://zfsonlinux.org/epel/zfs-release-2-3.el8.noarch.rpm)、[EL9](https://zfsonlinux.org/epel/zfs-release-2-3.el9.noarch.rpm)、[EL10](https://zfsonlinux.org/epel/zfs-release-3-0.el10.noarch.rpm)
 
 **归档发行版软件包：** [参见仓库页面](https://github.com/zfsonlinux/zfsonlinux.github.com/tree/master/epel)
 
