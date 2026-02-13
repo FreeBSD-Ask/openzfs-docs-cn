@@ -1,4 +1,4 @@
-# RAIDZ
+# RAIDZ（ZFS RAID）
 
 ## 介绍
 
