@@ -30,7 +30,7 @@ ZFS 内核模块使用内部日志缓冲区记录详细的日志信息。对于�
 
 >**重要信息**
 >
->如果内核线程卡住，则卡住线程的回溯可能记录在日志中。在某些情况下，在死码计时器触发之前不会记录线程。另请参见 [调试可调参数](https://github.com/zfsonlinux/zfs/wiki/ZFS-on-Linux-Module-Parameters#debug)。
+>如果内核线程卡住，则卡住线程的回溯可能记录在日志中。在某些情况下，在挂起检测计时器触发之前不会记录线程。另请参见 [调试可调参数](https://github.com/zfsonlinux/zfs/wiki/ZFS-on-Linux-Module-Parameters#debug)。
 
 ## ZFS 事件
 
