@@ -26,7 +26,7 @@
    dnf install -y kernel-devel-$(uname -r | awk -F'-' '{print $1}')
    ```
 
-   必须先安装软件包 `kernel-devel` ，然后才能安软件包装 `zfs`。
+   必须先安装软件包 `kernel-devel`，然后才能安装软件包 `zfs`。
 
 4. 安装 ZFS 软件包：
 
