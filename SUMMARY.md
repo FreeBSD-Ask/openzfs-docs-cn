@@ -69,3 +69,19 @@
 * [硬件](Performance-Tuning/Hardware.md)
 * [模块参数](Performance-Tuning/ModuleParameters.md)
 * [工作负载调优](Performance-Tuning/WorkloadTuning.md)
+* [OpenZFS 事务延迟](Performance-Tuning/Transaction-Delay.md)
+* [ZFS I/O (ZIO) 调度器](Performance-Tuning/ZIO-Scheduler.md)
+* [Async Write I/O 调度](Performance-Tuning/Async-Write.md)
+
+## 基础概念
+
+* [ZFS 的校验和及其用途](Basic-Concepts/Checksums.md)
+* [特性标志](Basic-Concepts/Feature-Flags.md)
+* [RAIDZ (ZFS RAID)](Basic-Concepts/RAIDZ.md)
+* [故障排除](Basic-Concepts/Troubleshooting.md)
+* [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
+* [分布式 RAID (dRAID)](Basic-Concepts/dRAID.md)
+
+## 许可证
+
+* [许可证](License-ZFS.md)
