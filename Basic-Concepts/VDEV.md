@@ -20,7 +20,7 @@ vdev（virtual device，虚拟设备）是 ZFS 存储池的基本构建单元。
 
 OpenZFS 支持多种类型的 vdev。顶级 vdev 承载数据，提供冗余：
 
-* **条带磁盘（Striped Disk(s)）**：由一到多个物理设备组成的条带化 vdev（类似 RAID 0）。未提供冗余，若磁盘故障会数据将丢失。
+* **条带磁盘（Striped Disk(s)）**：由一到多个物理设备组成的条带化 vdev（类似 RAID 0）。未提供冗余，若磁盘故障，数据会丢失。
 * **镜像（Mirror）**：将相同数据存储在两块或多块磁盘上的 vdev，可提供冗余。
 * [RAIDZ](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/RAIDZ.html)：通过校验提供容错能力的 vdev，类似传统 RAID 5/6。RAIDZ 有三个等级：
 
