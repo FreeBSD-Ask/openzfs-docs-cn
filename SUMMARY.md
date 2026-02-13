@@ -82,6 +82,16 @@
 * [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
 * [分布式 RAID (dRAID)](Basic-Concepts/dRAID.md)
 
+## ZFS 消息
+
+* [消息 ID：ZFS-8000-14](msg/ZFS-8000-14.md)
+* [消息 ID：ZFS-8000-2Q](msg/ZFS-8000-2Q.md)
+* [消息 ID：ZFS-8000-3C](msg/ZFS-8000-3C.md)
+* [消息 ID：ZFS-8000-4J](msg/ZFS-8000-4J.md)
+* [消息 ID：ZFS-8000-5E](msg/ZFS-8000-5E.md)
+* [消息 ID：ZFS-8000-6X](msg/ZFS-8000-6X.md)
+* [消息 ID：ZFS-8000-72](msg/ZFS-8000-72.md)
+
 ## 许可证
 
 * [许可证](License-ZFS.md)
