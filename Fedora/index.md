@@ -71,7 +71,7 @@
    echo 'zfs' > /etc/dnf/protected.d/zfs.conf
    ```
 
-   未完成的非内核更新仍可执行：
+   非内核更新仍可执行：
 
    ```sh
    dnf update --exclude=kernel*
