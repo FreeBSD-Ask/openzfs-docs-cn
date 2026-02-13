@@ -10,15 +10,15 @@
 
 >**专业提示**
 >
->像 *elasticsearch*、*fluentd*、*influxdb* 或 *splunk* 这样的日志基础设施工具可以简化日志分析和事件关联。
+>像 *elasticsearch*、*fluentd*、*influxdb* 或 *splunk* 这种日志基础设施工具能够简化日志分析和事件关联。
 
 ### 通用内核日志
 
-通常，Linux 内核日志消息可以通过 `dmesg -T`、`/var/log/syslog` 或内核日志消息发送的目标获取（例如由 `rsyslogd` 发送）。
+通常，可以通过 `dmesg -T`、`/var/log/syslog` 或内核日志消息发送的目标获取（例如由 `rsyslogd` 发送）Linux 内核日志消息。
 
 ### ZFS 内核模块调试信息
 
-ZFS 内核模块使用内部日志缓冲区记录详细的日志信息。对于启用了 ZFS 模块参数 [zfs_dbgmsg_enable = 1](https://github.com/zfsonlinux/zfs/wiki/ZFS-on-Linux-Module-Parameters#zfs_dbgmsg_enable) 的 ZFS 构建，该日志信息可以在伪文件 `/proc/spl/kstat/zfs/dbgmsg` 中获取。
+ZFS 内核模块使用内部日志缓冲区记录详细的日志信息。对于启用了 ZFS 模块参数 [zfs_dbgmsg_enable = 1](https://github.com/zfsonlinux/zfs/wiki/ZFS-on-Linux-Module-Parameters#zfs_dbgmsg_enable) 的 ZFS 构建，可以在伪文件 `/proc/spl/kstat/zfs/dbgmsg` 中获取该日志信息。
 
 ## 无法终止的进程
 
@@ -30,7 +30,7 @@ ZFS 内核模块使用内部日志缓冲区记录详细的日志信息。对于�
 
 >**重要信息**
 >
->如果内核线程卡住，则卡住线程的回溯可能记录在日志中。在某些情况下，线程在死码计时器触发之前不会被记录。另请参见 [调试可调参数](https://github.com/zfsonlinux/zfs/wiki/ZFS-on-Linux-Module-Parameters#debug)。
+>如果内核线程卡住，则卡住线程的回溯可能记录在日志中。在某些情况下，在死码计时器触发之前不会记录线程。另请参见 [调试可调参数](https://github.com/zfsonlinux/zfs/wiki/ZFS-on-Linux-Module-Parameters#debug)。
 
 ## ZFS 事件
 
@@ -40,6 +40,6 @@ ZFS 使用基于事件的消息接口，将重要事件传递给系统上运行�
 
 使用 `zpool events -v` 可以观察到更详细的事件信息。详细事件的内容可能随事件类型及事件发生时可用信息而变化。
 
-每个事件都有一个用于过滤事件类型的类标识符。常见事件通常与池管理相关，类为 `sysevent.fs.zfs.*`，包括导入、导出、配置更新以及 `zpool history` 更新。
+每个事件都有一个用于过滤事件类型的类标识符。常见事件通常与池管理相关，类为 `sysevent.fs.zfs.*`，包括导入、导出、配置更新以及更新 `zpool history`。
 
 与错误相关的事件报告为类 `ereport.*`，对于故障排查非常有价值。一些故障可能在软件的不同层次处理时产生多个 ereport。例如，对于没有奇偶校验保护的简单池，读取损坏磁盘时可能产生一个 `ereport.io`，从而在池级别生成一个 `ereport.fs.zfs.checksum`。这些事件也会反映在 `zpool status` 中的错误计数器中。如果在 `zpool status` 中看到校验和或读写错误，则在 `zpool events` 输出中应该有一个或多个对应的 ereport。
