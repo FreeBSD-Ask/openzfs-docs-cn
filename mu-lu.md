@@ -75,7 +75,7 @@
 
 ## 基础概念
 
-* [校验和](Basic-Concepts/Checksums.md)
+* [ZFS 的校验和及其用途](Basic-Concepts/Checksums.md)
 * [特性标志](Basic-Concepts/Feature-Flags.md)
 * [RAIDZ（ZFS RAID）](Basic-Concepts/RAIDZ.md)
 * [故障排除](Basic-Concepts/Troubleshooting.md)
