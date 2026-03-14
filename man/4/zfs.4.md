@@ -1,1 +1,1991 @@
 # zfs(4)
+
+
+## 名称
+
+`zfs` — ZFS 内核模块调优
+
+## 说明
+
+ZFS 模块支持以下若干参数。
+
+### **dbuf_cache_max_bytes** = **UINT64_MAX**B (u64)
+
+dbuf 缓存的最大字节数。目标大小由 MIN 与目标 ARC 大小的 1/2^**dbuf_cache_shift**（1/32）决定。dbuf 缓存及其相关设置的行为可通过 /proc/spl/kstat/zfs/dbufstats kstat 进行观察。
+
+### **dbuf_metadata_cache_max_bytes** = **UINT64_MAX**B (u64)
+
+元数据 dbuf 缓存的最大字节数。目标大小由 MIN 与目标 ARC 大小的 1/2^**dbuf_metadata_cache_shift**（1/64）决定。元数据 dbuf 缓存及其相关设置的行为可通过 /proc/spl/kstat/zfs/dbufstats kstat 进行观察。
+
+### **dbuf_cache_hiwater_pct** = **10**% (uint)
+
+当 dbuf 必须被直接淘汰时，相对于 **dbuf_cache_max_bytes** 的百分比。
+
+### **dbuf_cache_lowater_pct** = **10**% (uint)
+
+当淘汰线程停止淘汰 dbuf 时，相对于 **dbuf_cache_max_bytes** 的百分比。
+
+### **dbuf_cache_shift** = **5** (uint)
+
+将 dbuf 缓存（**dbuf_cache_max_bytes**）的大小设置为目标 ARC 大小的 log2 分数。
+
+### **dbuf_metadata_cache_shift** = **6** (uint)
+
+将元数据 dbuf 缓存（**dbuf_metadata_cache_max_bytes**）的大小设置为目标 ARC 大小的 log2 分数。
+
+### **dbuf_mutex_cache_shift** = **0** (uint)
+
+设置 dbuf 缓存的互斥锁数组大小。设置为 **0** 时，数组大小会根据系统总内存动态调整。
+
+
+### **dmu_object_alloc_chunk_shift** = **7** (128) (uint)
+
+以 2 的幂分配单次操作中 dnode 插槽的数量。默认值可最小化批量操作时的锁竞争。
+
+### **dmu_ddt_copies** = **3** (uint)
+
+控制去重表（DDT）对象存储的副本数量。将副本数量从原默认的 3 降至 1 可以减少去重引起的写放大。这假设数据的冗余由 vdev 层提供。如果 DDT 损坏，当 DDT 无法报告正确引用计数时，可能会导致空间泄漏（未释放）。
+
+### **dmu_prefetch_max** = **134217728**B (128 MiB) (uint)
+
+限制单次调用可预取的数据量（以字节计）。这有助于限制预取操作使用的内存量。
+
+### **l2arc_feed_again** = **1**|0 (int)
+
+L2ARC 极速预热。当 L2ARC 为冷状态时，填充间隔将尽可能快。
+
+### **l2arc_feed_min_ms** = **200** (u64)
+
+最小填充间隔（毫秒）。需要 **l2arc_feed_again**=1，仅在相关情况下适用。
+
+### **l2arc_feed_secs** = **1** (u64)
+
+L2ARC 写入间隔（秒）。
+
+### **l2arc_headroom** = **8** (u64)
+
+每个周期搜索 ARC 列表以寻找可缓存到 L2ARC 内容的深度，表示为有效写入大小的倍数。设置为 **0** 可禁用每周期的 headroom 限制。当持久化标记激活时，扫描深度还受 **l2arc_ext_headroom_pct** 限制。
+
+### **l2arc_headroom_boost** = **200**% (u64)
+
+当 L2ARC 内容在写入前成功压缩时，将 **l2arc_headroom** 按此百分比放大。设置为 100 表示禁用此功能。
+
+### **l2arc_dwpd_limit** = **100** (uint)
+
+L2ARC 设备每日写入量（DWPD）限制，用于保护 SSD 耐久性，以百分比表示，其中 100 等于 1.0 DWPD。值为 100 表示每个 L2ARC 设备每天可写入自身容量一次。较低值支持分数 DWPD（50 = 0.5 DWPD，30 = 0.3 DWPD，用于 QLC SSD）。较高值允许更多写入（300 = 3.0 DWPD）。有效写入速率始终受 **l2arc_write_max** 限制。设置为 0 则完全禁用 DWPD 限制。DWPD 限制仅在初始填充完成且总 L2ARC 容量至少为 arc_c_max 两倍时生效。
+
+### **l2arc_exclude_special** = **0**|1 (int)
+
+控制是否将存在于特殊 vdev 上的缓冲区缓存到 L2ARC。如果设置为 1，则排除特殊 vdev 上的 dbuf 被缓存到 L2ARC。
+
+### **l2arc_mfuonly** = **0**|1|2 (int)
+
+控制是否仅将 MFU 元数据和数据从 ARC 缓存到 L2ARC。
+
+* 默认值为 0，表示 MRU 和 MFU 的数据及元数据都会被缓存。当关闭此功能（设置为 0）时，一些 MRU 缓冲区仍会保留在 ARC 中，并最终缓存到 L2ARC。如果 **l2arc_noprefetch**=0，一些预取缓冲区也会缓存到 L2ARC，并可能随后转换为 MRU，此时 **l2arc_mru_asize** arcstat 不会为 0。
+
+* 设置为 1 表示仅将 MFU 数据和元数据缓存到 L2。
+
+* 设置为 2 表示缓存所有元数据（MRU + MFU），但仅缓存 MFU 数据（即不缓存 MRU 数据）。当数据更新频繁时，这种设置可最大化元数据缓存量。
+
+无论 **l2arc_noprefetch** 如何，一些 MFU 缓冲区可能从 ARC 被淘汰，随后作为预取被访问并转换为 MRU。如果再次被访问，它们会被计为 MRU，此时 **l2arc_mru_asize** arcstat 不会为 0。
+
+L2ARC 缓冲区首次缓存到 L2ARC 时的 ARC 状态可通过 arcstats **l2arc_mru_asize**、**l2arc_mfu_asize** 和 **l2arc_prefetch_asize**  查看（在导入池或上线缓存设备时，如果启用持久化 L2ARC）。
+
+arcstat **evict_l2_eligible_mru**  不考虑此选项是否启用，可通过 arcstats **evict_l2_eligible_m[rf]u** 提供的信息来判断是否应为当前工作负载切换此选项。
+
+### **l2arc_meta_percent** = **33**% (uint)
+
+允许用于 L2ARC 专用头的 ARC 大小百分比。由于 L2ARC 缓冲区在内存压力下不会被淘汰，如果系统的 L2ARC 过大且头部过多，可能会导致性能下降或无法使用。此参数限制 L2ARC 写入和重建，以达到目标。
+
+### **l2arc_trim_ahead** = **0**% (u64)
+
+在 L2ARC 设备上按当前写入大小的百分比提前 TRIM 已填充的设备空间。如果设置为 **100**，则 TRIM 空间为即将写入所需空间的两倍，最少 TRIM **64 MiB**。还会在创建或向现有池添加设备时，或在导入池或上线缓存设备时设备头无效时 TRIM 整个 L2ARC 设备。设置为 **0** 则完全禁用 L2ARC TRIM（默认值），以避免对底层存储设备造成较大压力。效果取决于具体设备对这些命令的处理能力。
+
+### **l2arc_noprefetch** = **1**|0 (int)
+
+如果缓冲区被预取但未被应用使用，则不写入 L2ARC。如果 L2ARC 中已有预取缓冲区且随后启用此选项，则不会从 L2ARC 读取这些预取缓冲区。取消此选项有助于将磁盘的顺序读取缓存到 L2ARC，并在后续从 L2ARC 提供这些读取。当 L2ARC 在顺序读取上明显快于池中磁盘时，这种设置尤为有利。设置 **1** 禁用，**0** 启用对 L2ARC 的预取缓存/读取。
+
+### **l2arc_norw** = **0**|1 (int)
+
+写入期间不进行读取。
+
+### **l2arc_ext_headroom_pct** = **25** (u64)
+
+每个 ARC 状态在重置标记到尾部之前可扫描的百分比。较低值在高负载下可使标记保持靠近尾部。设置为 0 可禁用扫描深度限制。
+
+### **l2arc_meta_cycles** = **2** (u64)
+
+元数据可连续占用写入预算的周期数，之后将跳过以让数据运行。默认值 2 在持续负载下大约给元数据 67%、数据 33% 的 L2ARC 写入带宽。较高值偏向元数据；设置为 0 可禁用。
+
+### **l2arc_write_max** = **33554432**B (32 MiB) (u64)
+
+每个 L2ARC 设备的最大写入速率（字节/秒）。在初始填充、DWPD 限制禁用或非持久 L2ARC 时直接使用。启用 DWPD 限制时，写入速率受此上限约束。总 L2ARC 吞吐量随池中缓存设备数量线性扩展。
+
+### **l2arc_rebuild_enabled** = **1**|0 (int)
+
+在导入池时重建 L2ARC（持久化 L2ARC）。如果在导入池或附加 L2ARC 设备时遇到问题（例如 L2ARC 设备读取存储日志元数据速度慢，或元数据已碎片化/不可用），可以禁用此功能。
+
+### **l2arc_rebuild_blocks_min_l2size** = **1073741824**B (1 GiB) (u64)
+
+写入日志块到 L2ARC 设备所需的最小设备大小。导入池时使用日志块重建持久化 L2ARC。对于小于 1 GiB 的 L2ARC 设备，相比恢复的 L2ARC 数据，`l2arc_evict`() 淘汰的数据量较大。在此情况下，为避免浪费空间，不应在 L2ARC 中写入日志块。
+
+### **metaslab_aliquot** = **2097152**B (2 MiB) (u64)
+
+每个子 vdev 在 metaslab 组中的分配粒度（字节）。大致相当于传统 RAID 阵列中的“条带大小”。在正常操作中，ZFS 会尝试在每个顶级 vdev 的子设备上写入此大小的数据，然后再移动到下一个顶级 vdev。
+
+### **metaslab_bias_enabled** = **1**|0 (int)
+
+根据 metaslab 组相对于 metaslab 类平均值的过度或不足利用启用偏置分配。如果禁用，每个 metaslab 组将按其容量比例进行分配。
+
+### **metaslab_perf_bias** = **1**|0|2 (int)
+
+根据写入性能控制 metaslab 组偏置分配。
+
+* 设置为 0：所有 metaslab 组接收固定分配量。
+* 设置为 2：允许性能更高的 metaslab 组分配更多。
+* 设置为 1：如果池受写入带宽限制，则等同于 2，否则等同于 0。即，如果池受写入吞吐量限制，则从更快的 metaslab 组分配更多；否则尽量均匀分配。
+
+### **metaslab_force_ganging** = **16777217**B (16 MiB + 1 B) (u64)
+
+将超过某个大小的块强制为 gang 块。该选项用于测试套件以便测试。
+
+### **metaslab_force_ganging_pct** = **3**% (uint)
+
+对于可被强制为 gang 块的块（由 **metaslab_force_ganging** 决定），强制其中的百分比块为 gang 块。
+
+### **brt_zap_prefetch** = **1**|0 (int)
+
+控制即将克隆的块的 BRT 记录是否进行预取。
+
+### **brt_zap_default_bs** = **13** (8 KiB) (int)
+
+默认 BRT ZAP 数据块大小，以 2 的幂表示。注意，在池上创建 BRT 后更改此值不会影响现有 BRT，只会影响新创建的 BRT。
+
+
+### **brt_zap_default_ibs** = **13** (8 KiB) (int)
+
+默认 BRT ZAP 间接块大小，以 2 的幂表示。注意，在池上创建 BRT 后更改此值不会影响现有 BRT，只会影响新创建的 BRT。
+
+### **ddt_zap_default_bs** = **15** (32 KiB) (int)
+
+默认 DDT ZAP 数据块大小，以 2 的幂表示。注意，在池上创建 DDT 后更改此值不会影响现有 DDT，只会影响新创建的 DDT。
+
+### **ddt_zap_default_ibs** = **15** (32 KiB) (int)
+
+默认 DDT ZAP 间接块大小，以 2 的幂表示。注意，在池上创建 DDT 后更改此值不会影响现有 DDT，只会影响新创建的 DDT。
+
+### **zfs_default_bs** = **9** (512 B) (int)
+
+默认 dnode 块大小，以 2 的幂表示。
+
+### **zfs_default_ibs** = **17** (128 KiB) (int)
+
+默认 dnode 间接块大小，以 2 的幂表示。
+
+### **zfs_dio_enabled** = **1**|0 (int)
+
+启用 Direct I/O。如果此设置为 0，则所有 I/O 请求将通过 ARC 定向处理，就像数据集属性 [**direct**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#direct) 设置为 [**disabled**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#disabled) 一样。
+
+### **zfs_dio_strict** = **0**|1 (int)
+
+严格执行 Direct I/O 请求的对齐，如果未按页对齐，则返回 **EINVAL**，而不是静默回退到未缓存 I/O。
+
+### **zfs_history_output_max** = **1048576**B (1 MiB) (u64)
+
+在尝试将 ioctl 输出 nvlist 记录到磁盘历史时，如果输出大于此大小（字节），则不会存储。该值必须小于 [**DMU_MAX_ACCESS**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#DMU_MAX_ACCESS)（64 MiB）。主要适用于 [`zfs_ioc_channel_program`](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#zfs_ioc_channel_program)()（参见 [zfs-program(8)](https://openzfs.github.io/openzfs-docs/man/master/8/zfs-program.8.html)）。
+
+### **zfs_keep_log_spacemaps_at_export** = **0**|1 (int)
+
+防止在池导出或销毁时销毁日志空间映射。
+
+### **zfs_metaslab_segment_weight_enabled** = **1**|0 (int)
+
+启用/禁用基于段的 metaslab 选择。
+
+
+### **zfs_metaslab_switch_threshold** = **2** (int)
+
+使用基于段的 metaslab 选择时，继续从活动 metaslab 分配，直到耗尽该选项指定数量的桶。
+
+### **metaslab_debug_load** = **0**|1 (int)
+
+在池导入时加载所有 metaslab。
+
+### **metaslab_debug_unload** = **0**|1 (int)
+
+防止 metaslab 被卸载。
+
+### **metaslab_fragmentation_factor_enabled** = **1**|0 (int)
+
+启用在计算 metaslab 权重时使用碎片化指标。
+
+### **metaslab_df_max_search** = **16777216**B (16 MiB) (uint)
+
+从上一次偏移量向前搜索的最大距离。没有此限制时，碎片化池可能出现 [*>100,000*](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#_100_000) 次迭代，`metaslab_block_picker`() 在高性能存储上会成为性能瓶颈。默认 **16 MiB** 时，即使对高度碎片化的 **ashift**=**9** 池，通常也不到 *500* 次迭代。最大迭代次数为 **metaslab_df_max_search / 2^(ashift+1)**。默认 16 MiB 时，对应 [*16*1024*](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#16*1024)（**ashift**=**9**）或 [*2*1024*](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#2*1024)（**ashift**=[**12**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#12)）。
+
+### **metaslab_df_use_largest_segment** = **0**|1 (int)
+
+如果未向前搜索（由于 **metaslab_df_max_search**、[**metaslab_df_free_pct**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#metaslab_df_free_pct) 或 [**metaslab_df_alloc_threshold**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#metaslab_df_alloc_threshold)），该可调参数控制使用哪个段。设置为 1 时使用最大空闲段；未设置时使用至少满足请求大小的段。
+
+### **zfs_metaslab_max_size_cache_sec** = **3600**s (1 hour) (u64)
+
+卸载 metaslab 时，缓存最大空闲块的大小。该缓存大小用于判断是否加载该 metaslab 进行分配。随着更多释放累积，该缓存值会逐渐不准确。由此可调参数控制的秒数之后，将不再考虑缓存的最大大小，仅使用直方图判断。
+
+### **zfs_metaslab_mem_limit** = **25**% (uint)
+
+加载新 metaslab 时，检查存储 metaslab 范围树所用的内存量。如果超过阈值，则尝试卸载最少使用的 metaslab，以防系统内存被范围树占满。该参数设置总系统内存的百分比作为阈值。
+
+### **zfs_metaslab_try_hard_before_gang** = **0**|1 (int)
+
+* 未设置时：
+
+  * 先尝试正常分配。
+  * 如果失败，则执行 gang 分配。
+  * 如果失败，则执行“try hard” gang 分配。
+  * 如果失败，则生成多层 gang 块。
+* 设置时：
+
+  * 先尝试正常分配。
+  * 如果失败，则执行“try hard”分配。
+  * 如果失败，则执行 gang 分配。
+  * 如果失败，则执行“try hard” gang 分配。
+  * 如果失败，则生成多层 gang 块。
+
+### **zfs_metaslab_find_max_tries** = **100** (uint)
+
+在未使用“try hard”分配时，仅考虑数量最多的前 100 个最佳 metaslab。这能提高性能，尤其是在每个 vdev 拥有大量 metaslab 且无法满足分配请求时，否则会遍历所有 metaslab。
+
+### **zfs_vdev_default_ms_count** = **200** (uint)
+
+新增 vdev 时，每个顶层 vdev 的目标 metaslab 数量。
+
+### **zfs_vdev_default_ms_shift** = **29** (512 MiB) (uint)
+
+metaslab 大小的默认下限。
+
+### **zfs_vdev_max_ms_shift** = **34** (16 GiB) (uint)
+
+metaslab 大小的默认上限。
+
+### **zfs_vdev_max_auto_ashift** = **14** (uint)
+
+为新顶层 vdev 优化逻辑扇区到物理扇区大小时使用的最大 ashift。可增加至 [**ASHIFT_MAX**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ASHIFT_MAX)（16），但可能降低池空间效率。
+
+### **zfs_vdev_direct_write_verify** = **Linux 1** | **FreeBSD 0** (uint)
+
+非零时，每次发起 Direct I/O 写入时都会校验 checksum，提交到块指针前。如果校验失败，I/O 返回 EIO。可用于检测用户缓冲区在 Direct I/O 写入过程中是否被篡改，以及判断报告的 checksum 错误是否与 Direct I/O 写入相关。每次验证错误生成 [**dio_verify_wr**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#dio_verify_wr) 事件。Linux 默认值为 1，FreeBSD 为 0（FreeBSD 会在发起 Direct I/O 写入前对用户页启用写保护）。
+
+### **zfs_vdev_min_auto_ashift** = **ASHIFT_MIN** (9) (uint)
+
+创建新顶层 vdev 时使用的最小 ashift。
+
+### **zfs_vdev_min_ms_count** = **16** (uint)
+
+顶层 vdev 中创建的最少 metaslab 数量。
+
+### **vdev_validate_skip** = **0**|1 (int)
+
+在导入池时跳过标签验证步骤。仅在了解风险并恢复损坏标签时修改，否则不推荐更改。
+
+### **zfs_vdev_ms_count_limit** = **131072** (128k) (uint)
+
+顶层 vdev 的 metaslab 总数的实际上限。
+
+### **metaslab_preload_enabled** = **1**|0 (int)
+
+启用 metaslab 组预加载。
+
+### **metaslab_preload_limit** = **10** (uint)
+
+每组可预加载的最大 metaslab 数量。
+
+### **metaslab_preload_pct** = **50** (uint)
+
+用于 metaslab 预加载任务的 CPU 百分比。
+
+### **metaslab_lba_weighting_enabled** = **1**|0 (int)
+
+给低 LBA 的 metaslab 更高权重，假设它们带宽更大，这通常适用于现代恒速盘（CAV）硬盘。
+
+### **metaslab_unload_delay** = **32** (uint)
+
+一个 metaslab 被使用后，保持加载状态的 TXG 数量，以减少不必要的重新加载。注意，必须同时满足此 TXG 数量和 **metaslab_unload_delay_ms** 毫秒后才会卸载。
+
+### **metaslab_unload_delay_ms** = **600000** ms (10 分钟) (uint)
+
+一个 metaslab 被使用后，保持加载状态的毫秒数，以减少不必要的重新加载。卸载前必须同时满足 TXG 数量和毫秒数。
+
+### **reference_history** = **3** (uint)
+
+在启用 **reference_tracking_enable** 时，跟踪的最大引用持有者数量。
+
+### **raidz_expand_max_copy_bytes** = **160MB** (ulong)
+
+RAID-Z 扩展 I/O 可使用的最大内存量。限制一次性可挂起的 I/O 数量。
+
+### **raidz_expand_max_reflow_bytes** = **0** (ulong)
+
+用于测试，当重排（reflow）量达到该值时暂停 RAID-Z 扩展。
+
+### **raidz_io_aggregate_rows** = **4** (ulong)
+
+在扩展 RAID-Z 中，对超过此行数的读取进行聚合。
+
+### **reference_tracking_enable** = **0**|1 (int)
+
+跟踪 [**refcount_t**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#refcount_t) 对象的引用持有者（仅调试构建）。
+
+### **send_holes_without_birth_time** = **1**|0 (int)
+
+启用时，不使用 **hole_birth** 优化，`zfs send` 总是发送所有 hole。适用于怀疑数据集受 **hole_birth** 错误影响的情况。
+
+### **spa_config_path** = /etc/zfs/zpool.cache (charp)
+
+SPA 配置文件路径。
+
+### **spa_asize_inflation** = **24** (uint)
+
+用于估算写入数据实际占用磁盘空间的乘数。默认值为最坏情况估算，但可根据池配置设定更合理的值，尤其在接近配额或容量限制时。
+
+### **spa_load_print_vdev_tree** = **0**|1 (int)
+
+在池导入时，是否在调试消息缓冲区打印 vdev 树。
+
+### **spa_load_verify_data** = **1**|0 (int)
+
+在 “extreme rewind” (`-X`) 导入时，是否遍历数据块进行验证。未设置时，非元数据块不遍历。可在导入开始后切换以停止或启动非元数据块遍历。
+
+### **spa_load_verify_metadata** = **1**|0 (int)
+
+在 “extreme rewind” (`-X`) 导入时，是否遍历块进行验证。未设置时，不执行遍历。可在导入开始后切换以停止或启动遍历。
+
+### **spa_load_verify_shift** = **4** (1/16) (uint)
+
+在池导入期间，设置最多消耗的字节数，相对于目标 ARC 大小的 log2 分数。
+
+### **spa_slop_shift** = **5** (1/32) (int)
+
+通常，不允许池中最后约 3.2%（1/2^spa_slop_shift）的空间被消耗。这可避免由于未计入的更改（如 MOS）导致池完全耗尽，同时限制最坏情况的分配时间。如果剩余空间少于该值，大多数 ZPL 操作（如写入、创建）将返回 **ENOSPC**。
+
+### **spa_num_allocators** = **4** (int)
+
+每个 SPA 实例使用的块分配器数量，由 **spa_cpus_per_allocator** 限制为系统实际 CPU 数量。设置过高可能导致性能下降或额外碎片。仅对之后导入/创建的池生效。
+
+### **spa_cpus_per_allocator** = **4** (int)
+
+每个 SPA 实例的块分配器对应的最少 CPU 数量。仅对之后导入/创建的池生效。
+
+### **spa_upgrade_errlog_limit** = **0** (uint)
+
+在启用 [**head_errlog**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#head_errlog) 特性时，限制转换为新格式的磁盘错误日志条目数量。默认是转换所有日志条目。
+
+### **vdev_read_sit_out_secs** = **600** s (10 分钟) (ulong)
+
+检测到慢盘异常时，将其置于 “sit out” 状态。在此状态下，磁盘不参与正常读取，其数据由校验重建。Scrub 操作仍会读取磁盘。RAID-Z 或 dRAID vdev 中最多有与校验盘数量相等的磁盘可同时 sit out。写入仍会发送到 sit out 的磁盘以保持冗余。默认 600 秒，设置为 0 可禁用所有 sit out，包括慢盘检测。
+
+### **vdev_raidz_outlier_check_interval_ms** = **1000** ms (1 秒) (ulong)
+
+每个 RAID-Z 或 dRAID vdev 检测慢盘异常的间隔时间。增大间隔会降低检测灵敏度，但响应盘故障的速度也会变慢。默认每秒一次；过小的值可能影响性能。
+
+### **vdev_raidz_outlier_insensitivity** = **50** (uint)
+
+进行 RAID-Z 和 dRAID 慢盘检测时，判定异常的“耐受度”值。值越大，检测越保守，值越小，异常盘被 sit out 的概率越高，但可能增加误触发率。技术上，这是 Tukey’s Fence 算法中 IQR 的倍数，考虑到极值分布，因此比标准 Gaussian k 值大很多。
+
+### **vdev_removal_max_span** = **32768** B (32 KiB) (uint)
+
+在顶层 vdev 移除过程中，数据块会从 vdev 复制，其中可能包含空闲空间以换取 IOPS。本参数决定了每个复制块中被视为“非必要”数据的最大空闲跨度。默认值与 **zfs_vdev_read_gap_limit** 对齐，但不必相同。
+
+### **vdev_file_logical_ashift** = **9** (512 B) (u64)
+
+文件型设备的逻辑 ashift。
+
+### **vdev_file_physical_ashift** = **9** (512 B) (u64)
+
+文件型设备的物理 ashift。
+
+### **zap_iterate_prefetch** = **1**|0 (int)
+
+如果设置，在迭代 ZAP 对象时，预取整个对象（所有叶子块）。受 **dmu_prefetch_max** 限制。
+
+### **zap_micro_max_size** = **131072** B (128 KiB) (int)
+
+微型 ZAP 的最大尺寸。超过该大小后，“微型” ZAP 会升级为“胖” ZAP。默认最大 128 KiB，除非启用 [**large_microzap**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#large_microzap) 功能。
+
+### **zap_shrink_enabled** = **1**|0 (int)
+
+如果设置，相邻空 ZAP 块会被合并以减少磁盘占用。
+
+### **zfetch_min_distance** = **4194304** B (4 MiB) (uint)
+
+每个流的最小预取字节数。预取距离从需求访问大小开始，并快速增长到该值，每次命中翻倍。之后可能每次增加 1/8，但仅当上次预取未及时完成满足需求请求时才会增长。
+
+### **zfetch_max_distance** = **67108864** B (64 MiB) (uint)
+
+每个流的最大预取字节数。
+
+### **zfetch_max_idistance** = **67108864** B (64 MiB) (uint)
+
+每个流的间接块最大预取字节数。
+
+### **zfetch_max_reorder** = **16777216** B (16 MiB) (uint)
+
+距离当前预取流位置内的请求被视为流的一部分，可因并行处理而重新排序。这些请求不会立即推进流位置，除非达到 **zfetch_hole_shift** 填充阈值，但会被保存以便稍后填充流中的空洞。
+
+### **zfetch_max_streams** = **8** (uint)
+
+每个文件的最大预取流数。
+
+### **zfetch_min_sec_reap** = **1** (uint)
+
+非活动预取流被回收前的最短时间（秒）。
+
+### **zfetch_max_sec_reap** = **2** (uint)
+
+非活动预取流被删除前的最长时间（秒）。
+
+### **zfs_abd_scatter_enabled** = **1**|0 (int)
+
+允许 ARC 使用 scatter/gather 列表，强制所有分配在内核内存中为线性。禁用可在某些代码路径下提高性能，但可能增加内核内存碎片。
+
+### **zfs_abd_scatter_max_order** = **MAX_ORDER-1** (uint)
+
+用于 scatter/gather 列表的单块连续内存页最大数量。**MAX_ORDER** 依赖内核配置。
+
+### **zfs_abd_scatter_min_size** = **1536** B (1.5 KiB) (uint)
+
+使用 scatter（基于页）ABD 的最小分配大小。较小分配将使用线性 ABD。
+
+### **zfs_arc_dnode_limit** = **0** B (u64)
+
+当 ARC 中 dnode 消耗的字节数超过此值时，会尝试在非元数据需求下释放部分 dnode。该值作为 dnode 元数据的上限，默认 **0** 表示使用基于 **zfs_arc_dnode_limit_percent** 的百分比。
+
+### **zfs_arc_dnode_limit_percent** = **10** % (u64)
+
+ARC 元缓冲区中可被 dnode 占用的百分比。与 **zfs_arc_dnode_limit** 配合使用，后者非零时优先级更高。
+
+### **zfs_arc_dnode_reduce_percent** = **10** % (u64)
+
+当 dnode 消耗字节超过 **zfs_arc_dnode_limit** 时，为响应非元数据需求，尝试扫描的 ARC dnode 百分比。
+
+### **zfs_arc_average_blocksize** = **8192** B (8 KiB) (uint)
+
+ARC 的缓冲区哈希表大小基于此平均块大小估算。默认约每 1 GiB 物理内存对应 1 MiB 哈希表（使用 8 字节指针）。已知平均块更大时，可调大以减少内存占用。
+
+### **zfs_arc_eviction_pct** = **200** % (uint)
+
+当 [`arc_is_overflowing`](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#arc_is_overflowing)() 时，[`arc_get_data_impl`](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#arc_get_data_impl)() 会等待请求数据量中此百分比被淘汰。例如，默认情况下，每淘汰 2 KiB，可“重用” 1 KiB。由于超过 100%，确保 ARC 尺寸可以逐步降至 **arc_c** 以下，即使 **arc_size** 超过 **arc_c**，仍能进行分配。
+
+### **zfs_arc_evict_batch_limit** = **10** (uint)
+
+每个子列表在处理前要淘汰的 ARC header 数量。批量操作可避免一次性清空整个子列表，但增加锁解锁开销。
+
+### **zfs_arc_evict_batches_limit** = **5** (uint)
+
+在高负载下，每个并行淘汰任务处理的 **zfs_arc_evict_batch_limit** 批次数，以减少上下文切换次数。
+
+### **zfs_arc_evict_threads** = **0** (int)
+
+设置用于 ARC 淘汰的线程数。
+
+* 若大于 0，ZFS 会分配最多这么多线程处理 ARC 淘汰，每个线程一次处理一个子列表，直到达到淘汰目标或所有子列表处理完成。
+* 若为 0，ZFS 会根据 CPU 数量自动计算合理的线程数：
+
+| CPU    | 线程 |
+| ------- | ------- |
+| 1-4     | 1       |
+| 5-8     | 2       |
+| 9-15    | 3       |
+| 16-31   | 4       |
+| 32-63   | 6       |
+| 64-95   | 8       |
+| 96-127  | 9       |
+| 128-160 | 11      |
+| 160-191 | 12      |
+| 192-223 | 13      |
+| 224-255 | 14      |
+| 256+    | 16      |
+
+更多线程可提升 ZFS 对内存压力的响应能力，在 ARC 淘汰成为读写瓶颈时尤其重要。该参数仅能在模块加载时设置。
+
+
+### **zfs_arc_grow_retry** = **0**s (uint)
+
+若设置为非零值，会替代默认 **arc_grow_retry**（5s）。该值表示 ARC 在内存压力事件后尝试恢复增长前等待的秒数。
+
+
+### **zfs_arc_lotsfree_percent** = **10** % (int)
+
+当系统空闲内存低于总内存的该百分比时，限制 I/O。设置为 **0** 可禁用限制。
+
+
+### **zfs_arc_max** = **0** B (u64)
+
+ARC 的最大字节数。
+
+* 若为 **0**，则最大值由系统内存决定：使用 **all_system_memory - 1 GiB** 与 **5/8 × all_system_memory** 的较大值，最少为 **64 MiB**。
+* 可动态修改，但运行时不能再设回 **0**；减小 ARC 大小不会立即生效，需内存压力触发收缩。
+
+
+### **zfs_arc_meta_balance** = **500** (uint)
+
+调整 ghost hits 时元数据与数据的平衡。值大于 100 时增加元数据缓存，同时按比例降低 ghost 数据命中对目标数据/元数据速率的影响。
+
+
+### **zfs_arc_min** = **0** B (u64)
+
+ARC 的最小字节数。
+
+* 若为 **0**，则 **arc_c_min** 默认为 **32 MiB** 与 **all_system_memory / 32** 中的较大值。
+
+
+### **zfs_arc_min_prefetch_ms** = **0** ms (≡1 s) (uint)
+
+预取块在 ARC 中被锁定的最短时间。
+
+### **zfs_arc_min_prescient_prefetch_ms** = **0** ms (≡6 s) (uint)
+
+“预测性预取”块在 ARC 中被锁定的最短时间。这类块会被较激进地预取，提前于可能使用它们的代码。
+
+
+### **zfs_arc_prune_task_threads** = **1** (int)
+
+ARC 修剪线程数量。
+
+* FreeBSD 通常不需要超过 1 个线程。
+* Linux 理论上可为每个挂载点设置一个线程，最多到 CPU 数量，但未证实有明显效果。
+
+
+### **zfs_max_missing_tvds** = **0** (int)
+
+允许在只读模式下导入池时缺失的顶层 vdev 数量。
+
+
+### **zfs_max_nvlist_src_size** = **0** B (u64)
+
+允许通过 `/dev/zfs` ioctl 传递的 nvlist 源的最大字节数，以防止用户导致内核分配过多内存。
+
+* 超过限制时，ioctl 返回 **EINVAL** 并记录错误到 zfs-dbgmsg。
+* 若为 **0**：FreeBSD 相当于用户有线内存限制的 1/4，Linux 相当于 **128 MiB**。
+
+
+### **zfs_multilist_num_sublists** = **0** (uint)
+
+为更细粒度锁定，每个 ARC 状态包含若干子列表，分别管理数据与元数据对象。
+
+* 此参数控制每个 ARC 状态的子列表数量，也适用于其他 multilist 用途。
+* 若为 **0**，取在线 CPU 数与 **4** 的较大值。
+
+
+### **zfs_arc_overflow_shift** = **8** (int)
+
+ARC 被认为溢出时超过目标大小 **arc_c** 的阈值由该参数决定：
+
+* 超过 (**arc_c** >> **zfs_arc_overflow_shift**) / 2 开始 ARC 回收。
+* 若仍不够，超过 (**arc_c** >> **zfs_arc_overflow_shift**) × 1.5 阻止新缓冲分配，直到回收线程追上。
+* 默认 **8**：当 ARC 超过目标的 0.2% 开始回收，超过 0.6% 阻止新分配。
+
+
+### **zfs_arc_shrink_shift** = **0** (uint)
+
+若非零，会更新 **arc_shrink_shift**（默认 **7**）为新值。
+
+
+### **zfs_arc_pc_percent** = **0** % (off) (uint)
+
+设置 ARC 在回收时可占用的页缓存百分比。
+
+* 允许 ARC 与内核 LRU pagecache 更好协作。
+* 在内存压力回收时，可确保 ARC 不会崩塌，但仍可回收至 **zfs_arc_min**。
+* 该值以页缓存大小百分比表示（NR_ACTIVE_FILE + NR_INACTIVE_FILE），可超过 100%。
+
+### **zfs_arc_shrinker_limit** = **0** (int)
+
+限制 ARC shrinker 在一次页面分配尝试中可用于回收的页面数。
+
+* 内核 shrinker 实际上可能请求多达该值约四倍的页面。
+* 为降低 OOM 风险，仅对 kswapd 回收生效。
+* 设置为 **0** 可禁用该限制，仅在 Linux 上适用。
+* 示例：**10000** 页（约 160 MiB，每次 4 KiB 页）可将回收 ARC 内存时间限制在每次分配尝试 <100 ms，即使平均压缩块仅 8 KiB。
+
+
+### **zfs_arc_shrinker_seeks** = **2** (int)
+
+在 Linux 上 ARC 回收的相对成本，也称为恢复被回收页面所需的寻道次数。
+
+* 较大值意味着 ARC 更“珍贵”，回收量相对较小。
+* 值 **4** 与页缓存平价。
+
+
+### **zfs_arc_sys_free** = **0** B (u64)
+
+ARC 应保持的系统空闲内存目标字节数。
+
+* 若为 **0**，等效于 **512 KiB** 与 **all_system_memory/64** 的较大值。
+
+
+### **zfs_checksum_events_per_second** = **20**/s (uint)
+
+每秒限制校验事件的数量。
+
+* 不应低于 ZED 阈值（目前为 10 次校验/10 秒），否则守护进程可能无法触发任何操作。
+
+
+### **zfs_commit_timeout_pct** = **10**% (uint)
+
+控制 ZIL 块（lwb）在未满时保持“开放”的时间比例。
+
+* 超时基于上一次 lwb 延迟的百分比缩放，以避免显著影响每条事务记录（itx）的延迟。
+
+
+### **zfs_condense_indirect_commit_entry_delay_ms** = **0** ms (int)
+
+Vdev 间接层（用于设备移除）在映射生成时的延迟毫秒数。
+
+* 主要用于测试套件以调节 vdev 移除速度。
+
+
+### **zfs_condense_indirect_obsolete_pct** = **25**% (uint)
+
+Vdev 映射中废弃字节的最小百分比，以尝试进行压缩（参考 **zfs_condense_indirect_vdevs_enable**）。
+
+* 用于测试套件以便按需触发压缩。
+
+
+### **zfs_condense_indirect_vdevs_enable** = **1** | 0 (int)
+
+启用间接 vdev 映射压缩。
+
+* 若映射占用超过 **zfs_condense_min_mapping_bytes** 内存且废弃空间映射对象在磁盘上使用超过 **zfs_condense_max_obsolete_bytes**，则尝试压缩。
+* 压缩过程通过移除废弃映射节省内存。
+
+
+### **zfs_condense_max_obsolete_bytes** = **1073741824** B (1 GiB) (u64)
+
+仅当废弃空间映射对象在磁盘上大小超过此值时才尝试压缩间接 vdev 映射（参考 **zfs_condense_indirect_vdevs_enable**）。
+
+### **zfs_condense_min_mapping_bytes** = **131072** B (128 KiB) (u64)
+
+尝试压缩的最小 vdev 映射大小（参考 **zfs_condense_indirect_vdevs_enable**）。
+
+
+### **zfs_dbgmsg_enable** = **1** | 0 (int)
+
+ZFS 内部维护一个小型日志以便调试。
+
+* 默认启用，可通过取消设置此选项禁用。
+* 日志内容可通过读取 `/proc/spl/kstat/zfs/dbgmsg` 访问，写入 **0** 会清空日志。
+* 该设置不影响 **zfs_flags** 导致的调试输出。
+
+
+### **zfs_dbgmsg_maxsize** = **4194304** B (4 MiB) (uint)
+
+ZFS 内部调试日志的最大大小。
+
+
+### **zfs_dbuf_state_index** = **0** (int)
+
+历史上用于控制 `/proc/spl/kstat/zfs` 下的报告内容。
+
+* 当前无效。
+
+
+### **zfs_deadman_checktime_ms** = **60000** ms (1 min) (u64)
+
+检查时间间隔（毫秒）。
+
+* 定义检查挂起 I/O 请求并可能触发 **zfs_deadman_failmode** 行为的频率。
+
+
+### **zfs_deadman_enabled** = **1** | 0 (int)
+
+启用 Deadman 检测机制。
+
+* 当池同步操作超过 **zfs_deadman_synctime_ms**，或单次 I/O 超过 **zfs_deadman_ziotime_ms**，操作被视为“挂起”。
+* 若启用，Deadman 行为按 **zfs_deadman_failmode** 执行。
+* 默认启用，Failmode 为 **wait**，仅记录挂起 I/O。
+* 当池挂起时，Deadman 自动禁用。
+
+
+### **zfs_deadman_events_per_second** = **1**/s (int)
+
+Deadman 生成 zevent（报告挂起 I/O）的速率限制，每秒允许数量。
+
+### **zfs_deadman_failmode** = **wait** (charp)
+
+控制 Deadman 检测到“挂起” I/O 操作时的处理方式。有效值包括：
+
+#### **wait**
+
+  等待“挂起”操作完成。每个挂起操作都会生成一个 Deadman 事件，描述该操作。
+
+#### **continue**
+
+  尝试通过重新派发 I/O 来恢复“挂起”操作（如果可能）。
+
+#### **panic**
+
+  触发系统 panic，可用于配合自动故障转移到已配置的备用节点。
+
+### **zfs_deadman_synctime_ms** = **600000**ms (10 min) (u64)
+
+定义 Deadman 被触发的时间间隔，同时也表示池同步操作被视为“挂起”的时间。超过此限制后，Deadman 会每 **zfs_deadman_checktime_ms** 毫秒触发一次，直到池同步完成。
+
+### **zfs_deadman_ziotime_ms** = **300000**ms (5 min) (u64)
+
+定义单个 I/O 操作被视为“挂起”的时间间隔。只要该操作仍然挂起，Deadman 将每 **zfs_deadman_checktime_ms** 毫秒触发一次，直到操作完成。
+
+### **zfs_dedup_prefetch** = 0 | 1 (int)
+
+启用对即将释放的去重块进行预取。
+
+### **zfs_dedup_log_flush_min_time_ms** = **1000**ms (uint)
+
+每个事务在刷新去重日志时至少花费的时间。即使会延迟事务，也会确保至少执行此时长的日志刷新，直到达到 **zfs_txg_timeout**。
+
+### **zfs_dedup_log_flush_entries_min** = **100** (uint)
+
+每个事务至少刷新这么多去重日志条目。该设置防止在写入速率下降时日志积压完全清空。增大此值可加快日志清理速度，但可能与其他 I/O 冲突。
+
+### **zfs_dedup_log_flush_entries_max** = **UINT_MAX** (uint)
+
+每个事务最多刷新这么多条目。主要用于调试。
+
+### **zfs_dedup_log_flush_txgs** = **100** (uint)
+
+处理整个去重日志所需的目标 TXG 数。每个 TXG，OpenZFS 会处理 DDT 积压大小的 1/100，从而保持积压与写入速率大致匹配。增大此值可提高去重日志效率，但会增加导入时间。
+
+### **zfs_dedup_log_cap** = **UINT_MAX** (uint)
+
+去重日志的软上限。如果日志大小超过此值，系统会增加刷新强度以尽量将日志降低到软上限。设置该值可减少导入时间，但会降低 DDT 日志效率，增加刷新同等数据量所需的 I/O 次数。
+
+### **zfs_dedup_log_hard_cap** = 0 | 1 (uint)
+
+决定是否将日志上限视为硬上限。
+
+* 0（默认）：**zfs_dedup_log_cap** 仅增加每个 TXG 刷新的最大条目数，使积压接近上限，但不会显著延长 TXG 同步时间。
+* 1：上限作为硬上限，每个 TXG 刷新的最小条目数也会增加。启用后可降低最坏导入时间，但会增加 TXG 同步时间。
+
+### **zfs_dedup_log_flush_flow_rate_txgs** = **10** (uint)
+
+用于计算日志刷新流速的事务数量。OpenZFS 会基于最近若干事务的指数加权移动平均，计算条目变化率、刷新率和刷新时间率，并合成整体“流速”。增大此值可平滑处理峰值负载，但流速对持续写入率变化的响应会变慢。
+
+### **zfs_dedup_log_txg_max** = **8** (uint)
+
+刷新去重日志前允许累计的最大事务数。OpenZFS 维护两个去重日志：一个接收新变更，另一个用于刷新。若无待刷条目，最多累积此数量的事务后开始切换日志并刷新。
+
+### **zfs_dedup_log_mem_max** = **0** (u64)
+
+用于去重日志的最大内存。OpenZFS 在内存使用达到此值的一半时开始刷新。默认 0 表示由 **zfs_dedup_log_mem_max_percent** 来确定实际限制。
+
+### **zfs_dedup_log_mem_max_percent** = **1**% (uint)
+
+去重日志使用的最大内存占总内存的百分比。
+如果 **zfs_dedup_log_mem_max** 未设置，则会按系统总内存的这个百分比初始化。
+
+### **zfs_delay_min_dirty_percent** = **60**% (uint)
+
+当脏数据量达到此百分比（相对于 **zfs_dirty_data_max**）时，开始延迟每个事务。
+此值应至少与 **zfs_vdev_async_write_active_max_dirty_percent** 相等。参考 [ZFS TRANSACTION DELAY](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_TRANSACTION_DELAY)。
+
+### **zfs_delay_scale** = **500000** (int)
+
+控制事务延迟增长到无穷大的速度。
+值越大，给定脏数据量的延迟越长。为了最平滑的延迟，该值应约等于 10^9 除以最大每秒操作数。这可平滑处理高于或低于此操作数的情况。
+**zfs_delay_scale × zfs_dirty_data_max** 必须小于 2^64。
+
+### **zfs_dio_write_verify_events_per_second** = **20**/s (uint)
+
+限制 Direct I/O 写验证事件的速率，每秒不超过此值。
+
+### **zfs_disable_ivset_guid_check** = 0 | 1 (int)
+
+禁用加密数据集原始接收时 IVset GUID 必须存在且匹配的要求。
+用于早期 OpenZFS 版本创建的池，现在可能存在兼容性问题的用户。
+
+### **zfs_key_max_salt_uses** = 400000000 (4×10^8) (ulong)
+
+单个盐值在生成新盐值前的最大使用次数，用于加密数据集。默认值即为最大值。
+
+### **zfs_object_mutex_size** = **64** (uint)
+
+用于 znode 哈希表的锁大小。
+由于对象可能尚不存在，内核不会为每个对象创建互斥锁，而是使用哈希表管理，哈希冲突时对象会等待，即使实际上没有同对象的竞争。
+
+### **zfs_slow_io_events_per_second** = **20**/s (int)
+
+限制慢 I/O 报告事件（delay zevents）的速率，每秒不超过此值。
+
+### **zfs_unflushed_max_mem_amt** = **1073741824**B (1 GiB) (u64)
+
+日志空间映射在内存中持有的未刷写元数据变更的上限（以字节为单位）。
+
+### **zfs_unflushed_max_mem_ppm** = **1000**ppm (0.1%) (u64)
+
+ZFS 允许用于未刷写元数据变更的系统总内存比例，以百万分之一计。
+
+### **zfs_unflushed_log_block_max** = **131072** (128k) (u64)
+
+每个池允许的最大日志空间映射块数量。默认值意味着所有日志空间映射块总和不得超过 **131072** 块（假设块大小为 128 KiB，则逻辑空间为 *16 GiB*，未考虑压缩和 Ditto 块）。
+
+此参数影响未正常导出后的导入时间与 metaslab 刷写频率之间的权衡：
+
+* 值越高，池活跃时允许的日志块越多，metaslab 刷写频率降低，每个 TXG 的空间映射更新 I/O 操作减少。
+* 值越低，刷写增加，日志块更快变为过期，未正常导出时导入需读取的日志块减少，从而减少导入开销。
+
+每个在池导入时存在的日志空间映射块大约会引发一次额外逻辑 I/O，因此此参数以块数而非空间量进行调节。
+
+### **zfs_unflushed_log_block_min** = **1000** (u64)
+
+当 metaslab 数量较少且写入速率较高时，可能出现每个 TXG 都刷写所有 metaslab 的情况。此参数确保至少允许存在这么多日志块。
+
+### **zfs_unflushed_log_block_pct** = **400**% (u64)
+
+用于确定日志空间映射可使用块数，相对于池中未刷写 metaslab 总数的百分比。
+
+### **zfs_unflushed_log_txg_max** = **1000** (u64)
+
+限制任意 metaslab 在未刷写状态下可持续的最大 TXG 数。有效地限制了未正常导出池后需要读取的每 TXG 日志块的最大数量。
+
+### **zfs_unlink_suspend_progress** = **0**|1 (uint)
+
+启用后，文件不会被异步从待删除列表移除，所占空间会暂时“泄漏”。禁用此选项并重新挂载数据集后，待删除操作会被处理，释放的空间返回池中。此选项主要用于测试套件。
+
+### **zfs_delete_blocks** = **20480** (ulong)
+
+定义大文件的阈值。大于 **zfs_delete_blocks** 的文件将异步删除，小于该值的文件同步删除。降低此值可减少 [unlink(2)]() 系统调用的执行时间，但会延长释放空间的延迟。仅适用于 Linux。
+
+### **zfs_dirty_data_max** = (int)
+
+定义脏数据空间的上限（字节）。超过此上限后，新写入将被阻塞，直至空间释放。此参数优先于 **zfs_dirty_data_max_percent**。默认值为 **physical_ram/10**，并受 **zfs_dirty_data_max_max** 限制。
+
+### **zfs_dirty_data_max_max** = (int)
+
+**zfs_dirty_data_max** 的最大允许值（字节）。此限制仅在模块加载时生效，如果之后修改 **zfs_dirty_data_max** 将被忽略。该参数优先于 **zfs_dirty_data_max_max_percent**。默认值为 **min(physical_ram/4, 4GiB)**，32 位系统为 **min(physical_ram/4, 1GiB)**。
+
+### **zfs_dirty_data_max_max_percent** = **25**% (uint)
+
+**zfs_dirty_data_max** 的最大允许值，以物理内存百分比表示。仅在模块加载时生效，之后修改 **zfs_dirty_data_max** 会被忽略。优先级低于 **zfs_dirty_data_max_max**。
+
+### **zfs_dirty_data_max_percent** = **10**% (uint)
+
+脏数据空间上限，以系统总内存百分比表示。超过此限，新写入将被阻塞直到空间释放。若 **zfs_dirty_data_max** 被设置，将优先使用 **zfs_dirty_data_max**。此值受 **zfs_dirty_data_max_max** 限制。
+
+### **zfs_dirty_data_sync_percent** = **20**% (uint)
+
+当脏数据达到 **zfs_dirty_data_max** 的此百分比时，开始同步事务组。应小于 **zfs_vdev_async_write_active_min_dirty_percent**。
+
+### **zfs_wrlog_data_max** = (int)
+
+写事务 ZIL 日志数据的上限（字节）。当接近此上限时，写入操作将被限流，直到事务组同步后日志数据被清理。因存在额外开销，应至少设为 **zfs_dirty_data_max** 的两倍以保障写入吞吐，同时不得超过 slog 设备大小（如果存在）。默认值为 **zfs_dirty_data_max × 2**。
+
+### **zfs_fallocate_reserve_percent** = **110**% (uint)
+
+由于 ZFS 是写时复制文件系统且支持快照，不能为文件预先分配块以保证后续写入不会耗尽空间。`fallocate(2)` 仅检查池或用户项目配额当前是否有足够空间，然后创建所请求大小的稀疏文件。请求空间会乘以 **zfs_fallocate_reserve_percent** 以预留间接块和其他内部元数据所需的额外空间。设置为 **0** 会禁用 `fallocate(2)` 支持，并返回 **EOPNOTSUPP**。
+
+### **zfs_fletcher_4_impl** = **fastest** (string)
+
+选择 Fletcher 4 校验算法的实现。可选值包括：**fastest**、**scalar**、**sse2**、**ssse3**、**avx2**、**avx512f**、**avx512bw** 和 **aarch64_neon**。除 **fastest** 和 **scalar** 外，其余选项需要 CPU 指令集支持，并仅在运行时检测到可用时出现。若有多个实现，**fastest** 会通过微基准测试选择最快者。选择 **scalar** 使用原始 CPU 计算；选择其他选项则使用对应向量指令。
+
+### **zfs_bclone_enabled** = **1**|0 (int)
+
+启用块克隆功能。若设为 0，即使 feature@block_cloning 已启用，尝试克隆块的函数和系统调用也会表现为功能被禁用。
+
+### **zfs_bclone_strict_properties** = **1**|0 (int)
+
+限制不同属性（校验和、压缩、拷贝数、去重或 special_small_blocks）的数据集之间的块克隆。
+
+### **zfs_bclone_wait_dirty** = **1**|0 (int)
+
+设置为 1 时，FICLONE 和 FICLONERANGE ioctl 会等待所有脏数据写入磁盘后再继续，保证克隆操作可靠，即使文件在修改后立即被克隆。对小文件可能比直接复制慢。设置为 0 时，如遇脏块克隆操作会立即失败。默认启用等待。
+
+### **zfs_blake3_impl** = **fastest** (string)
+
+选择 BLAKE3 校验算法的实现。可选值包括：**cycle**、**fastest**、**generic**、**sse2**、**sse41**、**avx2**、**avx512**。除 **cycle**、**fastest** 和 **generic** 外，其余选项需要 CPU 指令集支持，仅在运行时检测到可用时出现。如果多个实现可用，**fastest** 会通过微基准测试选择最快者。可通过读取 `/proc/spl/kstat/zfs/chksum_bench` 查看基准结果。
+
+### **zfs_free_bpobj_enabled** = **1**|0 (int)
+
+启用或禁用 free_bpobj 对象的处理。
+
+### **zfs_async_block_max_blocks** = **UINT64_MAX** (u64)
+
+单个 TXG 中释放的最大块数（无限制）。
+
+### **zfs_max_async_dedup_frees** = **250000** (u64)
+
+单个 TXG 中可释放的去重、克隆或 gang 块的最大数量。这些释放可能需要额外 I/O，因此成本更高。
+
+### **zfs_async_free_zio_wait_interval** = **2000** (u64)
+
+释放此数量的去重、克隆或 gang 块后，等待所有挂起 I/O 完成再继续。
+
+### **zfs_vdev_async_read_max_active** = **3** (uint)
+
+每个设备最大异步读 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_async_read_min_active** = **1** (uint)
+
+每个设备最小异步读 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_async_write_active_max_dirty_percent** = **60**% (uint)
+
+当池中脏数据超过此百分比时，使用 **zfs_vdev_async_write_max_active** 限制活动异步写。若脏数据介于最小与最大之间，活动 I/O 限制按线性插值计算。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_async_write_active_min_dirty_percent** = **30**% (uint)
+
+当池中脏数据低于此百分比时，使用 **zfs_vdev_async_write_min_active** 限制活动异步写。若脏数据介于最小与最大之间，活动 I/O 限制按线性插值计算。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_async_write_max_active** = **10** (uint)
+
+每个设备最大异步写 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_async_write_min_active** = **2** (uint)
+
+每个设备最小异步写 I/O 操作数。较低值有助于旋转盘延迟优化，但可能降低 resilver 性能。默认值 **2** 是折中选择，设置为 **3** 可进一步提升 resilver 性能，但会增加延迟。
+
+### **zfs_vdev_initializing_max_active** = **1** (uint)
+
+每个设备最大初始化 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_initializing_min_active** = **1** (uint)
+
+每个设备最小初始化 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_max_active** = **1000** (uint)
+
+每个设备允许的最大 I/O 操作总数，理想值应至少等于各队列 **max_active** 之和。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_open_timeout_ms** = **1000** (uint)
+
+导入时等待设备响应的超时值（毫秒），用于处理因 udev 事件导致的临时路径丢失问题。
+
+### **zfs_vdev_rebuild_max_active** = **3** (uint)
+
+每个设备最大顺序 resilver I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_rebuild_min_active** = **1** (uint)
+
+每个设备最小顺序 resilver I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_removal_max_active** = **2** (uint)
+
+每个设备最大移除 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_removal_min_active** = **1** (uint)
+
+每个设备最小移除 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_scrub_max_active** = **2** (uint)
+
+每个设备最大 scrub I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_scrub_min_active** = **1** (uint)
+
+每个设备最小 scrub I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_sync_read_max_active** = **10** (uint)
+
+每个设备最大同步读 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_sync_read_min_active** = **10** (uint)
+
+每个设备最小同步读 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_sync_write_max_active** = **10** (uint)
+
+每个设备最大同步写 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_sync_write_min_active** = **10** (uint)
+
+每个设备最小同步写 I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_trim_max_active** = **2** (uint)
+
+每个设备最大 trim/discard I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_trim_min_active** = **1** (uint)
+
+每个设备最小 trim/discard I/O 操作数。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_nia_delay** = **5** (uint)
+
+对于非交互 I/O（scrub、resilver、removal、initialize 和 rebuild），同时活跃的 I/O 操作数限制为对应的 **zfs_*_min_active**，除非设备处于“空闲”状态。当没有交互 I/O 操作活动（同步或其他）且自上一次交互操作以来已有 **zfs_vdev_nia_delay** 个操作完成，则该设备被视为空闲，并将非交互操作的并发数增加至 **zfs_*_max_active**。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_nia_credit** = **5** (uint)
+
+某些 HDD 会强烈优先顺序 I/O，以至于并发随机 I/O 延迟达到数秒。即使将 **zfs_*_max_active** 设置为 **1** 也无法缓解。为了防止 scrub 等非交互 I/O 垄断设备，当存在未完成的交互操作时，不允许发送超过 **zfs_vdev_nia_credit** 个非交互操作。此机制确保 HDD 在合理时间内响应交互 I/O。参见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+### **zfs_vdev_failfast_mask** = **1** (uint)
+
+定义驱动在遇到特定错误类型时是否立即放弃重试。可以按位组合以下选项：
+
+|   | 值 | 名称        | 描述         |
+| - | - | --------- | ---------- |
+|   | 1 | Device    | 设备错误时驱动不重试 |
+|   | 2 | Transport | 传输错误时驱动不重试 |
+|   | 4 | Driver    | 驱动错误时驱动不重试 |
+
+
+### **zfs_vdev_disk_max_segs** = **0** (uint)
+
+BIO 可添加的最大段数（最小为 4）。如果超过设备队列或内核允许的最大值，将被限制。设置为 0 时使用内核理想值。仅适用于 Linux。
+
+
+### **zfs_expire_snapshot** = **300** s (int)
+
+**.zfs/snapshot** 下快照过期前的等待时间（秒）。
+
+
+### **zfs_admin_snapshot** = **0**|1 (int)
+
+允许通过 **.zfs/snapshot** 目录创建、删除或重命名条目来触发快照的创建、销毁或重命名。启用后，此功能在本地和设置了 [*no_root_squash*](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#no_root_squash) 的 NFS 导出上均可用。
+
+
+### **zfs_snapshot_no_setuid** = **0**|1 (int)
+
+是否禁用快照挂载的 [*setuid/setgid*](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#setuid/setgid) 支持，通过在挂载时加上 [*nosuid*](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#nosuid) 选项实现。
+
+### **zfs_flags** = **0** (int)
+
+设置附加调试标志。以下标志可按位组合：
+
+|       | 值     | 名称                          | 描述                                                           |
+| ----- | ----- | --------------------------- | ------------------------------------------------------------ |
+|       | 1     | ZFS_DEBUG_DPRINTF           | 在调试日志中启用 dprintf 条目。                                         |
+| ***** | 2     | ZFS_DEBUG_DBUF_VERIFY       | 启用额外的 dbuf 验证。                                               |
+| ***** | 4     | ZFS_DEBUG_DNODE_VERIFY      | 启用额外的 dnode 验证。                                              |
+|       | 8     | ZFS_DEBUG_SNAPNAMES         | 启用快照名称验证。                                                    |
+| ***** | 16    | ZFS_DEBUG_MODIFY            | 检查 ARC 缓冲区是否被非法修改。                                           |
+|       | 64    | ZFS_DEBUG_ZIO_FREE          | 启用块释放验证。                                                     |
+|       | 128   | ZFS_DEBUG_HISTOGRAM_VERIFY  | 启用额外的 spacemap 直方图验证。                                        |
+|       | 256   | ZFS_DEBUG_METASLAB_VERIFY   | 验证磁盘上的空间计数是否与内存中的 **range_trees** 匹配。                        |
+|       | 512   | ZFS_DEBUG_SET_ERROR         | 在调试日志中启用 **SET_ERROR** 和 dprintf 条目。                         |
+|       | 1024  | ZFS_DEBUG_INDIRECT_REMAP    | 验证由设备移除导致的拆分块。                                               |
+|       | 2048  | ZFS_DEBUG_TRIM              | 验证 TRIM 范围始终在可分配范围树内。                                        |
+|       | 4096  | ZFS_DEBUG_LOG_SPACEMAP      | 验证日志摘要与 spacemap 日志一致，并启用 **zfs_dbgmsgs** 用于 metaslab 加载和刷新。 |
+|       | 8192  | ZFS_DEBUG_METASLAB_ALLOC    | 当分配失败时启用调试消息。                                                |
+|       | 16384 | ZFS_DEBUG_BRT               | 启用与 BRT 相关的调试消息。                                             |
+|       | 32768 | ZFS_DEBUG_RAIDZ_RECONSTRUCT | 启用 raidz 重建的调试消息。                                            |
+|       | 65536 | ZFS_DEBUG_DDT               | 启用与 DDT 相关的调试消息。                                             |
+
+***** 需要调试版本构建。
+
+
+### **zfs_btree_verify_intensity** = **0** (uint)
+
+启用 btree 验证，以下设置可累加：
+
+|       | 值 | 描述                 |
+| ----- | - | ------------------ |
+|       | 1 | 验证高度。              |
+|       | 2 | 验证从子节点到父节点的指针。     |
+|       | 3 | 验证元素计数。            |
+|       | 4 | 验证元素顺序。（开销大）       |
+| ***** | 5 | 验证未使用内存是否被毒化。（开销大） |
+
+***** 需要调试版本构建。
+
+### **zfs_free_leak_on_eio** = **0** | 1 (int)
+
+当销毁操作在读取元数据（如间接块）时遇到 **EIO** 错误，通常引用这些缺失元数据的空间无法释放。默认情况下，这会导致后台销毁“暂停”，因为无法继续前进。在暂停状态下，所有待释放的空间会“暂时泄漏”。
+设置此标志会忽略 **EIO** 错误，永久泄漏无法读取的间接块空间，同时继续释放其余可释放空间。
+
+默认的“暂停”行为在存储部分失败（即部分 I/O 操作失败）然后恢复的情况下非常有用。此时可以在部分失败期间继续池操作，并在恢复后继续释放空间，无泄漏。然而，这种情况实际较少发生。
+
+通常，存储池要么：
+
+1. 完全失败（可能是暂时的，例如顶级 vdev 离线），
+2. 出现局部永久错误（例如磁盘因位翻转或固件错误返回错误数据）。
+
+对于第一种情况，此设置无影响，因为池会被挂起，同步线程无法前进。对于第二种情况，由于错误是永久性的，设置此标志可以最小化空间泄漏。因此，通常可以设置该标志，但出于保守考虑，默认不设置，以避免在“部分暂时性”失败情况下泄漏空间。
+
+
+### **zfs_free_min_time_ms** = **500**ms (uint)
+
+在使用 [**async_destroy**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#async_destroy) 功能的 `zfs destroy` 操作中，每个 TXG 至少花费此时间用于释放块。
+
+
+### **zfs_obsolete_min_time_ms** = **500**ms (uint)
+
+与 **zfs_free_min_time_ms** 类似，但用于清理已移除 vdev 的旧间接记录。
+
+### **zfs_immediate_write_sz** = **32768**B (32 KiB) (s64)
+
+当 **logbias** = [**latency**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#latency) 时，将数据直接写入 ZIL 的最大写入大小。较大的写入会以间接方式写入，类似 **logbias** = **throughput**。如果存在 SLOG，此参数被忽略，相当于无限大，所有写入数据都会写入 ZIL，不依赖常规 vdev 的延迟。
+
+
+### **zil_special_is_slog** = **1** | 0 (int)
+
+启用后，当写入块到达普通 vdev 时，将当前的 special vdev 当作 SLOG 处理。写入 special vdev 的块仍以间接方式写入，类似 **logbias** = **throughput**。如果已经存在 SLOG，此参数被忽略。
+
+
+### **zfs_import_defer_txgs** = **5** (uint)
+
+在导入池后等待的事务组数量，才开始后台操作，如异步释放块（来自快照、克隆或去重）以及 scrub 或 resilver。可让池导入和文件系统挂载更快完成，避免后台干扰。默认值 5 事务组通常足够大多数系统使用。
+
+
+### **zfs_initialize_value** = **16045690984833335022** (0xDEADBEEFDEADBEEE) (u64)
+
+由 [zpool-initialize(8)](https://openzfs.github.io/openzfs-docs/man/master/8/zpool-initialize.8.html) 写入 vdev 空闲空间的模式值。
+
+
+### **zfs_initialize_chunk_size** = **1048576**B (1 MiB) (u64)
+
+[ zpool-initialize(8) ]写入的块大小。测试套件使用此选项。
+
+
+### **zfs_livelist_max_entries** = **500000** (5×10^5) (u64)
+
+创建新子 livelist 的阈值（以块指针计）。较大的子列表占用更多内存，但子列表越少，插入成本越低。
+
+
+### **zfs_livelist_min_percent_shared** = **75**% (int)
+
+快照与克隆间共享空间低于此阈值时，克隆关闭 livelist 并回退至旧的删除方法。因为当克隆被覆盖足够多时，livelist 已不再有优势。
+
+
+### **zfs_livelist_condense_new_alloc** = **0** (int)
+
+在 condense livelist 时，每次添加额外 ALLOC blkptr 都会递增此值。测试套件用于跟踪竞态条件。
+
+
+### **zfs_livelist_condense_sync_cancel** = **0** (int)
+
+在 [`spa_livelist_condense_sync`](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#spa_livelist_condense_sync)() 中每次 condense 被取消时递增。用于测试竞态条件。
+
+
+### **zfs_livelist_condense_sync_pause** = **0** | 1 (int)
+
+启用时，livelist condense 进程在执行同步任务 `spa_livelist_condense_sync`() 前无限暂停。用于测试竞态条件。
+
+
+### **zfs_livelist_condense_zthr_cancel** = **0** (int)
+
+在 [`spa_livelist_condense_cb`](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#spa_livelist_condense_cb)() 中，每次 condense 被取消时递增。用于测试竞态条件。
+
+### **zfs_livelist_condense_zthr_pause** = **0** | 1 (int)
+
+启用时，livelist condense 进程在执行 `spa_livelist_condense_cb`() 中的 open context condensing 工作前无限暂停。测试套件用于触发竞态条件。
+
+
+### **zfs_lua_max_instrlimit** = **100000000** (10^8) (u64)
+
+ZFS 通道程序可设置的最大执行时间限制，以 Lua 指令数量计。
+
+
+### **zfs_lua_max_memlimit** = **104857600** (100 MiB) (u64)
+
+ZFS 通道程序可设置的最大内存限制，以字节计。
+
+
+### **zfs_max_dataset_nesting** = **50** (int)
+
+嵌套数据集的最大深度。可临时调整以修复已存在的超过预设限制的数据集。
+
+
+### **zfs_max_log_walking** = **5** (u64)
+
+日志 spacemap 功能刷新算法用于估算即将写入的日志块的过去 TXG 数量。
+
+
+### **zfs_max_logsm_summary_length** = **10** (u64)
+
+spacemap 日志摘要允许的最大行数。
+
+
+### **zfs_max_recordsize** = **16777216** (16 MiB) (uint)
+
+支持的块大小范围为 512 B 至 16 MiB。大块可提高 I/O 效率，但修改单字节时需 COW 整块，可能影响 I/O 延迟和内存分配器。历史上默认禁止创建大于 1 MiB 的块，但可以通过调整创建更大块。x86_32 系统默认仍限制为 1 MiB，因为 Linux 3/1 内存划分无法容纳 16M 块。
+
+
+### **zfs_allow_redacted_dataset_mount** = **0** | 1 (int)
+
+允许挂载通过 redacted send/receive 接收的数据集。通常禁用，因为这些数据集可能缺失关键数据。
+
+
+### **zfs_min_metaslabs_to_flush** = **1** (u64)
+
+每个 dirty TXG 至少要刷新的 metaslab 数量。
+
+
+### **zfs_metaslab_fragmentation_threshold** = **77**% (uint)
+
+当 metaslab 的碎片率不超过此值时，保持其 active 状态。超过阈值的 active metaslab 将失去 active 状态，以便选择更优的 metaslab。
+
+### **zfs_mg_fragmentation_threshold** = **95**% (uint)
+
+当 metaslab group 的碎片率（百分比）小于或等于此值时，认为其可用于分配。如果 metaslab group 超过该阈值，则会被跳过，除非同一 metaslab class 内的所有 metaslab group 也都超过该阈值。
+
+
+### **zfs_mg_noalloc_threshold** = **0**% (uint)
+
+定义 metaslab group 的分配可用阈值。该值表示自由空间百分比，低于或等于此阈值的 group 默认不进行分配，除非池中所有 group 都达到了该阈值。默认 **0** 表示禁用此功能，所有 metaslab group 都可参与分配。
+此参数有助于处理 vdev 分布不均的池，例如新加入 vdev 的情况。非零阈值可防止向未填满的 vdev 分配，并允许较空闲的 vdev 获取更多分配。
+
+
+### **zfs_ddt_data_is_special** = **1** | 0 (int)
+
+启用时，ZFS 会将 DDT 数据放入 special 分配类。
+
+
+### **zfs_user_indirect_is_special** = **1** | 0 (int)
+
+启用时，ZFS 会将用户数据的 indirect block 放入 special 分配类。
+
+
+### **zfs_multihost_history** = **0** (uint)
+
+保留最近指定数量的多主机更新历史统计，可在 `/proc/spl/kstat/zfs/⟨pool⟩/multihost` 查看。
+
+### **zfs_multihost_interval** = **1000**ms (1 s) (u64)
+
+控制在 **multihost** 属性启用时多主机写入的频率，也是导入期间活动检查长度的参考因素之一。多主机写入周期为 **zfs_multihost_interval** ÷ **leaf-vdevs**。平均而言，每个 leaf vdev 每 **zfs_multihost_interval** 毫秒会执行一次多主机写入。实际观察到的周期可能随 I/O 负载变化，并且该延迟值会存储在 uberblock 中。
+
+
+### **zfs_multihost_import_intervals** = **20** (uint)
+
+控制导入时活动测试的持续时间。值越小，导入时间越短，但检测活动池失败的风险越高。活动检查的最短时间为 **zfs_multihost_interval × zfs_multihost_import_intervals**，或上一次导入该池的主机上计算的相同值，两者取较大者。若最佳 uberblock 中 MMP 延迟显示实际多主机更新间隔长于 **zfs_multihost_interval**，活动检查时间会进一步延长。最短执行时间为 100 ms。
+**0** 等效于 **1**。
+
+
+### **zfs_multihost_fail_intervals** = **10** (uint)
+
+控制检测到多主机写入失败或延迟时池的行为。
+
+* 若为 **0**，忽略多主机写入失败或延迟，但仍会向 ZED 报告，ZED 可根据配置采取动作，如挂起池或下线设备。
+* 非零时，如果 **zfs_multihost_fail_intervals × zfs_multihost_interval** 毫秒内没有成功的 MMP 写入，池将被挂起。
+  **1** 等效于 **2**，用于避免因正常小幅 I/O 延迟导致池被挂起。
+
+
+### **zfs_no_scrub_io** = **0** | 1 (int)
+
+设置为 1 可禁用 scrub I/O。此时 scrub 操作仅进行元数据扫描，而不实际检查或修复数据。
+
+### **zfs_no_scrub_prefetch** = **0** | 1 (int)
+
+设置为 1 可禁用 scrub 操作的块预取。
+
+
+### **zfs_nocacheflush** = **0** | 1 (int)
+
+禁用写入时对磁盘的缓存刷新操作。如果启用易失的乱序写缓存，设置此项可能在断电时导致池损坏。
+
+
+### **zfs_nopwrite_enabled** = **1** | 0 (int)
+
+允许执行无操作写入（nopwrite）。nopwrite 的实际发生还取决于其他池属性，例如校验和和压缩算法。
+
+
+### **zfs_dmu_offset_next_sync** = **1** | 0 (int)
+
+启用强制 TXG 同步以发现文件空洞。启用时，使用 **SEEK_HOLE** 或 **SEEK_DATA** 标志可以准确报告文件中的空洞；禁用时，最近修改的文件中的空洞不会被报告。
+
+
+### **zfs_pd_bytes_max** = **52428800** B (50 MiB) (int)
+
+在池遍历（如 `zfs send` 或其他数据扫描操作）期间应预取的字节数。
+
+
+### **zfs_traverse_indirect_prefetch_limit** = **32** (uint)
+
+在池遍历（如 `zfs send` 或其他数据扫描操作）期间，应预取的间接块（非 L0 块）指向的块数量。
+
+
+### **zfs_per_txg_dirty_frees_percent** = **30**% (u64)
+
+控制每个 TXG 中允许的脏间接块释放百分比。超过该阈值后，额外的释放操作将等待到下一个 TXG。**0** 表示禁用此限流。
+
+
+### **zfs_prefetch_disable** = **0** | 1 (int)
+
+禁用预测性预取。注意，它不会影响“先见”预取（例如用于 `zfs send`），因为先见预取从不执行无用 I/O，不会影响性能。
+
+
+### **zfs_qat_checksum_disable** = **0** | 1 (int)
+
+禁用 QAT 硬件加速的 SHA256 校验和。只要支持已编译且 QAT 驱动存在，ZFS 模块加载后可取消此设置以初始化 QAT 硬件。
+
+
+### **zfs_qat_compress_disable** = **0** | 1 (int)
+
+禁用 QAT 硬件加速的 gzip 压缩。同样，在支持编译且 QAT 驱动存在的情况下，可在 ZFS 模块加载后取消此设置以初始化 QAT 硬件。
+
+### **zfs_qat_encrypt_disable** = **0** | 1 (int)
+
+禁用 QAT 硬件加速的 AES-GCM 加密。只要支持已编译且 QAT 驱动存在，ZFS 模块加载后可取消此设置以初始化 QAT 硬件。
+
+
+### **zfs_vnops_read_chunk_size** = **33554432** B (32 MiB) (u64)
+
+每次读取操作的块大小（以字节为单位）。
+
+
+### **zfs_read_history** = **0** (uint)
+
+保留最近指定数量的读取操作历史统计，可在 `/proc/spl/kstat/zfs/⟨pool⟩/reads` 查看。
+
+
+### **zfs_read_history_hits** = **0** | 1 (int)
+
+在读取历史中是否包含缓存命中。
+
+
+### **zfs_rebuild_max_segment** = **1048576** B (1 MiB) (u64)
+
+在顺序重建（resilver）顶级 vdev 时，单次最大读取段大小。
+
+
+### **zfs_rebuild_scrub_enabled** = **1** | 0 (int)
+
+顺序重建完成后，自动启动池 scrub 以验证已重建块的校验和。默认启用，强烈推荐保持开启。
+
+
+### **zfs_rebuild_vdev_limit** = **67108864** B (64 MiB) (u64)
+
+顺序重建每个叶设备允许的最大并发 I/O 总量（以字节为单位）。
+
+
+### **zfs_reconstruct_indirect_combinations_max** = **4096** (int)
+
+如果间接拆分块在重建时可能的唯一组合超过此数量，则认为计算代价过高，不会全部检查。每次访问块时，最多随机尝试该数量的组合，以确保各段副本公平参与重建，并避免重复使用错误副本。
+
+
+### **zfs_recover** = **0** | 1 (int)
+
+尝试从致命错误中恢复。仅在万不得已时使用，因为通常会导致空间泄漏或更严重的问题。
+
+### **zfs_removal_ignore_errors** = **0** | 1 (int)
+
+在设备移除过程中忽略严重 I/O 错误。启用后，即使设备在移除时遇到硬件 I/O 错误，移除操作也不会取消。这可能导致原本可恢复的数据块永久损坏，因此不推荐使用，仅在无法在移除设备前将池恢复到健康状态时作为最后手段。
+
+
+### **zfs_removal_suspend_progress** = **0** | 1 (uint)
+
+供测试套件使用，用于确保在设备移除过程中某些操作能够在特定中间状态发生。
+
+
+### **zfs_remove_max_segment** = **16777216** B (16 MiB) (uint)
+
+移除设备时尝试分配的最大连续段大小。如果大块分配影响性能，可考虑减小该值。默认值也是允许的最大值。
+
+
+### **zfs_resilver_disable_defer** = **0** | 1 (int)
+
+忽略 **resilver_defer** 功能，使本应延迟的重建操作立即启动当前正在进行的重建。
+
+
+### **zfs_resilver_defer_percent** = **10** % (uint)
+
+如果当前重建进度低于该阈值，即使启用了 **resilver_defer** 功能，新重建也会从头开始，而不是等待当前重建完成后再延迟。
+
+
+### **zfs_resilver_min_time_ms** = **1500** ms (uint)
+
+重建操作由同步线程处理。在重建期间，每个 TXG 刷新之间至少花费此时间处理重建任务。
+
+
+### **zfs_scan_ignore_errors** = **0** | 1 (int)
+
+启用后，即使池扫描（scrub）中存在无法修复的错误，也会在完成后清除 DTL（dirty time list）。用于池修复或恢复，以便下次导入时停止重建。
+
+
+### **zfs_scrub_after_expand** = **1** | 0 (int)
+
+RAIDZ 扩展完成后自动启动池 scrub，以验证扩展过程中复制的所有块的校验和。默认启用，强烈推荐保持开启。
+
+
+### **zfs_scrub_min_time_ms** = **750** ms (uint)
+
+scrub 操作由同步线程处理。每个 TXG 刷新之间至少花费此时间处理 scrub 任务。
+
+
+### **zfs_scrub_error_blocks_per_txg** = **4096** (uint)
+
+每个 TXG 中待 scrub 的错误块数量。
+
+### **zfs_scan_checkpoint_intval** = **7200** s (2 小时) (uint)
+
+为了在重启后保留进度，顺序扫描算法会定期停止元数据扫描，并将所有验证 I/O 写入磁盘。此刷新频率由该参数控制。
+
+
+### **zfs_scan_fill_weight** = **3** (uint)
+
+该参数影响 scrub 和 resilver 操作中 I/O 段的调度顺序。数值越大表示更重视段内填充密度，数值越小表示更关注范围大小而不考虑段内空隙。该值仅在模块加载时可调，加载后修改不会影响 scrub 或 resilver 性能。
+
+
+### **zfs_scan_issue_strategy** = **0** (uint)
+
+确定 scrub 或 resilver 时验证数据的顺序。
+
+
+#### **1**
+  尽可能按顺序验证数据，受为 scrub 保留的内存量限制（参见 **zfs_scan_mem_lim_fact**）。如果池中数据非常碎片化，这种方式可能提高 scrub 性能。
+
+#### **2**
+  优先验证找到的最大几乎连续的数据块。通过延迟处理小段数据，后续可能找到相邻数据合并，从而增大段大小。
+
+#### **0**
+  在普通验证时使用策略 **1**，在执行 checkpoint 时使用策略 **2**。
+
+
+### **zfs_scan_legacy** = **0** | 1 (int)
+
+未设置时，scrub 和 resilver 会先在内存中收集元数据，再发起顺序 I/O。设置时使用传统算法，即发现 I/O 即刻执行。对已在进行中的 scrub 或 resilver 无影响。
+
+
+### **zfs_scan_max_ext_gap** = **2097152** B (2 MiB) (int)
+
+设置 scrub/resilver I/O 操作间仍被视为顺序的最大字节间隙。改变此值不会影响已进行中的操作。
+
+
+### **zfs_scan_mem_lim_fact** = **20**^-1 (uint)
+
+顺序扫描算法用于 I/O 排序的最大内存比例。达到此硬限制时，会停止扫描元数据并开始数据验证 I/O，直到低于软限制为止。
+
+
+### **zfs_scan_mem_lim_soft_fact** = **20**^-1 (uint)
+
+顺序扫描算法用于 I/O 排序的软限制占硬限制的比例。从下方跨过此值时不采取行动；从上方跨过时（正在执行验证 I/O）会停止验证 I/O 并重新扫描元数据，直至达到硬限制。
+
+
+### **zfs_scan_report_txgs** = **0** | 1 (uint)
+
+报告 resilver 吞吐量和预计完成时间时，使用最近 **zfs_scan_report_txgs** 个 TXG 的性能数据。设置为 0 时，则使用检查点间的时间计算性能。
+
+
+### **zfs_scan_strict_mem_lim** = **0** | 1 (int)
+
+顺序扫描进行时，是否严格限制池扫描的内存使用。禁用时，高速磁盘可能会超出限制。
+
+### **zfs_scan_suspend_progress** = **0** | 1 (int)
+
+冻结正在进行的 scrub/resilver，但实际上不暂停。用于测试或调试。
+
+
+### **zfs_scan_vdev_limit** = **16777216** B (16 MiB) (int)
+
+每个叶子设备在 scrub 和 resilver 中一次性可发起的最大并发数据量（字节）。
+
+
+### **zfs_send_corrupt_data** = **0** | 1 (int)
+
+允许发送损坏数据（发送时忽略读取/校验错误）。
+
+
+### **zfs_send_unmodified_spill_blocks** = **1** | 0 (int)
+
+在发送流中包含未修改的 spill block。在某些情况下，旧版本 ZFS 可能错误地删除对象中的 spill block。包含未修改的 spill block 可生成向后兼容的流，确保错误删除的 spill block 会被重建。
+
+
+### **zfs_send_no_prefetch_queue_ff** = **20**^-1 (uint)
+
+`zfs send` 内部队列的填充比例，用于控制内部线程唤醒的时机。
+
+
+### **zfs_send_no_prefetch_queue_length** = **1048576** B (1 MiB) (uint)
+
+`zfs send` 内部队列允许的最大字节数。
+
+
+### **zfs_send_queue_ff** = **20**^-1 (uint)
+
+`zfs send` 预取队列的填充比例，用于控制内部线程唤醒的时机。
+
+
+### **zfs_send_queue_length** = **16777216** B (16 MiB) (uint)
+
+`zfs send` 可预取的最大字节数。此值必须至少为使用的最大块大小的两倍。
+
+
+### **zfs_recv_queue_ff** = **20**^-1 (uint)
+
+`zfs receive` 队列的填充比例，用于控制内部线程唤醒的时机。
+
+### **zfs_recv_queue_length** = **16777216** B (16 MiB) (uint)
+
+`zfs receive` 队列允许的最大字节数。此值必须至少为使用的最大块大小的两倍。
+
+
+### **zfs_recv_write_batch_size** = **1048576** B (1 MiB) (uint)
+
+`zfs receive` 在单个 DMU 事务中写入的最大数据量（字节）。即使接收压缩的发送流，此值也指未压缩大小。写入不会小于单个块，最大限制为 **32 MiB**。
+
+
+### **zfs_recv_best_effort_corrective** = **0** (int)
+
+非零时启用纠正性接收：
+
+1. 不强制源与目标快照 GUID 匹配。
+2. 修复过程中出现错误时，不终止接收，而是继续处理下一个记录。
+
+
+### **zfs_override_estimate_recordsize** = **0** | 1 (uint)
+
+覆盖 `zfs send` 时默认的块大小估算逻辑。默认情况下，平均块大小为当前 recordsize。若数据集中大部分数据大小不同，可启用此选项以获得准确的发送大小估算。
+
+
+### **zfs_sync_pass_deferred_free** = **2** (uint)
+
+数据刷新到磁盘按多个 pass 执行。从此 pass 开始延迟释放空间。
+
+
+### **zfs_spa_discard_memory_limit** = **16777216** B (16 MiB) (int)
+
+在丢弃 checkpoint 时，每个 vdev 为预取 checkpoint 空间映射可使用的最大内存。
+
+
+### **zfs_spa_note_txg_time** = **600** (uint)
+
+定义 TXG 时间数据库记录新 TXG 的间隔（秒）。在指定时间过去且 TXG 号改变后，将记录新值，可用于更精细的操作，如 scrub。
+
+
+### **zfs_spa_flush_txg_time** = **600** (uint)
+
+定义将 TXG 时间数据库刷写到磁盘的间隔（秒）。确保数据持久化，有助于在意外关机时保护数据库。导出池时也会自动刷新。
+
+
+### **zfs_special_class_metadata_reserve_pct** = **25**% (uint)
+
+仅在 special 和 dedup vdev 可用空间百分比超过此值时，允许分配小数据块。确保 special vdev 接近容量时仍有空间保留给池元数据。
+
+### **zfs_sync_pass_dont_compress** = **8** (uint)
+
+从此 sync pass 开始禁用压缩（包括元数据压缩）。默认设置下，实际系统通常没有这么多 sync pass，因此此参数无效。最初的设计意图是禁用压缩可帮助 sync pass 收敛，但实际上禁用压缩会增加平均 sync pass 数量，因为关闭压缩后，许多块大小会发生变化，必须重新分配（而非覆盖）它们。同时，会增加 *128 KiB* 分配次数（如间接块和 spacemap），在高度碎片化系统上尤其影响性能，因为此类大小的空闲段可能很少，需要加载新的 metaslab 来满足分配。
+
+
+### **zfs_sync_pass_rewrite** = **2** (uint)
+
+从此 sync pass 开始重写新块指针。
+
+
+### **zfs_trim_extent_bytes_max** = **134217728** B (128 MiB) (uint)
+
+TRIM 命令的最大范围。超过此大小的范围将被拆分为不大于此值的块后再发出。
+
+
+### **zfs_trim_extent_bytes_min** = **32768** B (32 KiB) (uint)
+
+TRIM 命令的最小范围。小于此范围的 TRIM 将被跳过，除非它们属于被拆分的大范围的一部分。此规则是为了避免小范围 TRIM 对整体性能产生负面影响。
+
+
+### **zfs_trim_metaslab_skip** = **0** | 1 (uint)
+
+在 TRIM 过程中跳过未初始化的 metaslab。适用于由大型薄配置设备构建的池，这类池的 TRIM 操作较慢。随着池老化，更多 metaslab 会被初始化，此选项的效果会逐渐减弱。此设置在手动 TRIM 开始时保存，并在 TRIM 过程中持续有效。
+
+### **zfs_trim_queue_limit** = **10** (uint)
+
+每个叶子 vdev 最大排队 TRIM 命令数。设备上并发 TRIM 命令数量由 **zfs_vdev_trim_min_active** 和 **zfs_vdev_trim_max_active** 控制。
+
+
+### **zfs_trim_txg_batch** = **32** (uint)
+
+在向设备发出 TRIM 操作前，应聚合的事务组（TXG）释放量。该设置在更大、更高效的 TRIM 操作与最近释放空间可用之间形成权衡。增大此值可延长释放聚合时间，导致 TRIM 操作更大并可能增加内存使用；减小此值则相反。默认 **32** 被认为是合理折中。
+
+
+### **zfs_txg_history** = **100** (uint)
+
+/ proc / spl / kstat / zfs / ⟨pool⟩/TXGs 中可查看最近 **100** 个 TXG 的历史统计信息。
+
+
+### **zfs_txg_timeout** = **5** s (uint)
+
+最少每隔该时间将脏数据刷新到磁盘（TXG 的最大持续时间）。
+
+
+### **zfs_vdev_aggregation_limit** = **1048576** B (1 MiB) (uint)
+
+vdev I/O 最大聚合大小。
+
+
+### **zfs_vdev_aggregation_limit_non_rotating** = **131072** B (128 KiB) (uint)
+
+非旋转介质 vdev 的最大 I/O 聚合大小。
+
+
+### **zfs_vdev_mirror_rotating_inc** = **0** (int)
+
+负载均衡算法用于旋转 vdev 时选择最空闲镜像成员的增量值。当 I/O 紧跟前一个操作时，用于基于负载做决策。
+
+
+### **zfs_vdev_mirror_rotating_seek_inc** = **5** (int)
+
+负载均衡算法用于旋转 vdev 时选择最空闲镜像成员的增量值。当 I/O 不具备前一个操作的局部性（由 **zfs_vdev_mirror_rotating_seek_offset** 定义）时使用。位于此偏移范围内但不紧跟前一操作的 I/O 增量取一半。
+
+### **zfs_vdev_mirror_rotating_seek_offset** = **1048576** B (1 MiB) (int)
+
+旋转 vdev 上最后排队的 I/O 操作被视为具备局部性的最大距离。详见 [ZFS I/O SCHEDULER](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#ZFS_I/O_SCHEDULER)。
+
+
+### **zfs_vdev_mirror_non_rotating_inc** = **0** (int)
+
+非旋转 vdev 上，当 I/O 操作不紧跟前一操作时，负载均衡算法选择最空闲镜像成员时的负载增量值。
+
+
+### **zfs_vdev_mirror_non_rotating_seek_inc** = **1** (int)
+
+非旋转 vdev 上，当 I/O 操作不具备由 **zfs_vdev_mirror_rotating_seek_offset** 定义的局部性时，负载均衡算法选择最空闲镜像成员的负载增量值。位于此偏移范围内但不紧跟前一操作的 I/O 增量取一半。
+
+
+### **zfs_vdev_read_gap_limit** = **32768** B (32 KiB) (uint)
+
+如果磁盘上读 I/O 操作之间的间隔小于该阈值，则对这些操作进行聚合。
+
+
+### **zfs_vdev_write_gap_limit** = **4096** B (4 KiB) (uint)
+
+如果磁盘上写 I/O 操作之间的间隔小于该阈值，则对这些操作进行聚合。
+
+### **zfs_vdev_raidz_impl** = **fastest** (string)
+
+选择 raidz 校验实现方式。
+不依赖 CPU 特定功能的实现可在模块加载时选择，适用于所有系统；其余选项必须在模块加载后设置，仅在相应实现被编译并支持的系统上可用。
+加载模块后，可通过 `/sys/module/zfs/parameters/zfs_vdev_raidz_impl` 查看可用选项，当前选择项用方括号标出。
+
+| **选项**              | **说明**                 |                      |
+| ------------------- | ---------------------- | -------------------- |
+| **fastest**         | 内置基准测试选择最快实现           |                      |
+| **original**        | 原始实现                   |                      |
+| **scalar**          | 标量实现                   |                      |
+| **sse2**            | SSE2 指令集               | 64-bit x86           |
+| **ssse3**           | SSSE3 指令集              | 64-bit x86           |
+| **avx2**            | AVX2 指令集               | 64-bit x86           |
+| **avx512f**         | AVX512F 指令集            | 64-bit x86           |
+| **avx512bw**        | AVX512F & AVX512BW 指令集 | 64-bit x86           |
+| **aarch64_neon**    | NEON                   | Aarch64/64-bit ARMv8 |
+| **aarch64_neonx2**  | NEON 更高展开版本            | Aarch64/64-bit ARMv8 |
+| **powerpc_altivec** | Altivec                | PowerPC              |
+
+
+### **zfs_zevent_len_max** = **512** (uint)
+
+事件队列最大长度。可用 [zpool-events(8)](https://openzfs.github.io/openzfs-docs/man/master/8/zpool-events.8.html) 查看队列中的事件。
+
+
+### **zfs_zevent_retain_max** = **2000** (int)
+
+保留最近 zevent 记录以进行重复检查的最大数量。设置为 **0** 将禁用重复检测。
+
+
+### **zfs_zevent_retain_expire_secs** = **900** s (15 分钟) (int)
+
+为重复检查保留的最近 ereport 的有效期。
+
+
+### **zfs_zil_clean_taskq_maxalloc** = **1048576** (int)
+
+允许缓存的最大 taskq 条目数。超过此限制时，事务记录 (itxs) 将同步清理。
+
+
+### **zfs_zil_clean_taskq_minalloc** = **1024** (int)
+
+taskq 创建时预填充的条目数，创建后可立即使用。
+
+### **zfs_zil_clean_taskq_nthr_pct** = **100%** (int)
+
+控制 [**dp_zil_clean_taskq**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#dp_zil_clean_taskq) 使用的线程数。默认 **100%** 将为每个 CPU 创建最多一个线程。
+
+
+### **zil_maxblocksize** = **131072**B (128 KiB) (uint)
+
+设置 ZIL 使用的最大块大小。在高度碎片化的池中，将其降低（通常为 **36 KiB**）可以改善性能。
+
+
+### **zil_maxcopied** = **7680**B (7.5 KiB) (uint)
+
+通过 WR_COPIED 记录的最大写入字节数。此参数在额外内存拷贝与日志空间效率之间做权衡，同时影响范围锁/解锁操作的次数。
+
+
+### **zil_nocacheflush** = **0**|1 (int)
+
+禁用 ZIL 在 LWB 写完成后发送到磁盘的缓存刷新命令。若启用且存在易失性乱序写缓存，会导致 ZIL 在断电时损坏。
+
+
+### **zil_replay_disable** = **0**|1 (int)
+
+禁用 intent log 重放。可在恢复损坏的 ZIL 时禁用。
+
+
+### **zil_slog_bulk** = **67108864**B (64 MiB) (u64)
+
+限制同步优先级提交时每次 SLOG 写入大小。超出部分将以异步优先级执行，防止单个活跃 ZIL 写入者滥用 SLOG 设备。
+
+
+### **zfs_zil_saxattr** = **1**|0 (int)
+
+将该参数设为 0 可禁用 ZIL 对新 [**xattr**](https://openzfs.github.io/openzfs-docs/man/master/4/zfs.4.html#xattr) = **sa** 记录的日志（前提是池启用了 **org.openzfs:zilsaxattr** 功能）。仅在 ZIL 日志或重放此记录类型存在 bug 时才需要。若功能未启用，该参数无效。
+
+
+### **zfs_embedded_slog_min_ms** = **64** (uint)
+
+通常，每个普通和 special class vdev 都会预留一个 metaslab 用于 ZIL 记录同步写入。但若 vdev 中 metaslab 数量少于 **zfs_embedded_slog_min_ms**，则禁用此功能，以避免为 ZIL 预留过多空间。
+
+
+### **zstd_earlyabort_pass** = **1** (uint)
+
+启用使用 LZ4 和 zstd-1 pass 对 zstd 等级 ≥3 的不可压缩数据的早期终止启发式检测。
+
+
+### **zstd_abort_size** = **131072** (uint)
+
+早期终止启发式检测尝试的最小未压缩记录大小（含边界）。
+
+### **zio_deadman_log_all** = **0**|1 (int)
+
+若非零，zio deadman 会为所有 zio 生成调试信息（参见 **zfs_dbgmsg_enable**），而不仅限于带 vdev 的叶子 zio。此功能供开发者调试死循环等非互斥或锁原语导致的挂起情况使用。
+
+
+### **zio_slow_io_ms** = **30000**ms (30 s) (int)
+
+当 I/O 操作耗时超过该阈值时，将被标记为慢操作。每次慢操作都会触发延迟 zevent。慢 I/O 计数可通过 `zpool status -s` 查看。
+
+
+### **zio_dva_throttle_enabled** = **1**|0 (int)
+
+在 I/O 管道中限制块分配。这使得分配可以根据设备性能动态分配。
+
+
+### **zfs_xattr_compat** = 0|1 (int)
+
+控制在用户命名空间设置新 xattr 时的命名方案：
+
+* **0**（Linux 默认）：用户命名空间 xattr 名称带命名空间前缀，与 Linux 上 ZFS 旧版本兼容。
+* **1**（FreeBSD 默认）：用户命名空间 xattr 名称无前缀，与 illumos 和 FreeBSD 上旧版本兼容。
+
+任何命名方案都可以在本版本及未来版本读取，但 legacy illumos/FreeBSD 无法读取 Linux 格式的 xattr，legacy Linux 无法读取 FreeBSD/illumos 格式的 xattr。
+
+覆盖已有 xattr 时，会删除使用另一命名方案的旧 xattr，以避免重复累积。
+
+### **zio_requeue_io_start_cut_in_line** = **0**|1 (int)
+
+优先处理重新排队的 I/O。
+
+
+### **zfs_delete_inode** = **0**|1 (int)
+
+控制内核在最后一个引用释放时是否立即释放 inode 结构，或将其缓存于内存中，用于测试/调试。
+
+* **0**（默认）：缓存仍存在于磁盘上的 inode。
+* **1**：立即释放未使用的 inode 及其内存，回收到 dbuf cache 或 ARC，可提高内存回收效率，但若 inode 被频繁驱逐与重新加载，可能降低性能。
+
+仅在 Linux 上可用。
+
+
+### **zfs_delete_dentry** = **0**|1 (int)
+
+控制内核在目录项不再需要时是否立即释放，或保持在 dentry cache 中，用于测试/调试。
+
+* **0**（默认）：缓存目录项及其关联 inode，由内核缓存管理机制回收。
+* **1**：一旦目录项不再被文件系统引用，立即释放该目录项及关联 inode。
+
+仅在 Linux 上可用。
+
+
+### zio_taskq_batch_pct = 80 (uint)
+
+在线 CPU 中将运行 I/O 工作线程的百分比。这些工作线程负责压缩、加密、校验和奇偶校验计算等 I/O 工作。CPU 的小数部分将向下取整。
+
+默认值 80% 的选择是为了避免使用所有 CPU，从而导致延迟问题和应用性能不稳定，尤其是在启用较慢的压缩和/或校验时。设置值仅适用于之后导入/创建的池。
+
+### zio_taskq_batch_tpq = 0 (uint)
+
+每个 taskq 的工作线程数量。较高的值可改善 I/O 排序和 CPU 利用率，而较低的值可减少锁竞争。设置值仅适用于之后导入/创建的池。若为 0，则生成接近每个 taskq 6 个线程的系统相关值。设置值仅适用于之后导入/创建的池。
+
+### zio_taskq_write_tpq = 16 (uint)
+
+确定每个写入 issue taskq 的最小线程数。较高的值可在高吞吐量下提高 CPU 利用率，而较低的值可在高 IOPS 下减少 taskq 锁竞争。设置值仅适用于之后导入/创建的池。
+
+### zio_taskq_read = fixed,1,8 null scale null (charp)
+
+设置 I/O 读取队列的队列和线程配置。这是一个高级调试参数，除非理解其作用，否则不要更改。四个值分别对应 issue、issue 高优先级、interrupt 和 interrupt 高优先级队列。有效值为 fixed,N,M（每个队列 N 个线程，共 M 个队列）、scale[,MIN]（随 CPU 数量伸缩，总线程数最少为 MIN）、sync 和 null。设置值仅适用于之后导入/创建的池。
+
+
+### zio_taskq_write = sync null scale null (charp)
+
+设置 I/O 写入队列的队列和线程配置。这是一个高级调试参数，除非理解其作用，否则不要更改。四个值分别对应 issue、issue 高优先级、interrupt 和 interrupt 高优先级队列。有效值为 fixed,N,M（每个队列 N 个线程，共 M 个队列）、scale[,MIN]（随 CPU 数量伸缩，总线程数最少为 MIN）、sync 和 null。设置值仅适用于之后导入/创建的池。
+
+### zio_taskq_free = scale,32 null null null (charp)
+
+设置 I/O free 队列的队列和线程配置。这是一个高级调试参数，除非理解其作用，否则不要更改。四个值分别对应 issue、issue 高优先级、interrupt 和 interrupt 高优先级队列。有效值为 fixed,N,M（每个队列 N 个线程，共 M 个队列）、scale[,MIN]（随 CPU 数量伸缩，总线程数最少为 MIN）、sync 和 null。默认情况下使用最少 32 个线程，以在释放操作期间提高 DDT 和 BRT 元数据操作的并行性。设置值仅适用于之后导入/创建的池。
+
+### zvol_inhibit_dev = 0|1 (uint)
+
+不创建 zvol 设备节点。在拥有大量 zvol 的系统上，这可能略微提高启动速度。
+
+### zvol_major = 230 (uint)
+
+zvol 块设备的主设备号。
+
+### zvol_max_discard_blocks = 16384 (long)
+
+对 zvol 执行的丢弃（TRIM）操作将以此块数为单位进行批处理，其中块大小由 zvol 的 volblocksize 属性决定。
+
+### zvol_prefetch_bytes = 131072B (128 KiB) (uint)
+
+将 zvol 添加到系统时，从卷的开始和结束预取此数量的字节。预取这些区域是有益的，因为它们很可能会被 blkid 或内核分区工具立即访问。
+
+### zvol_request_sync = 0|1 (uint)
+
+在处理 zvol 的 I/O 请求时，同步提交这些请求。这实际上将每个 I/O 提交者的队列深度限制为 1。未设置时，请求由线程池异步处理。可同时处理的请求数量由 zvol_threads 控制。当在支持块多队列（blk-mq）的内核上运行时，zvol_request_sync 会被忽略。
+
+### zvol_num_taskqs = 0 (uint)
+
+zvol taskq 的数量。如果为 0（默认值），则内部按比例调整以每个 taskq 优先使用 6 个线程。此设置仅适用于 Linux。
+
+### zvol_threads = 0 (uint)
+
+用于处理 zvol 块 I/O 的系统范围线程数量。如果为 0（默认值），则内部将 zvol_threads 设置为 CPU 数量或 32（取较大者）。
+
+### zvol_blk_mq_threads = 0 (uint)
+
+每个 zvol 用于排队 I/O 请求的线程数量。此参数仅在内核支持 blk-mq 时出现，并且仅在 zvol 加载时读取和分配给 zvol。如果为 0（默认值），则内部将 zvol_blk_mq_threads 设置为 CPU 数量。
+
+### zvol_use_blk_mq = 0|1 (uint)
+
+设置为 1 使用 blk-mq API 处理 zvol。设置为 0（默认值）使用传统 zvol API。根据工作负载，该设置可能提高或降低 zvol 性能。此参数仅在内核支持 blk-mq 时出现，并且仅在 zvol 加载时应用。
+
+### zvol_blk_mq_blocks_per_thread = 8 (uint)
+
+如果启用 zvol_use_blk_mq，则每个 zvol 线程处理此数量的 volblocksize 大小的块。此调优可用于优化 zvol 读取性能（较低值）或写入性能（较高值）。设置为 0 时，zvol 层将处理每个线程可处理的最大块数。此参数仅在内核支持 blk-mq 时出现，并且仅在 zvol 加载时应用。
+
+### zvol_blk_mq_queue_depth = 0 (uint)
+
+zvol blk-mq 接口的 queue_depth 值。此参数仅在内核支持 blk-mq 时出现，并且仅在每个 zvol 加载时应用。如果为 0（默认值），则使用内核的默认队列深度。值会被限制在内核的 BLKDEV_MIN_RQ 和 BLKDEV_MAX_RQ/BLKDEV_DEFAULT_RQ 范围内。
+
+### zvol_volmode = 1 (uint)
+
+定义 zvol 块设备在 volmode=default 时的行为：
+
+#### 1 
+
+等同于 full
+
+#### 2 
+
+等同于 dev
+
+#### 3 
+
+等同于 none
+
+### zvol_enforce_quotas = 0|1 (uint)
+
+启用严格的 ZVOL 配额执行。严格配额执行可能会影响性能。
+
+## ZFS I/O 调度器
+
+ZFS 向叶子 vdev 发起 I/O 操作以满足并完成 I/O 请求。调度器决定这些操作的发起时间和顺序。调度器将操作划分为五类 I/O，优先顺序如下：同步读取、同步写入、异步读取、异步写入以及 scrub/resilver。每个队列定义可向设备发起的最小和最大并发操作数。此外，设备还有一个总的最大值 **zfs_vdev_max_active**。注意，每个队列的最小值之和不得超过总最大值。如果每个队列的最大值之和超过总最大值，则活跃操作数可能达到 **zfs_vdev_max_active**，此时无论各队列最小值是否已满足，都不会再发起新的操作。
+
+对于许多物理设备来说，并发操作数增加会提高吞吐量，但通常会影响延迟。此外，物理设备通常存在一个临界点，超过该点更多的并发操作对吞吐量没有影响，甚至可能降低吞吐量。
+
+调度器选择下一个要发起的操作时，首先查找最小值尚未满足的 I/O 类。一旦所有最小值都已满足且总最大值未达到，调度器会查找最大值尚未满足的 I/O 类。I/O 类的迭代顺序按上述优先级进行。如果已达到总最大并发操作数，或某个 I/O 类没有更多待处理操作且其最大值已达上限，则不会再发起新的操作。每次有 I/O 操作入队或操作完成时，调度器都会查找新的操作以发起。
+
+一般来说，更小的 **max_active** 会降低同步操作的延迟。更大的 **max_active** 可能提高总体吞吐量，具体取决于底层存储设备。
+
+各队列的 **max_active** 比例决定了读取、写入和 scrub 的性能平衡。例如，增加 **zfs_vdev_scrub_max_active** 会加快 scrub 或 resilver 完成速度，但会导致读取和写入的延迟增加、吞吐量降低。
+
+除异步写入类外，所有 I/O 类都有固定的未完成操作最大数。异步写入表示事务组在同步阶段提交到稳定存储的数据。事务组会周期性进入同步状态，因此排队的异步写入数会迅速增加，然后逐渐降为零。调度器不会尽快处理它们，而是根据池中脏数据量调整异步写入操作的最大活跃数。由于物理设备上并发操作数增加通常会同时提高吞吐量和延迟，减少同时操作的突发性也稳定了其他队列（尤其是同步队列）操作的响应时间。总体上，池中脏数据越多，调度器会从异步写入队列发起更多并发操作。
+
+
+### 异步写入
+
+异步写入 I/O 类的并发操作数遵循由几个可调节点定义的分段线性函数：
+
+```sh
+       |              o---------| <-- zfs_vdev_async_write_max_active
+  ^    |             /^         |
+  |    |            / |         |
+active |           /  |         |
+ I/O   |          /   |         |
+count  |         /    |         |
+       |        /     |         |
+       |-------o      |         | <-- zfs_vdev_async_write_min_active
+      0|_______^______|_________|
+       0%      |      |       100% of zfs_dirty_data_max
+               |      |
+               |      `-- zfs_vdev_async_write_active_max_dirty_percent
+               `--------- zfs_vdev_async_write_active_min_dirty_percent
+```
+
+直到脏数据量超过池中允许的脏数据最小百分比，I/O 调度器会将并发操作数限制在最小值。当超过该阈值时，发起的并发操作数会随着脏数据量线性增加，到达池中允许脏数据的最大百分比时达到最大值。
+
+理想情况下，繁忙池中的脏数据量应保持在函数的斜坡部分，即 **zfs_vdev_async_write_active_min_dirty_percent** 和 **zfs_vdev_async_write_active_max_dirty_percent** 之间。如果超过最大百分比，则表示输入数据速率高于后端存储可处理的速率。在这种情况下，必须进一步限制输入写入速率，如下一节所述。
+
+
+# ZFS 事务延迟
+
+当我们判断后端存储无法跟上输入写入速率时，会对事务进行延迟。
+
+如果已有事务在等待，延迟时间相对于该事务完成等待的时间计算。这样，计算出的延迟时间与同时执行事务的线程数无关。
+
+如果我们是唯一的等待者，则延迟时间相对于事务开始的时间计算，而不是当前时间。这会给事务“已服务时间”以信用，例如读取间接块。
+
+事务所需的最短时间计算公式为：
+
+```sh
+min_time = min(zfs_delay_scale × (dirty - min) / (max - dirty), 100ms)
+```
+
+延迟有两个可调自由度。开始延迟时的脏数据百分比由 **zfs_delay_min_dirty_percent** 定义。通常应设置在 **zfs_vdev_async_write_active_max_dirty_percent** 及以上，这样只有在以全速写入仍无法跟上输入速率时才开始延迟。曲线的比例由 **zfs_delay_scale** 定义，大致决定曲线中点的延迟量。
+
+```sh
+延迟
+ 10ms +-------------------------------------------------------------*+
+      |                                                             *|
+  9ms +                                                             *+
+      |                                                             *|
+  8ms +                                                             *+
+      |                                                            * |
+  7ms +                                                            * +
+      |                                                            * |
+  6ms +                                                            * +
+      |                                                            * |
+  5ms +                                                           *  +
+      |                                                           *  |
+  4ms +                                                           *  +
+      |                                                           *  |
+  3ms +                                                          *   +
+      |                                                          *   |
+  2ms +                                              (midpoint) *    +
+      |                                                  |    **     |
+  1ms +                                                  v ***       +
+      |             zfs_delay_scale ---------->     ********         |
+    0 +-------------------------------------*********----------------+
+      0%                    <- zfs_dirty_data_max ->               100%
+```
+
+注意，由于延迟会叠加到最近事务剩余的未完成时间上，因此其效果实际上与 IOPS 成反比。例如，曲线中点的 *500 μs* 对应约 *2000 IOPS*。曲线的形状设计为，在曲线前三个四分位中，累积脏数据量的小幅变化只会导致延迟量的较小变化。
+
+在对数刻度下表示延迟量时，更容易理解其效果。
+
+```sh
+延迟
+100ms +-------------------------------------------------------------++
+      +                                                              +
+      |                                                              |
+      +                                                             *+
+ 10ms +                                                             *+
+      +                                                           ** +
+      |                                              (midpoint)  **  |
+      +                                                  |     **    +
+  1ms +                                                  v ****      +
+      +             zfs_delay_scale ---------->        *****         +
+      |                                             ****             |
+      +                                          ****                +
+100us +                                        **                    +
+      +                                       *                      +
+      |                                      *                       |
+      +                                     *                        +
+ 10us +                                     *                        +
+      +                                                              +
+      |                                                              |
+      +                                                              +
+      +--------------------------------------------------------------+
+      0%                    <- zfs_dirty_data_max ->               100%
+```
+
+注意，仅当脏数据量接近其上限时，延迟才会开始迅速增加。经过适当调优的系统目标应是避免脏数据进入该范围，首先通过为 I/O 调度器设置合适的限制，以实现后端存储的最佳吞吐量，然后通过调整 **zfs_delay_scale** 的值来增加曲线的陡峭度。
+
+2025 年 9 月 15 日 | Debian 
+
+
+
