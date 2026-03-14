@@ -94,6 +94,14 @@
 * [消息 ID：ZFS-8000-5E](msg/ZFS-8000-5E.md)
 * [消息 ID：ZFS-8000-6X](msg/ZFS-8000-6X.md)
 * [消息 ID：ZFS-8000-72](msg/ZFS-8000-72.md)
+* [消息 ID：ZFS-8000-8A](msg/ZFS-8000-8A.md)
+* [消息 ID：ZFS-8000-9P](msg/ZFS-8000-9P.md)
+* [消息 ID：ZFS-8000-A5](msg/ZFS-8000-A5.md)
+* [消息 ID：ZFS-8000-ER](msg/ZFS-8000-ER.md)
+* [消息 ID：ZFS-8000-EY](msg/ZFS-8000-EY.md)
+* [消息 ID：ZFS-8000-HC](msg/ZFS-8000-HC.md)
+* [消息 ID：ZFS-8000-JQ](msg/ZFS-8000-JQ.md)
+* [消息 ID：ZFS-8000-K4](msg/ZFS-8000-K4.md)
 
 ## 许可证
 
