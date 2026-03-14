@@ -1240,9 +1240,11 @@ spacemap 日志摘要允许的最大行数。
 
 ### **zfs_multihost_import_intervals** = **20** (uint)
 
-控制导入时活动测试的持续时间。值越小，导入时间越短，但检测活动池失败的风险越高。活动检查的最短时间为 **zfs_multihost_interval × zfs_multihost_import_intervals**，或上一次导入该池的主机上计算的相同值，两者取较大者。若最佳 uberblock 中 MMP 延迟显示实际多主机更新间隔长于 **zfs_multihost_interval**，活动检查时间会进一步延长。最短执行时间为 100 ms。
-**0** 等效于 **1**。
+用于控制导入时活动测试的持续时间。较小的 **zfs_multihost_import_intervals** 值会缩短导入时间，但增加无法检测到活动池的风险。总活动检查时间不得低于一秒。
 
+导入时，活动检查的最短等待时间由 **zfs_multihost_interval × zfs_multihost_import_intervals** 决定，或者由最后导入该池的主机计算的同一乘积决定，以较大者为准。如果最佳 uberblock 中的 MMP 延迟值显示实际多主机更新发生间隔长于 **zfs_multihost_interval**，则活动检查时间可能进一步延长。最小值为 *100 ms*。
+
+**0** 等同于 **1**。
 
 ### **zfs_multihost_fail_intervals** = **10** (uint)
 
