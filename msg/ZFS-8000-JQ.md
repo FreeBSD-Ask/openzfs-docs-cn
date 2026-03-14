@@ -12,7 +12,7 @@
 
 ## 建议系统管理员采取的操作
 
-该池发生了 I/O 故障。由于 ZFS 池属性 `failmode` 设置为 `continue`，将继续处理读 I/O，但写入 I/O 扔被阻塞。有关 `failmode` 属性的更多信息，请参阅 zpoolprops(8) 手册页。需要手动干预以处理写入 I/O。可以通过运行 `zpool status -x` 查看受影响的设备：
+该池发生了 I/O 故障。由于 ZFS 池属性 `failmode` 设置为 `continue`，将继续处理读 I/O，但写入 I/O 仍被阻塞。有关 `failmode` 属性的更多信息，请参阅 zpoolprops(8) 手册页。需要手动干预以处理写入 I/O。可以通过运行 `zpool status -x` 查看受影响的设备：
 
 ```sh
 # zpool status -x
