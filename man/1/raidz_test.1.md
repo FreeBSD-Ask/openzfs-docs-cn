@@ -2,17 +2,17 @@
 
 ## 名称
 
-`raidz_test` — RAIZD 实现验证与基准测试工具
+`raidz_test` — RAIDZ 实现验证与基准测试工具
 
 ## 概述
 
 ```sh
-raidz_test [-StBevTD] [-a 对齐位数 (ashift)] [-o ZIO 偏移量 (zio_off_shift)] [-d RAIZD 数据盘数量 (raidz_data_disks)] [-s ZIO 大小偏移 (zio_size_shift)] [-r 重排偏移 (reflow_offset)]
+raidz_test [-StBevTD] [-a 对齐位数 (ashift)] [-o ZIO 偏移量 (zio_off_shift)] [-d RAIDZ 数据盘数量 (raidz_data_disks)] [-s ZIO 大小偏移 (zio_size_shift)] [-r 重排偏移 (reflow_offset)]
 ```
 
 ## 说明
 
-该工具旨在运行所有受支持的 RAIZD 实现并验证所有方法的结果。它还包含参数扫描选项，可验证影响 RAID-Z 块的所有参数（如 ashift 大小、数据偏移、数据大小等）。该工具还支持使用 `-B` 选项进行的基准测试模式。
+该工具旨在运行所有受支持的 RAIDZ 实现并验证所有方法的结果。它还包含参数扫描选项，可验证影响 RAID-Z 块的所有参数（如 ashift 大小、数据偏移、数据大小等）。该工具还支持使用 `-B` 选项进行的基准测试模式。
 
 ## 选项
 
