@@ -49,7 +49,7 @@ raidz/draid 磁盘数量（raidz 默认 `4`，draid 默认 `16`）
 
 ### `-R`、`--raid-parity=`
 
-Raid 奇偶校验数量（raidz & draid）（默认值: 1）
+RAID 奇偶校验数量（raidz & draid）（默认值: 1）
 
 ### `-K`、`--raid-kind=`
 
