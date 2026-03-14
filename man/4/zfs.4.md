@@ -312,7 +312,7 @@ metaslab 大小的默认上限。
 
 在一个 metaslab 被使用之后，我们会保持其加载状态 **此处指定的 TXG 数**，以尽量减少不必要的重新加载。注意，只有当这些 TXG 数和 **metaslab_unload_delay_ms** 所指定的毫秒数都过去之后，才会卸载该 metaslab。
 
-### **metaslab_unload_delay_ms** = **600000** ms (10 分钟) (uint)
+### **metaslab_unload_delay_ms** = **600000** 毫秒 (10 分钟) (uint)
 
 在一个 metaslab 被使用之后，我们会保持其加载状态 **此处指定的毫秒数**，以尽量减少不必要的重新加载。注意，只有当这段毫秒数和 **metaslab_unload_delay** 所对应的 TXG 都过去之后，才会卸载该 metaslab。
 
@@ -389,7 +389,7 @@ SPA 配置文件路径。
 
 在启用 **head_errlog** 特性时，限制转换为新格式的磁盘错误日志条目数量。默认是转换所有日志条目。
 
-### **vdev_read_sit_out_secs** = **600** s (10 分钟) (ulong)
+### **vdev_read_sit_out_secs** = **600** 秒 (10 分钟) (ulong)
 
 当检测到某个磁盘异常缓慢时，该磁盘会被置于“sit out”状态。在 sit out 状态下，该磁盘不会参与正常读操作，其数据将按需通过校验重建。即便磁盘处于 sit out 状态，scrub 操作仍会从该磁盘读取数据。RAID-Z 或 dRAID vdev 中允许同时有多个磁盘处于 sit out 状态，但不超过校验磁盘的数量。为了保持完整冗余，写操作仍会发送到处于 sit out 状态的磁盘。默认值为 600 秒，设置为 0 则完全禁用磁盘 sit out，包括慢速磁盘异常检测。
 
@@ -1540,7 +1540,7 @@ vdev I/O 最大聚合大小。
 
 保留最近 zevent 记录以进行重复检查的最大数量。设置为 **0** 将禁用重复检测。
 
-### **zfs_zevent_retain_expire_secs** = **900** s (15 分钟) (int)
+### **zfs_zevent_retain_expire_secs** = **900** 秒 (15 分钟) (int)
 
 为重复检查保留的最近 ereport 的有效期。
 
