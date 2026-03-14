@@ -96,7 +96,7 @@
   * [zilstat(1)](man/1/zilstat.1.md)
   * [ztest(1)](man/1/ztest.1.md)
   * [zvol_wait(1)](man/1/zvol_wait.1.md)
-* 设备及特殊文件（Devices and Special Files（4））
+* 设备及特殊文件（Devices and Special Files (4)）
   * [spl(4)](man/4/spl.4.md)
   * [zfs(4)](man/4/zfs.4.md)
 
