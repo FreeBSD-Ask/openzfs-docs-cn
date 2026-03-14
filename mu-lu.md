@@ -85,6 +85,18 @@
 * [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
 * [分布式 RAID (dRAID)](Basic-Concepts/dRAID.md)
 
+## 手册页
+
+* 用户命令（User Commands (1)）
+  * [cstyle(1)](man/1/cstyle.1.md)
+  * [raidz_test(1)](man/1/raidz_test.1.md)
+  * [test-runner(1)](man/1/test-runner.1.md)
+  * [zarcstat(1)](man/1/zarcstat.1.md)
+  * [zhack(1)](man/1/zhack.1.md)
+  * [zilstat(1)](man/1/zilstat.1.md)
+  * [ztest(1)](man/1/ztest.1.md)
+  * [zvol_wait(1)](man/1/zvol_wait.1.md)
+
 ## ZFS 消息
 
 * [消息 ID：ZFS-8000-14](msg/ZFS-8000-14.md)
