@@ -39,13 +39,13 @@ vdev 数量（默认值: `5`）
 
 测试使用的对齐偏移（默认值: `9`，使用 `0` 表示随机）
 
-### `-m`、`--mirror-copies=
+### `-m`、`--mirror-copies=`
 
-镜像副本数量（默认值: 2）
+镜像副本数量（默认值: `2`）
 
 ### `-r`、`--raid-disks=`
 
-raidz/draid 磁盘数量（raidz 默认 4，draid 默认 16）
+raidz/draid 磁盘数量（raidz 默认 `4`，draid 默认 `16`）
 
 ### `-R`、`--raid-parity=`
 
