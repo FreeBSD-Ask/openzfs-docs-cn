@@ -1466,7 +1466,7 @@ TRIM 命令的最小大小。小于此范围的 TRIM 将被跳过，除非它们
 
 ### **zfs_txg_history = 100** (uint)
 
-/ proc / spl / kstat / zfs / ⟨pool⟩/TXGs 中可查看最近 **100** 个 TXG 的历史统计信息。
+/proc/spl/kstat/zfs/⟨pool⟩/TXGs 中可查看最近 **100** 个 TXG 的历史统计信息。
 
 ### **zfs_txg_timeout = 5** 秒 (uint)
 
