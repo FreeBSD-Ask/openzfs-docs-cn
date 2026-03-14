@@ -10,11 +10,11 @@
 
 **存档发行版软件包：** [参见仓库页面](https://github.com/zfsonlinux/zfsonlinux.github.com/tree/master/epel)
 
-**签名密钥1（EL8 及更早版本，Fedora 36 及更早版本）** [pgp.mit.edu](https://pgp.mit.edu/pks/lookup?search=0xF14AB620&op=index&fingerprint=on) / [直接链接](https://raw.githubusercontent.com/zfsonlinux/zfsonlinux.github.com/master/zfs-release/RPM-GPG-KEY-openzfs-key1)
+**签名密钥 1（EL8 及更早版本，Fedora 36 及更早版本）** [pgp.mit.edu](https://pgp.mit.edu/pks/lookup?search=0xF14AB620&op=index&fingerprint=on) / [直接链接](https://raw.githubusercontent.com/zfsonlinux/zfsonlinux.github.com/master/zfs-release/RPM-GPG-KEY-openzfs-key1)
 
 **指纹：** C93A FFFD 9F3F 7B03 C310 CEB6 A9D5 A1C0 F14A B620
 
-**签名密钥2（EL9+，Fedora 37+）** [pgp.mit.edu](https://pgp.mit.edu/pks/lookup?search=0xA599FD5E9DB84141&op=index&fingerprint=on) / [直接链接](https://raw.githubusercontent.com/zfsonlinux/zfsonlinux.github.com/master/zfs-release/RPM-GPG-KEY-openzfs-key2)
+**签名密钥 2（EL9+，Fedora 37+）** [pgp.mit.edu](https://pgp.mit.edu/pks/lookup?search=0xA599FD5E9DB84141&op=index&fingerprint=on) / [直接链接](https://raw.githubusercontent.com/zfsonlinux/zfsonlinux.github.com/master/zfs-release/RPM-GPG-KEY-openzfs-key2)
 
 **指纹：** 7DC7 299D CF7C 7FD9 CD87 701B A599 FD5E 9DB8 4141
 
