@@ -190,7 +190,7 @@ L2ARC 缓冲首次缓存到 L2ARC 时的 ARC 状态，可通过 **l2arc_mru_asiz
 
 ### **zfs_history_output_max** = **1048576**B (1 MiB) (u64)
 
-在尝试将 ioctl 输出 nvlist 记录到磁盘历史时，如果输出大于此大小（字节），则不会存储。该值必须小于 **DMU_MAX_ACCESS**（64 MiB）。主要适用于 `zfs_ioc_channel_program`（参见 zfs-program(8))）。
+在尝试将 ioctl 输出 nvlist 记录到磁盘历史时，如果输出大于此大小（字节），则不会存储。该值必须小于 **DMU_MAX_ACCESS**（64 MiB）。主要适用于 `zfs_ioc_channel_program`（参见 zfs-program(8)）。
 
 ### **zfs_keep_log_spacemaps_at_export** = **0**|1 (int)
 
