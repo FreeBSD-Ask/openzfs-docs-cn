@@ -25,10 +25,10 @@ zfs set checksum=sha256 pool_name/dataset_name
 | fletcher4 | 否                  | 是                          | Fletcher 算法，也用于 `zfs send` 流                                                 |
 | sha256    | 是                  | 是                          | 去重数据集的默认值                                                                    |
 | noparity  | 否                  | 是                          | 不要使用 `noparity`                                                              |
-| sha512    | 是                  | 需要池特性 `org.illumos:sha512` | 带盐的 `sha512` 目前在任何启动池上的文件系统中不支持                                              |
-| skein     | 是                  | 需要池特性 `org.illumos:skein`  | 带盐的 `skein` 目前在任何启动池上的文件系统中不支持                                               |
-| edonr     | 见备注                | 需要池特性 `org.illumos:edonr`  | 带盐的 `edonr` 目前在任何启动池上的文件系统中不支持。为了谨慎起见，Edon-R 在与去重一起使用时需要验证，因此会自动使用 `verify`。 |
-| blake3    | 是                  | 需要池特性 `org.openzfs:blake3` | 带盐的 `blake3` 目前在任何启动池上的文件系统中不支持                                              |
+| sha512    | 是                  | 需要池特性 `org.illumos:sha512` | 带盐的 `sha512` 目前不支持用于启动池上的任何文件系统                                              |
+| skein     | 是                  | 需要池特性 `org.illumos:skein`  | 带盐的 `skein` 目前不支持用于启动池上的任何文件系统                                               |
+| edonr     | 见备注                | 需要池特性 `org.illumos:edonr`  | 带盐的 `edonr` 目前不支持用于启动池上的任何文件系统。为了谨慎起见，Edon-R 在与去重一起使用时需要验证，因此会自动使用 `verify`。 |
+| blake3    | 是                  | 需要池特性 `org.openzfs:blake3` | 带盐的 `blake3` 目前不支持用于启动池上的任何文件系统                                              |
 
 ## 校验和加速器
 
