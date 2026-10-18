@@ -10,7 +10,7 @@
 
 `vdev_id.conf` 文件使用的格式很简单：单行内由一个关键字后跟一个或多个值组成。任何不以可识别关键字开头的行都会被忽略。注释行可以选择以井号字符开头。
 
-以下为所用的关键字和值。
+本文件使用以下关键字和值。
 
 ### `alias name devlink`
 
@@ -18,7 +18,7 @@
 
 `name` 是将在 `/dev/disk/by-vdev` 下创建的、指向该设备的链接名称。
 
-`devlink` 是由 udev 定义的设备链接名称，可以是绝对路径，也可以是基本文件名。
+`devlink` 是 udev 中已经定义的设备链接名称，可以是绝对路径，也可以是基本文件名。
 
 ### `channel [pci_slot] port name`
 
@@ -44,7 +44,7 @@
 
 ### `multipath yes|no`
 
-指定 vdev_id(8) 是否仅处理 dm-multipath 设备。如果设为 `yes`，则 vdev_id(8) 会检查驱动程序命令所提供的 dm-multipath 设备的第一个正在运行的组件磁盘，以确定物理路径。
+指定 vdev_id(8) 是否仅处理 dm-multipath 设备。如果设为 `yes`，则 vdev_id(8) 会检查驱动程序命令所提供的 dm-multipath 设备中第一个处于运行状态的组件磁盘，以此确定物理路径。
 
 ### `topology sas_direct|sas_expander|sas_switch|scsi`
 
@@ -78,7 +78,7 @@ vdev_id(8) 的配置文件。
 
 ## 示例
 
-未启用多路径的配置，采用直连的 SAS 机箱和任意的插槽重映射：
+非多路径配置，直连 SAS 机箱，以及任意的插槽重映射：
 
 ```sh
 multipath     no
@@ -133,7 +133,7 @@ channel 0x500304000000002f J2A
 channel 0x500304000000003f J2B
 ```
 
-多路径配置。请注意，通道名称有多条定义——每条物理路径一个：
+多路径配置。请注意，通道名称有多个定义——每条物理路径一个：
 
 ```sh
 multipath yes
@@ -145,7 +145,7 @@ channel 86:00.0  1         A
 channel 86:00.0  0         B
 ```
 
-一个启用了 `enclosure_symlinks` 的配置：
+启用 `enclosure_symlinks` 的配置：
 
 ```sh
 multipath yes

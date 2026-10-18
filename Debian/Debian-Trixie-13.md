@@ -11,8 +11,8 @@
 ### 系统要求
 
 * [64 位 Debian GNU/Linux Trixie Live CD（带 GUI，例如 gnome ISO）](https://cdimage.debian.org/mirror/cdimage/release/current-live/amd64/iso-hybrid/)
-* 强烈建议使用 [64-bit 内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
-* 在逻辑扇区为 4 KiB（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[在 legacy（BIOS）启动模式下，GRUB 无法支持也不会支持 4K 扇区](http://savannah.gnu.org/bugs/?46700)。
+* 强烈建议使用 [64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
+* 在提供 4 KiB 逻辑扇区（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作](http://savannah.gnu.org/bugs/?46700)。
 
 在内存小于 2 GiB 的计算机上运行 ZFS 时，性能将严重下降。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication）功能，则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
 
@@ -22,9 +22,9 @@
 
 不加密自然不会对任何内容进行加密。在未加密的情况下，该方案自然具有最佳性能。
 
-ZFS 原生加密会对根池中的数据以及大多数元数据进行加密。它不会加密数据集或快照的名称和属性。也不会加密启动池，因为启动池只有引导加载器、内核和 initrd（除非你在 `/etc/fstab` 中设置了密码，否则 initrd 中通常未包含敏感数据）。系统在控制台输入口令之前无法启动。性能表现良好。由于加密发生在 ZFS 内部，即使使用多块磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
+ZFS 原生加密会对根池中的数据以及大多数元数据进行加密。它不会加密数据集或快照的名称和属性。完全不会加密启动池，但它只包含引导加载器、内核和 initrd（除非你在 `/etc/fstab` 中设置了密码，否则 initrd 中通常未包含敏感数据）。系统在控制台输入口令之前无法启动。性能表现良好。由于加密发生在 ZFS 内部，即使使用多块磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
 
-LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加载器、内核和 initrd。系统在控制台输入口令之前无法启动。性能表现良好，但 LUKS 是 ZFS 的底层，因此如果使用多块磁盘（mirror 或 raidz 拓扑），数据需要在每块磁盘上分别加密一次。
+LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加载器、内核和 initrd。系统在控制台输入口令之前无法启动。性能表现良好，但 LUKS 位于 ZFS 之下，因此如果使用多块磁盘（mirror 或 raidz 拓扑），数据需要在每块磁盘上分别加密一次。
 
 ## 步骤 1：准备安装环境
 
@@ -54,10 +54,10 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 >**提示：**
 >
->你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后在主机上使用 `ssh 用户名@IP地址` 进行连接。
+>你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后从你的主机上通过 `ssh user@IP` 进行连接。
 
 4. 禁用自动挂载：
-   如果磁盘之前被使用过（在相同偏移处存在分区），在未禁用的情况下，之前的文件系统（例如 ESP）可能会被自动挂载：
+   如果磁盘之前被使用过（在相同偏移处存在分区），在未禁用的情况下，之前的文件系统（例如 ESP）会被自动挂载：
 
    ```sh
    gsettings set org.gnome.desktop.media-handling automount false
@@ -76,7 +76,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    apt install --yes linux-headers-generic
    ```
 
-8. 在 Live CD 环境中安装 ZFS：
+7. 在 Live CD 环境中安装 ZFS：
 
    ```sh
    apt install --yes debootstrap gdisk zfsutils-linux
@@ -110,9 +110,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```sh
    apt install --yes mdadm
 
-   # 查看是否有一到多个 MD 阵列处于活动状态：
+   # 查看是否有一个或多个 MD 阵列处于活动状态：
    cat /proc/mdstat
-   # 如果有，则停止它们（根据需要替换 ``md0``）：
+   # 如果有，则停止它们（根据需要替换 md0）：
    mdadm --stop /dev/md0
 
    # 对于使用整个磁盘的阵列：
@@ -197,9 +197,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
        bpool ${DISK}-part3
    ```
 
->*注意：*
+>**注意：**
 >
->GRUB 未支持所有的 ZFS 存储池特性（参见位于 `grub-core/fs/zfs/zfs.c` 的  `spa_feature_names`）。此处单独为 `/boot` 创建一个 ZFS 存储池，并指定了属性 `-o compatibility=grub2`，将该池限制为仅使用 GRUB 支持的特性，从而让 根存储池可使用任意/全部特性。
+>GRUB 并不支持所有的存储池特性（参见 [`grub-core/fs/zfs/zfs.c`](https://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#288) 中的 `spa_feature_names`）。此处我们单独为 `/boot` 创建一个存储池，并指定 `-o compatibility=grub2` 属性，将该池限制为仅使用 GRUB 支持的特性，从而让根存储池可以使用任意/全部特性。
 >
 >更多信息请参阅 `zpool-features` 手册页中关于“Compatibility feature sets”的章节。
 

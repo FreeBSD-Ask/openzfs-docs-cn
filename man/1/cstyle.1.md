@@ -12,7 +12,7 @@ cstyle [-chpvCP] [文件]…
 
 ## 说明
 
-`cstyle` 将检查 C 源文件（`*.c` 和 `*.h`）中的常见风格错误。它按文档所述的 C 风格规范进行检查：[cstyle 文档](http://www.cis.upenn.edu/~lee/06cse480/data/cstyle.ms.pdf)。请注意，该文档中有许多内容都 **无法** 自动检查；若仅仅因为你的代码通过了 `cstyle` 检查，那不意味着你遵循了 Sun 的 C 风格。**代码风格责任自负**。
+`cstyle` 将检查 C 源文件（`*.c` 和 `*.h`）中的常见风格错误。它按文档所述的 C 风格规范进行检查：[cstyle 文档](http://www.cis.upenn.edu/~lee/06cse480/data/cstyle.ms.pdf)。请注意，该文档中有许多内容都 **无法** 自动检查；仅仅因为你的代码通过了 `cstyle` 检查，并不意味着你遵循了 Sun 的 C 风格。**代码风格责任自负**。
 
 ## 选项
 
@@ -30,7 +30,7 @@ cstyle [-chpvCP] [文件]…
 
 ### `-P`
 
-检查是否使用了非 POSIX 类型。过去如 **u_int** 和 **u_long** 类型曾被使用，但现在已被 POSIX 类型 **uint_t**、**ulong_t** 等取代。本选项用于检测那些弃用类型的使用，作为回写检查（putback check）的一部分。
+检查是否使用了非 POSIX 类型。过去曾使用过 **u_int** 和 **u_long** 这类类型，但如今已弃用，改用 POSIX 类型 **uint_t**、**ulong_t** 等。本选项用于检测那些弃用类型的使用，作为回写检查（putback check）的一部分。
 
 ### `-g`
 
@@ -40,7 +40,7 @@ cstyle [-chpvCP] [文件]…
 
 ### CI
 
-如果进行了设置且设置本身非空，相当于使用 `-g` 选项。
+若设置了该变量且其值非空，则等同于使用 `-g` 选项。
 
 ## 续行检查
 

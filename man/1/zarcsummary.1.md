@@ -12,7 +12,7 @@ zarcsummary [-adghr] [-p 页] [-s 小节]
 
 ## 说明
 
-`zarcsummary` 从正在运行的内核收集统计信息，并以易于阅读的格式打印一份关于 ZFS 自适应替换缓存（Adaptive Replacement Cache，ARC）及若干相关子系统状态的报告。输出是某一时刻的快照；如需周期性采样，请改用 zarcstat(1)。
+`zarcsummary` 从正在运行的内核收集统计信息，并打印一份易于阅读的报告，说明 ZFS 自适应替换缓存（Adaptive Replacement Cache，ARC）及若干相关子系统的状态。输出是某一时刻的快照；如需周期性采样，请改用 zarcstat(1)。
 
 不带参数调用时，`zarcsummary` 会依次打印所有小节。使用 `-s` 选项可以选择单个小节。
 
@@ -24,7 +24,7 @@ zarcsummary [-adghr] [-p 页] [-s 小节]
 
 ### archits
 
-按需求读取与预取、数据与元数据划分的 ARC 命中与未命中明细。
+从按需读取与预取、数据与元数据两个维度划分的 ARC 命中与未命中明细。
 
 ### dmu
 
@@ -44,7 +44,7 @@ Solaris 移植层（Solaris Porting Layer）内存分配器的统计信息。此
 
 ### zil
 
-ZFS 意图日志的统计信息：提交的事务计数、发往稳定存储的刷新请求，以及普通 vdev 与任何独立日志（Separate Log，SLOG）设备之间的字节级划分。
+ZFS 意图日志的统计信息：提交的事务计数、发往稳定存储的刷新请求，以及普通 vdev 与任何独立日志（SLOG）设备之间的字节级划分。
 
 ## 选项
 
@@ -104,7 +104,7 @@ ZFS 意图日志的统计信息：提交的事务计数、发往稳定存储的�
 # zarcsummary -s arc
 ```
 
-以图表方式查看 ARC 的健康状况：
+以可视化方式概览 ARC 的健康状况：
 
 ```sh
 # zarcsummary -g

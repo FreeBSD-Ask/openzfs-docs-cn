@@ -7,7 +7,7 @@
 ## 概述
 
 ```sh
-raidz_test [-StBevTD] [-a 对齐位数 (ashift)] [-o ZIO 偏移量 (zio_off_shift)] [-d RAIDZ 数据盘数量 (raidz_data_disks)] [-s ZIO 大小偏移 (zio_size_shift)] [-r 重排偏移 (reflow_offset)]
+raidz_test [-StBevTD] [-a 对齐位数 (ashift)] [-o ZIO 偏移量 (zio_off_shift)] [-d RAIDZ 数据盘数量 (raidz_data_disks)] [-s ZIO 大小偏移 (zio_size_shift)] [-r 扩展偏移 (reflow_offset)]
 ```
 
 ## 说明
@@ -20,7 +20,7 @@ raidz_test [-StBevTD] [-a 对齐位数 (ashift)] [-o ZIO 偏移量 (zio_off_shif
 
 打印帮助摘要。
 
-### `-a` ashift（默认值：9）
+### `-a` ashift（默认值: `9`）
 
 设置 ashift 值。
 
@@ -30,7 +30,7 @@ raidz_test [-StBevTD] [-a 对齐位数 (ashift)] [-o ZIO 偏移量 (zio_off_shif
 
 ### `-d` raidz_data_disks（默认值：8）
 
-RAID-Z 数据盘数量。额外的磁盘用于奇偶校验。
+RAID-Z 数据盘数量。额外的磁盘将用于奇偶校验。
 
 ### `-s` zio_size_shift（默认值：19）
 
