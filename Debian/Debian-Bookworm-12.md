@@ -58,9 +58,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    **提示：** 你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后在主机上使用 `ssh user@IP` 进行连接。
 4. 禁用自动挂载：
-   如果磁盘之前被使用过（在相同偏移处存在分区），在未禁用的情况下，之前的文件系统（例如 ESP）可能会被自动挂载：
+   如果磁盘之前被使用过（在相同偏移处存在分区），在未禁用的情况下，之前的文件系统（例如 ESP）会被自动挂载：
 
-   ```
+   ```sh
    gsettings set org.gnome.desktop.media-handling automount false
    ```
 
@@ -85,6 +85,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
    在使用 ZFS 时，应始终使用完整的别名 `/dev/disk/by-id/*`。直接使用设备节点 `/dev/sd*` 可能会导致偶发的导入失败，尤其是在拥有多个存储池的系统上。
+
    **提示：**
 
    * `ls -la /dev/disk/by-id` 可列出这些别名。
@@ -103,9 +104,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```sh
    apt install --yes mdadm
 
-   # 查看是否有一到多个 MD 阵列处于活动状态：
+   # 查看是否有一个或多个 MD 阵列处于活动状态：
    cat /proc/mdstat
-   # 如果有，则停止它们（根据需要替换 ``md0``）：
+   # 如果有，则停止它们（根据需要替换 md0）：
    mdadm --stop /dev/md0
 
    # 对于使用整个磁盘的阵列：
@@ -190,8 +191,10 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
        bpool ${DISK}-part3
    ```
 
-   *注意：* GRUB 未支持所有的 ZFS 存储池特性（参见位于 `grub-core/fs/zfs/zfs.c` 的  `spa_feature_names`）。此处单独为 `/boot` 创建一个 ZFS 存储池，并指定了属性 `-o compatibility=grub2`，将该池限制为仅使用 GRUB 支持的特性，从而让 根存储池可使用任意/全部特性。
+   **注意：** GRUB 并不支持所有的存储池特性（参见 [`grub-core/fs/zfs/zfs.c`](https://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#288) 中的 `spa_feature_names`）。此处我们单独为 `/boot` 创建一个存储池，并指定 `-o compatibility=grub2` 属性，将该池限制为仅使用 GRUB 支持的特性，从而让根存储池可以使用任意/全部特性。
+
    更多信息请参阅 `zpool-features` 手册页中关于“Compatibility feature sets”的章节。
+
    **提示：**
 
    * 如果你要创建 mirror 拓扑，可以使用：
@@ -204,7 +207,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
          /dev/disk/by-id/scsi-SATA_disk2-part3
      ```
 
-   * 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，再列出来自其他磁盘的分区。
+   * 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出来自其他磁盘的分区。
    * 存储池名称是任意的。如果更改了名称，必须在后续步骤中保持一致。`bpool` 这一约定源自本教程。
 5. 创建根存储池：
    在以下方案中选择其一：
@@ -259,15 +262,15 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 **注意事项：**
 
 * 这里推荐使用 `ashift=12`，因为如今许多磁盘即使对外呈现为 512 B 逻辑扇区，实际上也具有 4 KiB（或更大）的物理扇区。此外，后续更换的磁盘也可能具有 4 KiB 物理扇区（此时 `ashift=12` 是理想选择），或者具有 4 KiB 逻辑扇区（此时 `ashift=12` 是必需的）。
-* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 journald 需要 ACL。
-* 设置 `xattr=sa` 可以极大地提升扩展属性的性能。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，一些桌面 GUI 应用会用到它们。Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的。需要注意的是，`xattr=sa` 是 Linux 特有的。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍然可以）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
-* 设置 `normalization=formD` 可以消除与 UTF-8 文件名规范化相关的一些极端情况。它还隐含启用了 `utf8only=on`，这意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请勿使用此选项。关于为何强制要求 UTF-8 文件名可能不是一个好主意的讨论，请参见相关链接。
-* `recordsize` 未设置（保持默认的 128 KiB）。如果你希望进行调优（例如 `-O recordsize=1M`），请参阅相关博客文章。
-* 设置 `relatime=on` 在传统 POSIX `atime` 行为（具有显著性能开销）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间取得了折中。自 Linux 2.6.30 起，`relatime` 已成为其他文件系统的默认选项。更多信息请参见 RedHat 的文档。
-* 请务必包含驱动器路径中的 `-part4` 这一部分。如果忘记这一点，就会指定整个磁盘，ZFS 将重新对其分区，从而导致你丢失 bootloader 分区。
-* ZFS 原生加密现在默认使用 `aes-256-gcm`。
+* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 [journald 需要 ACL](https://askubuntu.com/questions/970886/journalctl-says-failed-to-search-journal-acl-operation-not-supported)。
+* 设置 `xattr=sa` [可以极大地提升扩展属性的性能](https://github.com/openzfs/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，[一些桌面 GUI 应用会用到它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)。[Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。需要注意的是，`xattr=sa` [是 Linux 特有的](https://openzfs.org/wiki/Platform_code_differences)。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍可读取）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
+* 设置 `normalization=formD` 可以消除与 UTF-8 文件名规范化相关的一些极端情况。它还隐含启用了 `utf8only=on`，这意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请勿使用此选项。关于为何强制要求仅使用 UTF-8 文件名可能并非好主意的讨论，请参见 [The problems with enforced UTF-8 only filenames](http://utcc.utoronto.ca/~cks/space/blog/linux/ForcedUTF8Filenames)。
+* `recordsize` 未设置（保持默认的 128 KiB）。如果你希望进行调优（例如 `-O recordsize=1M`），请参阅[这些](https://jrs-s.net/2019/04/03/on-zfs-recordsize/) [博客](http://blog.programster.org/zfs-record-size) [文章](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSFileRecordsizeGrowth) [帖子](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSRecordsizeAndCompression)。
+* 设置 `relatime=on` 在传统 POSIX `atime` 行为（具有显著性能开销）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间取得了折中。自 Linux 2.6.30 起，`relatime` 已成为其他文件系统的默认选项。更多信息请参见 [RedHat 的文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/power_management_guide/relatime)。
+* 请务必包含驱动器路径中的 `-part4` 这一部分。如果忘记这一点，就会指定整个磁盘，ZFS 将重新对其分区，从而导致你丢失引导加载器分区。
+* ZFS 原生加密[现](https://github.com/openzfs/zfs/commit/31b160f0a6c673c8f926233af2ed6d5354808393)默认使用 `aes-256-gcm`。
 * 对于 LUKS，这里选择的密钥长度是 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥会被一分为二。也就是说，`-s 512` 实际表示 AES-256。
-* 你的口令短语很可能是最薄弱的一环。请慎重选择。相关指导请参见 cryptsetup FAQ 的第 5 节。
+* 你的口令短语很可能是最薄弱的一环。请慎重选择。相关指导请参见 [cryptsetup FAQ 的第 5 节](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions#5-security-aspects)。
 
 **提示：**
 
@@ -294,7 +297,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    zfs create -o canmount=off -o mountpoint=none bpool/BOOT
    ```
 
-   在 Solaris 系统中，root 文件系统会被克隆，并在通过 `pkg image-update` 或 `beadm` 进行重大系统变更时递增后缀。Ubuntu 中通过 `zsys` 工具实现了类似功能，不过其数据集布局更为复杂，而且 `zsys` 已处于几乎失去维护的状态。即便没有此类工具，仍可手动创建 rpool/ROOT 和 bpool/BOOT 容器的克隆。尽管如此，为了简化起见，本教程假定 `/boot` 仅使用单一文件系统。
+   在 Solaris 系统中，root 文件系统会被克隆，并在通过 `pkg image-update` 或 `beadm` 进行重大系统变更时递增后缀。Ubuntu 中通过 `zsys` 工具实现了类似功能，不过其数据集布局更为复杂，而且 `zsys` [已基本停止维护](https://bugs.launchpad.net/ubuntu/+source/ubiquity/+bug/1968150)。即便没有此类工具，仍可手动创建 `rpool/ROOT` 和 `bpool/BOOT` 容器的克隆。尽管如此，为了简化起见，本教程假定 `/boot` 仅使用单一文件系统。
 2. 为 root 和 boot 文件系统创建文件系统数据集：
 
    ```sh
@@ -385,7 +388,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
    这种数据集布局的主要目标是将操作系统与用户数据分离。这样可以在回滚 root 文件系统时不回滚用户数据。
+
    如果你不做额外配置，`/tmp` 将作为 root 文件系统的一部分进行存储。或者，你也可以像上面那样为 `/tmp` 创建一个单独的数据集，从而将 `/tmp` 数据排除在 root 文件系统快照之外。你还能为 `rpool/tmp` 设置配额，限制其最大使用空间。否则，你也可以在后续使用 tmpfs（内存文件系统）。
+
    >**注意：**
    >
    >如果你将启动所需的目录（例如 `/etc`）分离为单独的数据集，必须将其添加到 `/etc/default/zfs` 中的 `ZFS_INITRD_ADDITIONAL_DATASETS`。设置了 `canmount=off` 的数据集（如上面的 `rpool/usr`）不受此影响。
@@ -493,7 +498,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    apt install --yes console-setup locales
    ```
 
-   即使你需要非英文的系统语言，也请务必确保 `en_US.UTF-8` 可用：
+   即使你偏好非英语的系统语言，也请务必确保 `en_US.UTF-8` 可用：
 
    ```sh
    dpkg-reconfigure locales tzdata keyboard-configuration console-setup
@@ -522,16 +527,19 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
    使用 `initramfs` 是针对 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906) 的一种变通方案。
+
    >**提示：**
    >
    >如果你创建的是 mirror 或 raidz 拓扑，请为 `luks2` 等重复添加 `/etc/crypttab` 条目，并根据每块磁盘进行相应调整。
-9. 安装 NTP 服务以同步时间。此步骤针对 Bookworm，因为在 bootstrap 过程中不会自动安装该软件包。虽然这一步对 ZFS 不是必须的，但在进行互联网访问时非常有用，因为本地时钟漂移可能导致登录失败：
 
-   ```
+9. 安装 NTP 服务以同步时间。此步骤仅适用于 Bookworm，因为它在 bootstrap 过程中不会安装该软件包。虽然这一步对 ZFS 不是必须的，但在浏览互联网时很有用，因为本地时钟漂移可能导致登录失败：
+
+   ```sh
    apt install systemd-timesyncd
    ```
 
 10. 安装 GRUB
+
     从以下方案中选择其一：
 
     * 为传统（BIOS）启动安装 GRUB：
@@ -563,7 +571,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     apt purge --yes os-prober
     ```
 
-    这样可以避免 update-grub 输出错误信息。仅在双启动配置中才需要 os-prober。
+    这样可以避免 `update-grub` 输出错误信息。仅在双系统配置中才需要 `os-prober`。
 12. 设置 root 密码：
 
     ```sh
@@ -571,7 +579,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     ```
 
 13. 启用导入 bpool
-    这可以确保无论是否存在 `/etc/zfs/zpool.cache`、是否在 cachefile 中、或者是否启用 `zfs-import-scan.service`，都会导入 `bpool`。
+    这样可确保 `bpool` 始终被导入，无论 `/etc/zfs/zpool.cache` 是否存在、是否位于 cachefile 中，或 `zfs-import-scan.service` 是否启用。
 
     ```sh
     vi /etc/systemd/system/zfs-import-bpool.service
@@ -599,12 +607,13 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     systemctl enable zfs-import-bpool.service
     ```
 
-   > **注意：**
+   >**注意：**
    >
    > 在某些磁盘配置（例如 NVMe？）下，此服务[可能会失败](https://github.com/openzfs/openzfs-docs/issues/349)，提示找不到 `bpool`。如果发生这种情况，请在 `zpool import` 命令中添加 `-d DISK-part3`（将 `DISK` 替换为正确的设备路径）。
 
 14. 可选（但建议）：将 tmpfs 挂载到 `/tmp`
-    如果你在前面选择创建了 `/tmp` 数据集，请跳过此步骤，因为两者是冲突的。或者，可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上。
+
+    如果你在前面选择创建了 `/tmp` 数据集，请跳过此步骤，因为二者只能择其一。或者，可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上。
 
     ```sh
     cp /usr/share/systemd/tmp.mount /etc/systemd/system/

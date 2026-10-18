@@ -37,6 +37,9 @@
 | switch | 交换机 | SAS 拓扑语境 |
 | slot | 插槽 | 磁盘插槽语境统一用"插槽"（不写"槽位"） |
 | spill block | spill 块（保留） | 与 `zfs.4` 现有译法一致，不译"溢出块" |
+| replicated configuration | 冗余配置 | 指池具备镜像/RAIDZ 冗余；non-replicated 译"非冗余"，不译"复制配置"（易与 send/receive 复制混淆） |
+| intent log | 意图日志 | |
+| top-level vdev、top level device | 顶级 vdev、顶层设备 | |
 | property | 属性 | dataset property 译“数据集属性”，user property 译“用户属性” |
 | quota | 配额 | |
 | refquota | 引用配额（建议） | |
