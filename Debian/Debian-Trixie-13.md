@@ -901,7 +901,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    echo RESUME=none > /etc/initramfs-tools/conf.d/resume
    ```
 
-   `RESUME=none` 用于禁用休眠恢复。因为在运行恢复脚本时尚未导入 zvol，如果不禁用，启动过程会因为等待 swap zvol 而出现约 30 秒的停滞。
+   `RESUME=none` 用于禁用从休眠恢复。这之所以必要，是因为恢复脚本运行之时 zvol 尚不存在（此时存储池尚未导入），恢复功能无法生效。若不将其禁用，启动过程会因等待 swap zvol 出现而停滞约 30 秒。
 
 3. 启用 swap 设备：
 
