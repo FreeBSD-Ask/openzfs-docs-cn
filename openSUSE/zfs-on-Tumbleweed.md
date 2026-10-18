@@ -7,7 +7,7 @@
 * 本教程使用整块物理磁盘。
 * 本教程不适用于双系统。
 * 备份你的数据。一切既有数据都将丢失。
-* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 Root on ZFS 的支持，本文档将会更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 zfs](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程在不使用 YaST2 的情况下通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
+* 这不是 openSUSE 官方教程。如果日后 openSUSE 新增了以 ZFS 为根文件系统的支持，本文档将随之更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 zfs](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程不使用 YaST2，而是通过 zypper 设置系统，其方法源自社区成员基于自身经验撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
 
 ### 系统要求
 
@@ -15,7 +15,7 @@
 * [强烈建议使用 64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)
 * 在提供 4 KiB 逻辑扇区（“4Kn”）的驱动器上进行的安装仅在使用 UEFI 启动时可行。这并非 ZFS 独有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作](http://savannah.gnu.org/bugs/?46700)。
 
-在内存少于 2 GiB 的计算机运行 ZFS 时，存在严重的性能瓶颈。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，将需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
+内存少于 2 GiB 的计算机运行 ZFS 会很慢。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，就需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
 
 ### 支持
 
@@ -23,18 +23,18 @@
 
 ### 加密
 
-本指南支持三种不同的加密方案：未加密、ZFS 原生加密、以及 LUKS。无论选择哪一种，都能完全使用一切 ZFS 特性。
+本指南支持三种不同的加密方案：未加密、ZFS 原生加密以及 LUKS。无论选择哪一种，所有 ZFS 特性都完全可用。
 
 未加密当然不会加密任何内容。在没有进行任何加密的情况下，该方案自然具有最佳性能。
 
-ZFS 原生加密会对根池中的数据和大多数元数据进行加密。它不会加密数据集或快照的名称或属性。启动池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）系统在未在控制台输入口令的情况下无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
+ZFS 原生加密会对根存储池中的数据和大多数元数据进行加密。它不会加密数据集或快照的名称或属性。启动存储池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）如果未在控制台输入口令，系统无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
 
-LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kernel 和 initrd。系统在未在控制台输入口令的情况下无法启动。性能良好，但 LUKS 位于 ZFS 底层，因此如果使用了多个磁盘（mirror 或 raidz 拓扑），数据需要在每个磁盘上各加密一次。
+LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kernel 和 initrd。如果未在控制台输入口令，系统无法启动。性能良好，但 LUKS 位于 ZFS 底层，因此如果使用了多个磁盘（mirror 或 raidz 拓扑），数据需要在每个磁盘上各加密一次。
 
 ## 第 1 步：准备安装环境
 
 1. 启动 openSUSE Live CD。如果出现提示，请使用用户名 `live` 登录，密码 `live`。根据需要将系统连接到互联网（例如加入你的 WiFi 网络）。打开终端。
-2. 设置更新软件仓库：
+2. 设置并更新软件仓库：
 
    ```sh
    sudo zypper addrepo https://download.opensuse.org/repositories/filesystems/openSUSE_Tumbleweed/filesystems.repo

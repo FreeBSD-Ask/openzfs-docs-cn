@@ -2,7 +2,7 @@
 
 * 原文地址：[wiki/ZFS](https://wiki.gentoo.org/wiki/ZFS)，版本 2026 年 1 月 12 日 (星期一) 07:58。
 
-本文重点介绍在 Gentoo 上将 ZFS 用作根文件系统，并设计为配合手册使用。随着时间推移，将会加入更多高级配置，请查看 TODO 部分，以了解是否有可添加的内容来改进本文。
+本文重点介绍在 Gentoo 上将 ZFS 用作根文件系统，并设计为配合手册使用。随着时间推移，将会加入更多高级配置，请查看待办事项部分，以了解是否有可添加的内容来改进本文。
 
 ## 分区
 
@@ -28,7 +28,7 @@ mkfs.vfat -F 32 /dev/sda1
 
 ### 交换分区
 
-在 ZFS 分区上 swap 性能较差，并且不支持使用 swapfile，因此建议使用单独的分区。
+在 ZFS 分区上使用 swap 性能较差，并且不支持使用 swapfile，因此建议使用单独的分区。
 
 ```sh
 mkswap /dev/sda2
@@ -55,9 +55,9 @@ zgenhostid -f
 zgenhostid -f 0x00bab10c
 ```
 
-### 创建 ZFS 池
+### 创建 ZFS 存储池
 
-加载 ZFS 内核模块，在 `/dev/sda3` 上创建 ZFS 池 `tank`。
+加载 ZFS 内核模块，在 `/dev/sda3` 上创建 ZFS 存储池 `tank`。
 
 ```sh
 modprobe zfs
@@ -80,7 +80,7 @@ zpool create -f \
 >
 >对于物理扇区大小为 512 字节的磁盘，请使用 `-o ashift=9`；对于物理扇区大小为 4096 字节的磁盘，请使用 `-o ashift=12`。详见 [OpenZFS: ashift 属性定义](https://openzfs.github.io/openzfs-docs/man/v2.4/7/zpoolprops.7.html#ashift)。
 
-### 可选方案：使用原生加密创建 ZFS 池
+### 可选方案：使用原生加密创建 ZFS 存储池
 
 >**警告**
 >
@@ -104,7 +104,7 @@ zpool create -f -o ashift=12 \
 
 >**注意**
 >
->也可以将属性 `keylocation` 设置为指向某个文件，这在使用 ZFSBootMenu 作为引导加载器时非常有用，或者在启动时希望减少输入密码次数时也可用。[参见 ZFSBootMenu 文档](https://docs.zfsbootmenu.org/en/v2.3.x/general/native-encryption.html) 了解其对加密文件系统的处理方式。
+>也可以将属性 `keylocation` 设置为指向某个文件，这在使用 ZFSBootMenu 作为引导加载器时非常有用，或者在希望减少启动时输入密码次数时也可用。[参见 ZFSBootMenu 文档](https://docs.zfsbootmenu.org/en/v2.3.x/general/native-encryption.html) 了解其对加密文件系统的处理方式。
 
 ### 创建 ZFS 文件系统
 
@@ -120,15 +120,15 @@ zfs create -o mountpoint=/home tank/home
 >
 >具有根挂载点的文件系统应设置属性 `canmount=noauto`。若省略此属性，操作系统可能会尝试自动挂载多个文件系统到 `/`，然后失败。如果打算将 `/usr`、`/etc` 或其他系统关键目录放在不同的数据集上，需确保它是根数据集的子数据集（例如 `tank/os/gentoo/usr`），并且 `canmount=on`，这样由 dracut 生成的 initramfs 才能被正确挂载。
 
-设置池的首选引导文件系统：
+设置存储池的首选引导文件系统：
 
 ```sh
 zpool set bootfs=tank/os/gentoo tank
 ```
 
-### 导出并重新导入池，挂载文件系统
+### 导出并重新导入存储池，挂载文件系统
 
-要导出并重新导入池，同时指定挂载点并且不自动挂载文件系统，请运行以下命令：
+要导出并重新导入存储池，同时指定挂载点并且不自动挂载文件系统，请运行以下命令：
 
 ```sh
 zpool export tank
@@ -197,7 +197,7 @@ cp /etc/hostid /mnt/gentoo/etc
 
 如果使用发行版内核，则需要启用 USE 标志 `dist-kernel`：
 
-文件 `/etc/portage/make.conf` 在 make.conf 中启用 USE 标志 **dist-kernel**
+在 `/etc/portage/make.conf` 中启用 USE 标志 **dist-kernel**
 
 ```ini
 USE="dist-kernel"
@@ -235,11 +235,11 @@ emerge --ask sys-fs/zfs
 make -j$(nproc) && make modules_install && make install
 ```
 
-每次更新 gentoo-sources 或内核配置发生更改时都必须重复此操作，否则系统将无法启动。
+每次更新 gentoo-sources 或更改内核配置时都必须重复此操作，否则系统将无法启动。
 
 ## ZFS 用户空间工具和内核模块
 
-包 sys-fs/zfs 是必须的，它能让系统与 ZFS 池交互和管理。确保已设置模块标志：
+包 sys-fs/zfs 是必需的，它能让系统与 ZFS 存储池交互并对其进行管理。确保已设置模块标志：
 
 ```sh
 emerge -av sys-fs/zfs
@@ -402,7 +402,7 @@ echo "sys-boot/grub libzfs" >> /etc/portage/package.use/grub
 
 #### 构建带 ZFS 支持的 GRUB
 
-确保 GRUB_PLATFORMS 设置正确，以适用于带 EFI 分区的系统：
+确保为带 EFI 分区的系统正确设置 GRUB_PLATFORMS：
 
 ```sh
 echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
@@ -445,7 +445,7 @@ rc-update add zfs-import sysinit && rc-update add zfs-mount sysinit
 
 ## 重启系统
 
-退出 chroot 环境并卸载所有挂载的分区，不要忘记导出池。之后即可重启系统。
+退出 chroot 环境并卸载所有挂载的分区，不要忘记导出存储池。之后即可重启系统。
 
 ```sh
 exit

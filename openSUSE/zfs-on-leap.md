@@ -7,25 +7,29 @@
 * 本教程使用整块物理磁盘。
 * 本教程不适用于双系统。
 * 备份你的数据。一切既有数据都将丢失。
-* 这不是 openSUSE 官方教程。如果后续 openSUSE 新增了 根文件系统的 ZFS 支持，本文档将进行更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 ZFS](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程将在不使用 YaST2 的情况下，通过 zypper 设置系统的方法，基于社区中人员经验所撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
+* 这不是 openSUSE 官方教程。如果日后 openSUSE 新增了以 ZFS 为根文件系统的支持，本文档将随之更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 ZFS](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程不使用 YaST2，而是通过 zypper 设置系统，其方法源自社区成员基于自身经验撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
 
 ### 系统要求
 
 * [64 位 openSUSE Leap Live CD，带 GUI（例如 gnome iso）](https://software.opensuse.org/distributions/leap)
 * [强烈建议使用 64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)
-* 在提供 4 KiB 逻辑扇区（“4Kn”）的驱动器上进行的安装仅在使用 UEFI 启动时可行。这并非 ZFS 独有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作。](http://savannah.gnu.org/bugs/?46700)
+* 在提供 4 KiB 逻辑扇区（“4Kn”）的驱动器上进行的安装仅在使用 UEFI 启动时可行。这并非 ZFS 独有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作](http://savannah.gnu.org/bugs/?46700)。
 
-在内存少于 2 GiB 的计算机运行 ZFS 时，存在严重的性能瓶颈。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，将需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
+内存少于 2 GiB 的计算机运行 ZFS 会很慢。对于基础工作负载，建议至少使用 4 GiB 内存以获得正常性能。如果你希望使用去重功能，就需要[大量的内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是一项永久性更改，无法轻易还原。
+
+### 支持
+
+如果你需要帮助，可以通过 [邮件列表](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/Mailing%20Lists.html#mailing-lists) 或在 [Libera Chat](https://libera.chat/) 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请提交新的 issue，并 [@Zaryob](https://github.com/Zaryob)。
 
 ### 加密
 
-本指南支持三种不同的加密方案：未加密、ZFS 原生加密、以及 LUKS。无论选择哪一种，都能完全使用一切 ZFS 特性。
+本指南支持三种不同的加密方案：未加密、ZFS 原生加密以及 LUKS。无论选择哪一种，所有 ZFS 特性都完全可用。
 
 未加密当然不会加密任何内容。在没有进行任何加密的情况下，该方案自然具有最佳性能。
 
-ZFS 原生加密会对根池中的数据和大多数元数据进行加密。它不会加密数据集或快照的名称或属性。启动池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）系统在未在控制台输入口令的情况下无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
+ZFS 原生加密会对根存储池中的数据和大多数元数据进行加密。它不会加密数据集或快照的名称或属性。启动存储池完全不加密，但其中只包含 bootloader、kernel 和 initrd。（除非你在 `/etc/fstab` 中放置了密码，否则 initrd 不太可能包含敏感数据。）如果未在控制台输入口令，系统无法启动。性能良好。由于加密是在 ZFS 内部完成的，即使使用了多个磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
 
-LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kernel 和 initrd。系统在未在控制台输入口令的情况下无法启动。性能良好，但 LUKS 位于 ZFS 底层，因此如果使用了多个磁盘（mirror 或 raidz 拓扑），数据需要在每个磁盘上各加密一次。
+LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kernel 和 initrd。如果未在控制台输入口令，系统无法启动。性能良好，但 LUKS 位于 ZFS 底层，因此如果使用了多个磁盘（mirror 或 raidz 拓扑），数据需要在每个磁盘上各加密一次。
 
 ### 注意
 
@@ -33,7 +37,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 ## 第 1 步：准备安装环境
 
-1. 启动 openSUSE Live CD。如果出现提示时，请使用用户名 `linux` 登录，空密码。根据需要将系统连接到互联网（例如加入你的 WiFi 网络）。打开终端。
+1. 启动 openSUSE Live CD。如果出现提示，请使用用户名 `linux` 登录，无需密码。根据需要将系统连接到互联网（例如加入你的 WiFi 网络）。打开终端。
 2. 检查你的 openSUSE Leap 发行版：
 
    ```sh
@@ -41,7 +45,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    Description:    openSUSE Leap {$release}
    ```
 
-3. 设置更新软件仓库：
+3. 设置并更新软件仓库：
 
    ```sh
    sudo zypper addrepo https://download.opensuse.org/repositories/filesystems/$(lsb_release -rs)/filesystems.repo
@@ -58,7 +62,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    >**提示：**
    >
-   >你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后，在你的主机上，通过 `ssh user@IP` 进行连接。不要忘记通过 `passwd` 为用户设置密码。
+   >你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后，在你的主机上，通过 `ssh user@IP` 进行连接。不要忘记用 `passwd` 为用户设置密码。
 5. 禁用自动挂载：
    如果磁盘之前被使用过（在相同偏移位置存在分区），在未禁用的情况下，先前的文件系统（例如 ESP）会被自动挂载：
 
@@ -95,7 +99,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    * `ls -la /dev/disk/by-id` 会列出别名。
    * 你是在虚拟机中操作吗？如果虚拟磁盘在 `/dev/disk/by-id` 中缺失，使用 KVM virtio 时可用 `/dev/vda`；否则，请参考[故障排查](https://openzfs.github.io/openzfs-docs/Getting%20Started/openSUSE/openSUSE%20Leap%20Root%20on%20ZFS.html#troubleshooting)部分。
 
-3. 如果重复使用磁盘，根据需要清理：
+2. 如果重复使用磁盘，根据需要清理：
    如果磁盘之前用于 MD 阵列：
 
    ```sh
@@ -126,7 +130,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    如果新分区仍未显示，可重启并重新开始（此步骤可跳过）。
 
-4. 分区你的磁盘：
+3. 分区你的磁盘：
    如果需要传统（BIOS）启动，运行：
 
    ```sh
@@ -139,7 +143,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    sgdisk     -n2:1M:+512M   -t2:EF00 $DISK
    ```
 
-   为启动池创建分区：
+   为启动存储池创建分区：
 
    ```sh
    sgdisk     -n3:0:+1G      -t3:BF01 $DISK
@@ -161,9 +165,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    **提示：**
 
-   * 如果创建镜像或 raidz 拓扑，请对将加入池的所有磁盘重复分区命令。
+   * 如果创建镜像或 raidz 拓扑，请对将加入存储池的所有磁盘重复分区命令。
 
-5. 创建启动池：
+4. 创建启动存储池：
 
    ```sh
    zpool create \
@@ -187,10 +191,10 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
        bpool ${DISK}-part3
    ```
 
-   对启动池无需自定义选项。
+   对启动存储池无需自定义选项。
 
-   GRUB 不支持所有的 zpool 功能。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
-   此步骤为 `/boot` 创建单独的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB“支持”。
+   GRUB 不支持所有的 zpool 特性。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
+   此步骤为 `/boot` 创建单独的启动存储池，其特性仅限于 GRUB 支持的特性，从而能够让根存储池使用任意特性。注意 GRUB 以只读方式打开存储池，因此所有只读兼容特性均被 GRUB“支持”。
 
    **提示：**
 
@@ -205,17 +209,17 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
      ```
 
    * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
-   * 池名称可自定义。若更改，新名称必须保持一致使用。`bpool` 命名约定来源于本教程。
+   * 存储池名称可自定义。若更改，新名称必须保持一致使用。`bpool` 命名约定来源于本教程。
 
-   **功能说明：**
+   **特性说明：**
 
-   * `allocation_classes` 功能安全可用。但除非使用它（如 `special` vdev），否则启用它无意义。几乎不会有人在启动池使用该功能。如果关注启动池速度，将整个池放在更快的磁盘上比使用 `special` vdev 更合理。
-   * `project_quota` 功能经过测试，安全可用。对启动池而言几乎无实际意义。
-   * `resilver_defer` 功能安全，但启动池容量较小，通常无需使用。
-   * `spacemap_v2` 功能经过测试，安全可用。启动池容量较小，实际影响不大。
-   * 作为只读兼容功能，`userobj_accounting` 理论上兼容，但在实践中 GRUB 可能报错“invalid dnode type”。此功能对 `/boot` 无关紧要。
+   * `allocation_classes` 特性安全可用。但除非使用它（如 `special` vdev），否则启用它无意义。几乎不会有人在启动存储池上使用该特性。如果关注启动存储池速度，将整个存储池放在更快的磁盘上比使用 `special` vdev 更合理。
+   * `project_quota` 特性经过测试，安全可用。对启动存储池而言几乎无实际意义。
+   * `resilver_defer` 特性安全，但启动存储池容量较小，通常无需使用。
+   * `spacemap_v2` 特性经过测试，安全可用。启动存储池容量较小，实际影响不大。
+   * 作为只读兼容特性，`userobj_accounting` 理论上兼容，但在实践中 GRUB 可能报错“invalid dnode type”。此特性对 `/boot` 无关紧要。
 
-7. 创建根池：
+5. 创建根存储池：
    选择以下方案之一：
 
    * 未加密：
@@ -266,15 +270,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 * 设置 `normalization=formD` 可消除一些与 UTF-8 文件名规范化相关的极端情况。它还隐含 `utf8only=on`，意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请不要使用此选项。关于强制仅使用 UTF-8 文件名可能存在的问题，请参见 [The problems with enforced UTF-8 only filenames](http://utcc.utoronto.ca/~cks/space/blog/linux/ForcedUTF8Filenames)。
 * `recordsize` 未设置（保持默认 128 KiB）。如果想调整（例如 `-O recordsize=1M`），请参见[这些](https://jrs-s.net/2019/04/03/on-zfs-recordsize/) [博客](http://blog.programster.org/zfs-record-size) [文章](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSFileRecordsizeGrowth) [帖子](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSRecordsizeAndCompression)。
 * 设置 `relatime=on` 在经典 POSIX `atime` 行为（性能影响显著）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间提供折中。自 Linux 2.6.30 起，`relatime` 成为其他文件系统的默认设置。更多信息请参见 [RedHat 文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/power_management_guide/relatime)。
-* 设置 `xattr=sa` [大幅提高扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用使用，[一些桌面 GUI 应用会使用它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)；[Samba 可使用它们存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。注意 `xattr=sa` 是 [Linux 特定](https://openzfs.org/wiki/Platform_code_differences) 的。如果将 `xattr=sa` 池迁移到 ZFS-on-Linux 以外的 OpenZFS 实现，扩展属性将无法读取（数据仍可用）。如果扩展属性的可移植性对你重要，请省略上面的 `-O xattr=sa`。即便不希望整个池使用 `xattr=sa`，在 `/var/log` 上使用通常是安全的。
-* 确保包括驱动路径的 `-part4` 部分。如果忘记，将指定整个磁盘，ZFS 会重新分区，你将丢失启动器分区。
+* 设置 `xattr=sa` [大幅提高扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用使用，[一些桌面 GUI 应用会使用它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)；[Samba 可使用它们存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。注意 `xattr=sa` 是 [Linux 特定](https://openzfs.org/wiki/Platform_code_differences) 的。如果将 `xattr=sa` 存储池迁移到 ZFS-on-Linux 以外的 OpenZFS 实现，扩展属性将无法读取（数据仍可用）。如果扩展属性的可移植性对你重要，请省略上面的 `-O xattr=sa`。即便不希望整个存储池使用 `xattr=sa`，在 `/var/log` 上使用通常是安全的。
+* 确保包含磁盘路径中的 `-part4` 部分。如果忘记，将指定整个磁盘，ZFS 会重新分区，你将丢失引导加载器分区。
 * ZFS 原生加密 [现](https://github.com/openzfs/zfs/commit/31b160f0a6c673c8f926233af2ed6d5354808393) 默认使用 `aes-256-gcm`。
-* 对于 LUKS，选择的密钥大小为 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥被一分为二。因此 `-s 512` 即表示 AES-256。
+* 对于 LUKS，密钥大小选择为 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥被一分为二，`-s 512` 即表示 AES-256。
 * 你的口令很可能是最薄弱环节。请谨慎选择。参考 [cryptsetup FAQ 第 5 节](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions#5-security-aspects) 获取指导。
 
 **提示：**
 
-* 如果你创建镜像拓扑，请使用以下命令创建池：
+* 如果你创建镜像拓扑，请使用以下命令创建存储池：
 
   ```sh
   zpool create \
@@ -286,8 +290,8 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
 * 使用 LUKS 配合镜像或 raidz 拓扑时，请使用 `/dev/mapper/luks1`、`/dev/mapper/luks2` 等，这些需要通过 `cryptsetup` 创建。
-* 可自定义存储池的名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根池默认命名为 `rpool`。
-* 如果想使用 grub 引导加载器，必须为根池设置：
+* 可自定义存储池的名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根存储池默认命名为 `rpool`。
+* 如果想使用 grub 引导加载器，必须为根存储池设置：
 
   ```sh
   -o feature@async_destroy=enabled \
@@ -304,7 +308,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
   -o feature@zpool_checkpoint=enabled \
   ```
 
-  适用于 grub 2.04 和 Leap 15.3。不要对该池执行 zpool upgrade，否则将失去使用 grub2-install 命令的能力。
+  适用于 grub 2.04 和 Leap 15.3。不要对该存储池执行 `zpool upgrade`，否则将失去使用 `grub2-install` 命令的能力。
 
 ## 第 3 步：系统安装
 
@@ -315,7 +319,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zfs create -o canmount=off -o mountpoint=none bpool/BOOT
    ```
 
-   在 Solaris 系统中，根文件系统会被克隆，并通过 `pkg image-update` 或 `beadm` 对后缀进行递增以应对重大系统更改。类似功能已在 Ubuntu 20.04 中通过 `zsys` 工具实现，尽管其数据集布局更复杂。即使没有此类工具，仍可手动创建 rpool/ROOT 和 bpool/BOOT 容器的克隆。不过，为简化操作，本教程假设 `/boot` 使用单一文件系统。
+   在 Solaris 系统中，根文件系统会被克隆，并通过 `pkg image-update` 或 `beadm` 递增后缀以应对重大系统更改。Ubuntu 20.04 已通过 `zsys` 工具实现了类似功能，尽管其数据集布局更复杂。即使没有此类工具，仍可手动创建 `rpool/ROOT` 和 `bpool/BOOT` 容器的克隆。不过，为简化操作，本教程假设 `/boot` 使用单一文件系统。
 
 2. 为根文件系统和启动文件系统创建数据集：
 
@@ -374,7 +378,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zfs create                                 rpool/var/games
    ```
 
-   如果系统将存储本地邮件在 `/var/mail`：
+   如果系统要在 `/var/mail` 中存储本地邮件：
 
    ```sh
    zfs create                                 rpool/var/mail
@@ -435,7 +439,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    如果不做额外操作，`/tmp` 将作为根文件系统的一部分存储。或者，可以如上创建独立的 `/tmp` 数据集，将 `/tmp` 数据排除在根文件系统快照之外。同时，可对 `rpool/tmp` 设置配额以限制最大使用空间。否则，可在后续使用 tmpfs（内存文件系统）。
 
-5. 复制 `zpool.cache`：
+4. 复制 `zpool.cache`：
 
    ```sh
    mkdir /mnt/etc/zfs -p
@@ -632,14 +636,14 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    >
    >如果创建 mirror 或 raidz 拓扑，为 `luks2` 等磁盘重复添加 `/etc/crypttab` 条目。
 
-10. 仅对 LUKS 安装：修正 ZFS 的 cryptsetup 命名：
+9. 仅对 LUKS 安装：修正 ZFS 的 cryptsetup 命名：
 
    ```sh
    echo 'ENV{DM_NAME}!="", SYMLINK+="$env{DM_NAME}"
    ENV{DM_NAME}!="", SYMLINK+="dm-name-$env{DM_NAME}"' >> /etc/udev/rules.d/99-local-crypt.rules
    ```
 
-11. 推荐：生成并设置 hostid：
+10. 推荐：生成并设置 hostid：
 
     ```sh
     cd /root
@@ -657,7 +661,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
     hostid
     ```
 
-12. 安装 GRUB：
+11. 安装 GRUB：
     选择一种启动方式：
 
     * 安装 GRUB 用于 legacy（BIOS）启动：
@@ -684,7 +688,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
       * 对于 4Kn 驱动器，`-s 1` 是为满足 FAT32 最小簇大小（512 MiB 分区）要求。512 B 扇区的驱动器也可正常使用。
       * 对于 mirror 或 raidz 拓扑，这一步只在第一块磁盘上安装 GRUB，其他磁盘稍后处理。
 
-13. 可选：移除 os-prober：
+12. 可选：移除 os-prober：
 
     ```sh
     zypper remove os-prober
@@ -692,15 +696,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
     仅在双系统环境中需要 os-prober，否则可避免 update-bootloader 报错。
 
-14. 设置 root 密码：
+13. 设置 root 密码：
 
     ```sh
     passwd
     ```
 
-15. 启用 bpool 导入：
+14. 启用 bpool 导入：
 
-    确保始终能导入 `bpool`，无论是否存在 `/etc/zfs/zpool.cache`，是否启用 `zfs-import-scan.service`。
+    确保始终能导入 `bpool`，无论是否存在 `/etc/zfs/zpool.cache`、其是否在 cachefile 中，以及是否启用 `zfs-import-scan.service`。
 
     ```sh
     vi /etc/systemd/system/zfs-import-bpool.service
@@ -730,9 +734,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
     systemctl enable zfs-import-bpool.service
     ```
 
-17. 可选（但推荐）：将 `/tmp` 挂载为 tmpfs
+15. 可选（但推荐）：将 `/tmp` 挂载为 tmpfs
 
-    如果之前创建了 `/tmp` 数据集，则跳过此步，否则可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上：
+    如果之前创建了 `/tmp` 数据集，则跳过此步（两者互斥），否则可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上：
 
     ```sh
     cp /usr/share/systemd/tmp.mount /etc/systemd/system/
@@ -769,7 +773,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    >**注意：**
    >
-   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
+   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED”。
    解决方法：检查 cryptsetup 的安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
 
    >**注意：**
@@ -859,9 +863,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
       >
       >这里是将 GRUB 安装到整个磁盘，而非单个分区。
 
-      如果创建了 mirror 或 raidz 拓扑，需要对池中每块磁盘重复执行该命令。
+      如果创建了 mirror 或 raidz 拓扑，需要对存储池中每块磁盘重复执行该命令。
 
-   3. 对于 UEFI 启动，将 GRUB 安装到 ESP 分区：
+   2. 对于 UEFI 启动，将 GRUB 安装到 ESP 分区：
 
       ```sh
       grub2-install --target=x86_64-efi --efi-directory=/boot/efi \
@@ -874,7 +878,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 >**警告：**
 >
->这将破坏你的 YaST2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 池而提供的替代方案。
+>这将破坏你的 YaST2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 存储池而提供的替代方案。
 
 1. 安装 systemd-boot：
 
@@ -939,14 +943,14 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zed -F &
    ```
 
-3. 验证 `zed` 是否更新了缓存，确保以下文件非空：
+2. 验证 `zed` 是否更新了缓存，确保以下文件非空：
 
    ```sh
    cat /etc/zfs/zfs-list.cache/bpool
    cat /etc/zfs/zfs-list.cache/rpool
    ```
 
-4. 如果文件为空，强制更新缓存并重新检查：
+3. 如果文件为空，强制更新缓存并重新检查：
 
    ```sh
    zfs set canmount=on     bpool/BOOT/suse
@@ -962,7 +966,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    然后重新启动 `zed` 并重试。
 
-5. 修正缓存路径，去掉前缀 `/mnt`：
+4. 修正缓存路径，去掉前缀 `/mnt`：
 
    ```sh
    sed -Ei "s|/mnt/?|/|" /etc/zfs/zfs-list.cache/*
@@ -1038,7 +1042,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
      grub-install $DISK
      ```
 
-     按回车直到出现设备选择界面，使用空格键选择池中的所有磁盘（不是分区）。
+     按回车直到出现设备选择界面，使用空格键选择存储池中的所有磁盘（不是分区）。
 
    * 对于 UEFI 启动：
 
@@ -1061,7 +1065,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 >**注意**：
 >
->在内存压力极高的系统上，无论 swap 空间剩余多少，使用 zvol 作为 swap 设备都可能导致系统锁死。[上游已有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
+>在内存压力极高的系统上，无论 swap 空间剩余多少，使用 zvol 作为 swap 设备都可能导致系统锁死。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
 1. 创建用于 swap 的 zvol（卷数据集）：
 
@@ -1074,9 +1078,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    你可以根据需求调整大小（这里为 `4G`）。
 
-   压缩算法使用 `zle`，因为这是开销最小的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），4 KiB 页面大小情况下，没有压缩算法能减少 I/O。唯一例外是全零页面，会被 ZFS 丢弃，但必须启用某种压缩才能实现这一行为。
+   压缩算法使用 `zle`，因为这是开销最小的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），在常见的 4 KiB 页面大小下，没有任何压缩算法能减少 I/O。唯一例外是全零页面，会被 ZFS 丢弃，但必须启用某种压缩才能实现这一行为。
 
-3. 配置 swap 设备：
+2. 配置 swap 设备：
 
    >**注意**：
    >
@@ -1088,9 +1092,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    echo RESUME=none > /etc/initramfs-tools/conf.d/resume
    ```
 
-   `RESUME=none` 用于禁用休眠恢复。由于 zvol 在启动时尚未导入（池未导入），恢复脚本无法找到 swap，如果不禁用，启动过程会停滞约 30 秒等待 swap zvol 出现。
+   `RESUME=none` 用于禁用休眠恢复。由于 zvol 在启动时尚未导入（存储池未导入），恢复脚本无法找到 swap，如果不禁用，启动过程会停滞约 30 秒等待 swap zvol 出现。
 
-5. 启用 swap 设备：
+3. 启用 swap 设备：
 
    ```sh
    swapon -av
@@ -1124,7 +1128,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    systemctl restart sshd
    ```
 
-6. 可选：重新启用图形启动过程：
+5. 可选：重新启用图形启动过程：
 
    如果你希望使用图形启动，并且使用了 LUKS，这可以让提示界面更美观。
 
@@ -1141,14 +1145,14 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    >
    >如果出现 `osprober` 错误，可忽略。
 
-8. 可选：仅针对 LUKS 安装，备份 LUKS 头：
+6. 可选：仅针对 LUKS 安装，备份 LUKS 头：
 
    ```sh
    sudo cryptsetup luksHeaderBackup /dev/disk/by-id/scsi-SATA_disk1-part4 \
        --header-backup-file luks1-header.dat
    ```
 
-   将备份妥善保存（如云端存储）。该备份受 LUKS 密码保护，但你也可选择额外加密。
+   将备份妥善保存（如云端存储）。该备份受 LUKS 口令保护，但你也可选择额外加密。
   
    >**提示**：
    >
@@ -1222,7 +1226,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 本教程中大多数问题报告都涉及 `mpt2sas` 硬件，这类硬件会延迟异步初始化驱动器，例如某些 IBM M1015 或已刷回参考 LSI 固件的 OEM 卡。
 
-基本问题是，这些控制器上的磁盘在 Linux 内核启动时不可见，而 ZoL 不支持热插拔池成员。详见：[https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
+基本问题是，在常规系统启动完成之前，Linux 内核看不到这些控制器上的磁盘，而 ZoL 不支持热插拔存储池成员。详见：[https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
 
 大多数 LSI 卡完全兼容 ZoL。如果你的 LSI 卡存在此问题，可在 `/etc/default/zfs` 中设置：
 
@@ -1230,7 +1234,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 ZFS_INITRD_PRE_MOUNTROOT_SLEEP=X
 ```
 
-系统将在导入池之前等待 X 秒，确保所有磁盘都已出现。
+系统将在导入存储池之前等待 X 秒，确保所有磁盘都已出现。
 
 
 ### QEMU/KVM/XEN

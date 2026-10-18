@@ -11,7 +11,7 @@
 
 ## 准备工作
 
-1. 下载 [NixOS Live 镜像](https://nixos.org/download.html#nixos-iso) ，然后从其启动。
+1. 下载 [NixOS Live 镜像](https://nixos.org/download.html#nixos-iso)，然后从其启动。
 
    ```sh
    sha256sum -c ./nixos-*.sha256
@@ -111,7 +111,7 @@
    done
    ```
 
-3. **仅 LUKS**：为根池设置加密的 LUKS 容器：
+3. **仅 LUKS**：为根存储池设置加密的 LUKS 容器：
 
    ```sh
    for i in ${DISK}; do
@@ -121,7 +121,7 @@
    done
    ```
 
-4. 创建根池
+4. 创建根存储池
 
    * 未加密
 

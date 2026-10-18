@@ -4,7 +4,7 @@
 
 >**注意**
 >
->本节是在既有 NixOS 系统上安装 ZFS。若要将 ZFS 用作根文件系统，请参见下文。
+>本节是在既有 NixOS 系统上安装 ZFS。若要将 ZFS 用作根文件系统，请参阅《[构建以 ZFS 为根文件系统的 NixOS](NixOS-Root-on-ZFS.md)》。
 
 NixOS Live 镜像默认内置了 ZFS 支持。
 
