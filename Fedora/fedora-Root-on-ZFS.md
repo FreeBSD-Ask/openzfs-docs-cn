@@ -324,6 +324,17 @@
 
    ```bash
    tail -n10 /var/lib/dkms/zfs/**/build/make.log
+
+   # ERROR: modpost: GPL-incompatible module zfs.ko uses GPL-only symbol 'bio_start_io_acct'
+   # ERROR: modpost: GPL-incompatible module zfs.ko uses GPL-only symbol 'bio_end_io_acct_remapped'
+   # make[4]:  [scripts/Makefile.modpost:138: /var/lib/dkms/zfs/2.1.9/build/module/Module.symvers] Error 1
+   # make[3]:  [Makefile:1977: modpost] Error 2
+   # make[3]: Leaving directory '/usr/src/kernels/6.2.9-100.fc36.x86_64'
+   # make[2]:  [Makefile:55: modules-Linux] Error 2
+   # make[2]: Leaving directory '/var/lib/dkms/zfs/2.1.9/build/module'
+   # make[1]:  [Makefile:933: all-recursive] Error 1
+   # make[1]: Leaving directory '/var/lib/dkms/zfs/2.1.9/build'
+   # make:  [Makefile:794: all] Error 2
    ```
 
    如果构建失败，需要安装 LTS 内核及其头文件，然后重新构建 ZFS 模块：
