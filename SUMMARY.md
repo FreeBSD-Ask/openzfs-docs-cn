@@ -3,6 +3,7 @@
 * [OpenZFS 中文文档](README.md)
 * [编辑日志](CHANGELOG.md)
 * [目录](mu-lu.md)
+* [术语表](shu-yu-biao.md)
 
 ## 安装指引
 

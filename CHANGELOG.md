@@ -3,6 +3,9 @@
 - 2026.10.18
   - 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   - 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置
+  - 新增术语表 `shu-yu-biao.md` 并收录进目录，作为全书术语唯一权威标准
+  - 确立 man 页版本基线：既有 10 页基于 openzfs/zfs@b481a8bb（2026-03-13）；本次校对与全量翻译以 zfs master（7c3d85aa，2026-10）为目标版本
+  - 启动全书逐段校对与 man 页全量翻译（工作单见 `script/校对工作单.md`）
 - 2026.3.14
   - 新增“ZFS 消息”
   - 新增“用户命令（User Commands (1)）”
