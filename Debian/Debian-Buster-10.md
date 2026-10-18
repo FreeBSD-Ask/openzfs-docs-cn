@@ -59,9 +59,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    **提示：** 你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后在主机上使用 `ssh user@IP` 进行连接。
 4. 禁用自动挂载：
-   如果磁盘之前被使用过（在相同偏移处存在分区），在未禁用的情况下，之前的文件系统（例如 ESP）可能会被自动挂载：
+   如果磁盘之前被使用过（在相同偏移处存在分区），在未禁用的情况下，之前的文件系统（例如 ESP）会被自动挂载：
 
-   ```
+   ```sh
    gsettings set org.gnome.desktop.media-handling automount false
    ```
 
@@ -82,7 +82,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 手动安装 dkms 依赖只是为了让它来自 buster 而非 buster-backports，这并非关键步骤。
 
-我们需要先构建并加载模块，否则在安装 zfsutils-linux 时，将无法启动 `zfs-mount.service`。
+我们需要先构建并加载模块，否则在安装 zfsutils-linux 时，`zfs-mount.service` [将无法启动](https://github.com/zfsonlinux/zfs/issues/9599)。
 
 
 ## 步骤 2：磁盘格式化
@@ -94,6 +94,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
    在使用 ZFS 时，应始终使用完整的别名 `/dev/disk/by-id/*`。直接使用设备节点 `/dev/sd*` 可能会导致偶发的导入失败，尤其是在拥有多个存储池的系统上。
+
    **提示：**
 
    * `ls -la /dev/disk/by-id` 可列出这些别名。
@@ -112,9 +113,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```sh
    apt install --yes mdadm
 
-   # 查看是否有一到多个 MD 阵列处于活动状态：
+   # 查看是否有一个或多个 MD 阵列处于活动状态：
    cat /proc/mdstat
-   # 如果有，则停止它们（根据需要替换 ``md0``）：
+   # 如果有，则停止它们（根据需要替换 md0）：
    mdadm --stop /dev/md0
 
    # 对于使用整个磁盘的阵列：
@@ -196,7 +197,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 
    你通常不需要为引导池自定义任何选项。
-   GRUB 并不支持所有的 ZFS 存储池功能。参见 `grub-core/fs/zfs/zfs.c` 中的 `spa_feature_names`。这一步为 `/boot` 创建了一个独立的引导池，其功能限制在 GRUB 支持的范围内，从而能让根池使用任意/所有功能。请注意，GRUB 以只读方式打开池，因此所有只读兼容的功能都被 GRUB 视为“支持”。
+
+   GRUB 并不支持所有的 ZFS 存储池特性。参见 [`grub-core/fs/zfs/zfs.c`](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。这一步为 `/boot` 创建了一个独立的引导池，其特性限制在 GRUB 支持的范围内，从而能让根池使用任意/所有特性。请注意，GRUB 以只读方式打开池，因此所有只读兼容的特性都被 GRUB 视为“支持”。
+
    **提示：**
 
    * 如果你要创建 mirror 拓扑，可以使用：
@@ -209,17 +212,16 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
          /dev/disk/by-id/scsi-SATA_disk2-part3
      ```
 
-   * 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，再列出来自其他磁盘的分区。
+   * 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出来自其他磁盘的分区。
    * 存储池名称是任意的。如果更改了名称，必须在后续步骤中保持一致。`bpool` 这一约定源自本教程。
 
-功能说明：
+**特性说明：**
 
-* `allocation_classes` 功能应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在引导池上使用此功能。如果关心加速引导池，更合理的方法是将整个池放在更快的磁盘上，而不是作为特殊 vdev 使用。
-* `log_spacemap` 和 `spacemap_v2` 功能已经经过测试，可安全使用。引导池较小，所以在实际中影响不大。
-* `project_quota` 功能已测试，可安全使用。对于引导池，这个功能几乎不会有实际意义。
-* `resilver_defer` 功能应该安全，但由于引导池足够小，通常不需要启用。
-* `spacemap_v2` 功能已测试，可安全使用。由于引导池较小，因此在实际中影响不大。
-* 作为只读兼容功能，`userobj_accounting` 功能理论上应兼容，但在实际中，GRUB 可能会出现报错“invalid dnode type”。无论如何，这个功能对 `/boot` 并不重要。
+* `allocation_classes` 特性应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在引导池上使用此特性。如果关心加速引导池，更合理的方法是将整个池放在更快的磁盘上，而不是作为特殊 vdev 使用。
+* `log_spacemap` 和 `spacemap_v2` 特性已经经过测试，可安全使用。引导池较小，所以在实际中影响不大。
+* `project_quota` 特性已测试，可安全使用。对于引导池，这个特性几乎不会有实际意义。
+* `resilver_defer` 特性应该安全，但由于引导池足够小，通常不需要启用。
+* 作为只读兼容特性，`userobj_accounting` 特性理论上应兼容，但在实际中，GRUB 可能会出现报错“invalid dnode type”。无论如何，这个特性对 `/boot` 并不重要。
 
 
 5. 创建根存储池：

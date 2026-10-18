@@ -53,7 +53,7 @@ vmap allocation for size 4198400 failed: use vmalloc=<size> to increase size.
 
 ## 在创建池时选择 `/dev/` 的名称（面向 Linux）
 
-在创建 ZFS 池时，可以指定不同的 `/dev/` 名称。每种方案都有其优缺点，如何正确选择适合你的 ZFS 存储池，实际上取决于你的需求。对于开发和测试，使用 `/dev/sdX` 式命名方式既快速又简单。普通的家用服务器可能更偏好使用 `/dev/disk/by-id/` 这种命名方式，能获得更好的简洁性和可读性。而那些拥有多个控制器、机箱和交换机的超大型配置，则很可能更倾向于使用 `/dev/disk/by-vdev` 这种命名方式，可获得最大的控制能力。但最终，如何标识你的磁盘，你说了算。
+在创建 ZFS 池时，可以指定不同的 `/dev/` 名称。每种方案都有其优缺点，为你的 ZFS 存储池做出正确的选择实际上取决于你的需求。对于开发和测试，使用 `/dev/sdX` 式命名方式既快速又简单。普通的家用服务器可能更偏好使用 `/dev/disk/by-id/` 这种命名方式，能获得更好的简洁性和可读性。而那些拥有多个控制器、机箱和交换机的超大型配置，则很可能更倾向于使用 `/dev/disk/by-vdev` 这种命名方式，可获得最大的控制能力。但最终，如何标识你的磁盘，你说了算。
 
 * **/dev/sdX、/dev/hdX** 最适合用于开发、测试池
   * 概要：顶层的 `/dev/` 名称是为了与其他 ZFS 实现保持一致而采用的默认方式。它们在所有 Linux 发行版中都可用，并且被广泛使用。然而，由于它们不是持久的，因此只应在开发、测试池中与 ZFS 一起使用。
@@ -61,7 +61,7 @@ vmap allocation for size 4198400 failed: use vmalloc=<size> to increase size.
   * 缺点：这些名称不是固定的，会根据磁盘的检测顺序而变化。在系统添加或移除硬件后很容易导致名称的改变。之后你需要删除 `zpool.cache` 文件，再使用新的名称重新导入池。
   * 示例：`zpool create tank sda sdb`
 * **/dev/disk/by-id/** 最适合用于小型池（少于 10 块磁盘）
-  * 概要：该目录包含具有更高可读性的人类可读磁盘标识符。磁盘标识符通常由接口类型、厂商名称、型号、设备序列号以及分区号组成。这种方式更加用户友好，因为它简化了对特定磁盘的识别。
+  * 概要：该目录包含人类可读性更高的磁盘标识符。磁盘标识符通常由接口类型、厂商名称、型号、设备序列号以及分区号组成。这种方式更加用户友好，因为它简化了对特定磁盘的识别。
   * 优点：非常适合只有单一磁盘控制器的小型系统。由于这些名称是固定的且肯定不会改变，磁盘如何连接到系统并不重要。你可以把它们全部取出，在桌面上随意打乱，再以任意方式装回系统，仍然可以正确地自动导入池。
   * 缺点：基于物理位置来配置冗余组会变得困难且容易出错。在许多个人虚拟机环境中并不可靠，因为相关软件默认不会生成固定且唯一的名称。
   * 示例：`zpool create tank scsi-SATA_Hitachi_HTS7220071201DP1D10DGG6HMRP`
@@ -71,7 +71,7 @@ vmap allocation for size 4198400 failed: use vmalloc=<size> to increase size.
   * 缺点：这些名称很长、很繁琐，并且对人工管理来说较为困难。
   * 示例：`zpool create tank pci-0000:00:1f.2-scsi-0:0:0:0 pci-0000:00:1f.2-scsi-1:0:0:0`
 * **/dev/disk/by-vdev/** 最适合用于大型池（超过 10 块磁盘）
-  * 概要：这种方式通过配置文件 `/etc/zfs/vdev_id.conf` 提供对设备命名的管理控制。可以自动为 JBOD 中磁盘生成名称，来反映其通过机箱 ID 和插槽编号确定的物理位置。也可以基于现有的 udev 设备链接手动分配名称，如 `/dev/disk/by-path` 或 `/dev/disk/by-id` 中的链接。这能让你为磁盘选择自己独特且有意义的名称。这些名称会在所有 zfs 工具中显示，从而有助于理清大型复杂池的管理。更多细节请参见 `vdev_id` 和 `vdev_id.conf` 的 man 页面。
+  * 概要：这种方式通过配置文件 `/etc/zfs/vdev_id.conf` 提供对设备命名的管理控制。可以自动为 JBOD 中的磁盘生成名称，来反映其通过机箱 ID 和插槽编号确定的物理位置。也可以基于现有的 udev 设备链接手动分配名称，如 `/dev/disk/by-path` 或 `/dev/disk/by-id` 中的链接。这能让你为磁盘选择自己独特且有意义的名称。这些名称会在所有 zfs 工具中显示，从而有助于理清大型复杂池的管理。更多细节请参见 `vdev_id` 和 `vdev_id.conf` 的 man 页面。
   * 优点：这种方式的主要优点是能让你选择有意义且可读的人类名称。除此之外，其优势取决于所采用的命名方法。如果名称来源于物理路径，则可以实现 `/dev/disk/by-path` 的优势；另一方面，如果基于驱动器标识符或 WWN 别名命名，则具有与 `/dev/disk/by-id` 相同的优势。
   * 缺点：此方法依赖于为你的系统正确配置 `/etc/zfs/vdev_id.conf` 文件。要配置此文件，请参阅章节 [设置 /etc/zfs/vdev_id.conf 文件](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#setting-up-the-etc-zfs-vdev-id-conf-file)。与优点一样，缺点也可能取决于所采用的命名方法，并可能涉及 `/dev/disk/by-id` 或 `/dev/disk/by-path` 的局限性。
   * 示例：`zpool create tank mirror A1 B1 mirror A2 B2`
@@ -243,11 +243,11 @@ CEPH filestore 后端高度依赖 xattrs，为获得最佳性能，所有 CEPH �
 
 ### CEPH 配置（`ceph.conf`）
 
-此外，CEPH 会根据底层文件系统内部设置各种值以处理 xattrs。由于 CEPH 官方仅支持/检测 XFS 和 BTRFS，对于其他所有文件系统，它将回退到相对 [有限的“安全”值](https://github.com/ceph/ceph/blob/4fe7e2a458a1521839bc390c2e3233dd809ec3ac/src/common/config_opts.h#L1125-L1148)。在新版本中，对较大 xattrs 的需求甚至会阻止 OSD 启动。
+此外，CEPH 会针对底层文件系统在内部设置各种值以处理 xattrs。由于 CEPH 官方仅支持/检测 XFS 和 BTRFS，对于其他所有文件系统，它将回退到相对 [有限的“安全”值](https://github.com/ceph/ceph/blob/4fe7e2a458a1521839bc390c2e3233dd809ec3ac/src/common/config_opts.h#L1125-L1148)。在新版本中，对较大 xattrs 的需求甚至会阻止 OSD 启动。
 
 官方推荐的解决方法（[见此处](https://tracker.ceph.com/issues/16187#note-3)）有一些严重缺点，而且它专门面向 xattr 支持“有限”的文件系统（如 ext4）。
 
-ZFS 内部对 xattrs 长度没有限制，因此我们可以将其视作 CEPH 对待 XFS 的方式。我们可以设置覆盖值，将 3 个内部值设为与 XFS 使用的值相同（[见此处](https://github.com/ceph/ceph/blob/9b317f7322848802b3aab9fec3def81dddd4a49b/src/os/filestore/FileStore.cc#L5714-L5737) 和 [此处](https://github.com/ceph/ceph/blob/4fe7e2a458a1521839bc390c2e3233dd809ec3ac/src/common/config_opts.h#L1125-L1148)），从而能够正常使用而不受“官方”解决方法的严重限制。
+ZFS 内部对 xattrs 长度没有限制，因此我们可以像 CEPH 对待 XFS 那样来处理。我们可以设置覆盖值，将 3 个内部值设为与 XFS 使用的值相同（[见此处](https://github.com/ceph/ceph/blob/9b317f7322848802b3aab9fec3def81dddd4a49b/src/os/filestore/FileStore.cc#L5714-L5737) 和 [此处](https://github.com/ceph/ceph/blob/4fe7e2a458a1521839bc390c2e3233dd809ec3ac/src/common/config_opts.h#L1125-L1148)），从而能够正常使用而不受“官方”解决方法的严重限制。
 
 ```ini
 [osd]
@@ -258,7 +258,7 @@ filestore_max_xattr_value_size = 65536
 
 ### 其他通用指南
 
-* 使用独立的日志设备。尽可能不要将 CEPH 日志与 ZFS 数据集放在同一设备上，否则将很快造成严重的碎片问题，更不用说在产生碎片之前，性能就已经非常差（CEPH 日志每次写入都会执行 dsync）。
+* 使用独立的日志设备。尽可能不要将 CEPH 日志与 ZFS 数据集放在同一设备上，否则将很快造成严重的碎片问题，更不用说在产生碎片之前性能就已经非常差（CEPH 日志每次写入都会执行 dsync）。
 * 使用 SLOG 设备，即使已经有独立的 CEPH 日志设备。对于某些工作负载，跳过 SLOG 并设置 `logbias=throughput` 可能是可接受的。
 * 使用高质量的 SLOG/CEPH 日志设备。消费级 SSD，甚至 NVMe 都不适用（例如 Samsung 830、840、850 等），原因五花八门。在此类使用下，CEPH 会很快损坏它们，而且性能也相当低。通常推荐的设备有 [Intel DC S3610, S3700, S3710, P3600, P3700] 或 [Samsung SM853, SM863]，或更好的设备。
 * 如果使用高质量 SSD 或 NVMe 设备（如上所述），可以在单个设备上共享 SLOG 和 CEPH 日志，并取得良好效果。曾有报告称，4 块 HDD 对 1 块 SSD（Intel DC S3710 200GB），每个 SSD 分区（记得对齐！）划分为 4×10GB（用于 ZIL/SLOG）+ 4×20GB（用于 CEPH 日志）效果良好。
@@ -304,7 +304,7 @@ $ zpool add -o ashift=12 tank mirror sdc sdd
 
 在创建快照前执行 trim，可确保快照占用最小空间。
 
-在 Linux 上，通过在 `/etc/fstab` 中为挂载的 ZVOL 添加 `discard` 选项，可以有效地让内核持续执行 trim 命令，无需按需运行 fstrim。
+在 Linux 上，通过在 `/etc/fstab` 中为挂载的 ZVOL 添加 `discard` 选项，可以有效地让内核持续执行 trim 命令，无需按需运行 `fstrim`。
 
 ## 在 Linux 上将 ZVOL 用作交换设备
 
@@ -332,7 +332,7 @@ $ zfs create -V 4G -b $(getconf PAGESIZE) \
 
 * 在 `grub.conf` 中为 Dom0 分配足够的内存。
   * `dom0_mem=16384M,max:16384M`
-* 在 `/etc/modprobe.d/zfs.conf` 中为 ZFS 分配不超过 Dom0 内存 30-40% 的内存。
+* 在 `/etc/modprobe.d/zfs.conf` 中最多为 ZFS 分配 Dom0 内存的 30-40%。
   * `options zfs zfs_arc_max=6442450944`
 * 在 `/etc/xen/xl.conf` 中禁用 Xen 的自动气球功能。
 * 注意 Xen 的相关 bug，例如与气球功能相关的 [这个问题](https://github.com/zfsonlinux/zfs/issues/1067)。

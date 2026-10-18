@@ -2,15 +2,15 @@
 
 **ZFSBootMenu**
 
-[ZFSBootMenu](https://zfsbootmenu.org/) 是一种替代的引导加载器，不存在上述限制，并且支持启动环境。如果计划使用 ZBM，请不要参照本文，因为磁盘布局不兼容。有关安装详情，请参考其官方网站。
+[ZFSBootMenu](https://zfsbootmenu.org/) 是一种不受此类限制的替代引导加载器，还支持启动环境。如果你计划使用 ZBM，请勿参照本页面上的说明，因为两者的布局并不兼容。安装详情请参考其官方网站。
 
 **自定义**
 
 除非另有说明，否则不建议在重启前自定义系统配置。
 
-**仅使用经过充分测试的 ZFS 存储池功能**
+**仅使用经过充分测试的存储池特性**
 
-应仅使用经过充分测试的 ZFS 存储池功能。如果数据完整性至关重要，应避免使用新功能。参见，例如 [此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
+你应当只使用经过充分测试的存储池特性。如果数据完整性至关重要，请避免使用新特性。例如，可参见 [此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
 
 **仅支持 UEFI**
 
@@ -96,7 +96,8 @@
     * 对于 QEMU：使用 `-drive format=raw,file=disk2.img,serial=AaBb`
     * 对于 libvirt：编辑 domain XML
       参见 [示例页面](https://bugzilla.redhat.com/show_bug.cgi?id=1245013)。
-      声明磁盘数组
+
+    声明磁盘数组
 
     ```sh
     DISK='/dev/disk/by-id/ata-FOO /dev/disk/by-id/nvme-BAR'
@@ -128,13 +129,13 @@
     RESERVE=1
     ```
 
-16. 从 live 系统安装 ZFS 支持
+15. 从 live 系统安装 ZFS 支持
 
     ```sh
     apk add zfs
     ```
 
-17. 安装分区工具
+16. 安装分区工具
 
     ```sh
     apk add parted e2fsprogs cryptsetup util-linux
@@ -167,7 +168,7 @@
    done
    ```
 
-3. 为本次安装设置临时加密 swap（仅用于安装）。当可用内存较小时非常有用：
+2. 仅为本次安装设置临时加密 swap。这在可用内存较小时非常有用：
 
    ```sh
    for i in ${DISK}; do
@@ -177,13 +178,13 @@
    done
    ```
 
-4. 加载 ZFS 内核模块
+3. 加载 ZFS 内核模块
 
    ```sh
    modprobe zfs
    ```
 
-5. 创建根池
+4. 创建根存储池
 
    * 未加密示例：
 
@@ -207,7 +208,7 @@
           done)
      ```
 
-6. 创建根系统容器
+5. 创建根系统容器
 
    ```sh
    # dracut 要求系统根数据集具有非 legacy mountpoint
@@ -222,7 +223,7 @@
    mount -o X-mount.mkdir -t zfs rpool/home "${MNT}"/home
    ```
 
-7. 格式化并挂载 ESP。只使用其中一个作为 /boot，其余可稍后设置镜像：
+6. 格式化并挂载 ESP。仅使用其中一个作为 `/boot`，之后需要设置镜像：
 
    ```sh
    for i in ${DISK}; do
