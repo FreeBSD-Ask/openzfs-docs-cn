@@ -90,9 +90,11 @@
 
 * 用户命令（User Commands (1)）
   * [cstyle(1)](man/1/cstyle.1.md)
+  * [dbufstat(1)](man/1/dbufstat.1.md)
   * [raidz_test(1)](man/1/raidz_test.1.md)
   * [test-runner(1)](man/1/test-runner.1.md)
   * [zarcstat(1)](man/1/zarcstat.1.md)
+  * [zarcsummary(1)](man/1/zarcsummary.1.md)
   * [zhack(1)](man/1/zhack.1.md)
   * [zilstat(1)](man/1/zilstat.1.md)
   * [ztest(1)](man/1/ztest.1.md)
@@ -100,6 +102,8 @@
 * 设备及特殊文件（Devices and Special Files (4)）
   * [spl(4)](man/4/spl.4.md)
   * [zfs(4)](man/4/zfs.4.md)
+* 文件格式（File Formats (5)）
+  * [vdev_id.conf(5)](man/5/vdev_id.conf.5.md)
 
 ## ZFS 消息
 
