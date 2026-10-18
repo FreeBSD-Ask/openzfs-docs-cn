@@ -8,9 +8,9 @@
 | :------------------: | :---------------------: | :-----------------------------: |
 | 如何在你挚爱的平台上使用 OpenZFS         | 关于项目以及贡献方法           | 讨论 OpenZFS 实现的技术文档               |
 
-- 错误追踪：<https://github.com/openzfs/zfs/issues>
-- 发行产物：<https://github.com/openzfs/zfs/releases>
-- 路线图：<https://github.com/openzfs/zfs/milestones>
+* 错误追踪：<https://github.com/openzfs/zfs/issues>
+* 发行产物：<https://github.com/openzfs/zfs/releases>
+* 路线图：<https://github.com/openzfs/zfs/milestones>
 
 ## FreeBSD 中文社区项目：OpenZFS 中文文档
 

@@ -1,6 +1,6 @@
 # 构建以 ZFS 为根文件系统的 Gentoo
 
-- 原文地址：[wiki/ZFS](https://wiki.gentoo.org/wiki/ZFS)，版本 2026 年 1 月 12 日 (星期一) 07:58。
+* 原文地址：[wiki/ZFS](https://wiki.gentoo.org/wiki/ZFS)，版本 2026 年 1 月 12 日 (星期一) 07:58。
 
 本文重点介绍在 Gentoo 上将 ZFS 用作根文件系统，并设计为配合手册使用。随着时间推移，将会加入更多高级配置，请查看 TODO 部分，以了解是否有可添加的内容来改进本文。
 
@@ -328,9 +328,9 @@ emerge sys-boot/zfsbootmenu
 
 之后，需要调整 ZFSBootMenu 配置以：
 
-- 启用镜像自动管理：`ManageImages:true`
-- 指向 EFI 挂载点：`BootMountPoint: /efi`
-- 启用 EFI 二进制生成：EFI 部分 `Enabled: true`
+* 启用镜像自动管理：`ManageImages:true`
+* 指向 EFI 挂载点：`BootMountPoint: /efi`
+* 启用 EFI 二进制生成：EFI 部分 `Enabled: true`
 
 ZFSBootMenu 配置文件 **/etc/zfsbootmenu/config.yaml**
 
@@ -464,6 +464,6 @@ reboot
 
 需要添加的部分以完善指南：
 
-- 添加 LUKS 加密
-- 添加备用引导加载器说明
-- 添加通过 `generate-zbm` 安装 ZFSBootMenu 的说明（可能需要使用 GURU）
+* 添加 LUKS 加密
+* 添加备用引导加载器说明
+* 添加通过 `generate-zbm` 安装 ZFSBootMenu 的说明（可能需要使用 GURU）

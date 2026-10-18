@@ -1,41 +1,41 @@
 # 编辑日志
 
-- 2026.10.18
-  - 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
-  - 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置
-  - 新增术语表 `shu-yu-biao.md` 并收录进目录，作为全书术语唯一权威标准
-  - 确立 man 页版本基线：既有 10 页基于 openzfs/zfs@b481a8bb（2026-03-13）；本次校对与全量翻译以 zfs master（7c3d85aa，2026-10）为目标版本
-  - 启动全书逐段校对与 man 页全量翻译（工作单见 `script/校对工作单.md`）
-- 2026.3.14
-  - 新增“ZFS 消息”
-  - 新增“用户命令（User Commands (1)）”
-  - 当前版本 <https://github.com/openzfs/openzfs-docs/commit/259438bd5f12278765eed197237be9d6ab9d5d27>
-- 2026.2.13
-  - 新增“OpenZFS 事务延迟”
-  - 新增“ZFS I/O（ZIO）调度器”
-  - 新增“Async Write I/O 调度”
-  - 新增“基础概念”
-  - 当前版本 [93ac90cde77c8bd1ac92fb67c075d008110ddb36](https://github.com/openzfs/openzfs-docs/commit/93ac90cde77c8bd1ac92fb67c075d008110ddb36)
-- 2026.2.5
-  - 新增“硬件”
-  - 新增“模块参数”（为空，不具有翻译意义）
-  - 新增“工作负载调优”
-- 2026.1.28
-  - 新增“开发资源”
-- 2026.1.26
-  - 新增“Ubuntu”
-  - 新增“OpenZFS 系统管理”
-- 2026.1.25
-  - 新增“NixOS”
-  - 新增“openSUSE”
-  - 新增“RHEL”
-  - 新增“Slackware”
-- 2026.1.24
-  - 新增“Debian”
-  - 新增“Fedora”
-  - 新增“FreeBSD”
-  - 新增“Gentoo”
-- 2026.1.23
-  - 项目开始，当前版本 [5ad3a5ff6227a499f576d886592692fd59b7d6c5](https://github.com/openzfs/openzfs-docs/commit/5ad3a5ff6227a499f576d886592692fd59b7d6c5)
-  - 新增“Alpine Linux”
-  - 新增“Arch Linux”
+* 2026.10.18
+  * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
+  * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置
+  * 新增术语表 `shu-yu-biao.md` 并收录进目录，作为全书术语唯一权威标准
+  * 确立 man 页版本基线：既有 10 页基于 openzfs/zfs@b481a8bb（2026-03-13）；本次校对与全量翻译以 zfs master（7c3d85aa，2026-10）为目标版本
+  * 启动全书逐段校对与 man 页全量翻译（工作单见 `script/校对工作单.md`）
+* 2026.3.14
+  * 新增“ZFS 消息”
+  * 新增“用户命令（User Commands (1)）”
+  * 当前版本 <https://github.com/openzfs/openzfs-docs/commit/259438bd5f12278765eed197237be9d6ab9d5d27>
+* 2026.2.13
+  * 新增“OpenZFS 事务延迟”
+  * 新增“ZFS I/O（ZIO）调度器”
+  * 新增“Async Write I/O 调度”
+  * 新增“基础概念”
+  * 当前版本 [93ac90cde77c8bd1ac92fb67c075d008110ddb36](https://github.com/openzfs/openzfs-docs/commit/93ac90cde77c8bd1ac92fb67c075d008110ddb36)
+* 2026.2.5
+  * 新增“硬件”
+  * 新增“模块参数”（为空，不具有翻译意义）
+  * 新增“工作负载调优”
+* 2026.1.28
+  * 新增“开发资源”
+* 2026.1.26
+  * 新增“Ubuntu”
+  * 新增“OpenZFS 系统管理”
+* 2026.1.25
+  * 新增“NixOS”
+  * 新增“openSUSE”
+  * 新增“RHEL”
+  * 新增“Slackware”
+* 2026.1.24
+  * 新增“Debian”
+  * 新增“Fedora”
+  * 新增“FreeBSD”
+  * 新增“Gentoo”
+* 2026.1.23
+  * 项目开始，当前版本 [5ad3a5ff6227a499f576d886592692fd59b7d6c5](https://github.com/openzfs/openzfs-docs/commit/5ad3a5ff6227a499f576d886592692fd59b7d6c5)
+  * 新增“Alpine Linux”
+  * 新增“Arch Linux”
