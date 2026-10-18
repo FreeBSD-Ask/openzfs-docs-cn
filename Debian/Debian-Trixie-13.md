@@ -987,7 +987,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    >**注意**：
    >
-   >如果出现报错 `osprober`，可忽略。
+   >如果存在来自 `osprober` 的报错，请忽略。
 
 6. 可选：仅针对 LUKS 安装，备份 LUKS 头：
 
@@ -996,7 +996,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
        --header-backup-file luks1-header.dat
    ```
 
-   将备份妥善保存（例如存储在云端）。它受你的 LUKS 密码保护，但你可能想使用额外的加密。
+   将备份妥善保存（例如存储在云端）。它受你的 LUKS 口令短语保护，但你可能想使用额外的加密。
 
    >**提示**：
    >
@@ -1006,7 +1006,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 ### 使用 Live CD 进行救援
 
-按照 [步骤 1：准备安装环境](https://openzfs.github.io/openzfs-docs/Getting%20Started/Debian/Debian%20Bookworm%20Root%20on%20ZFS.html#step-1-prepare-the-install-environment) 操作。
+按照 [步骤 1：准备安装环境](https://openzfs.github.io/openzfs-docs/Getting%20Started/Debian/Debian%20Trixie%20Root%20on%20ZFS.html#step-1-prepare-the-install-environment) 操作。
 
 对于 LUKS，首先解锁磁盘：
 
@@ -1041,7 +1041,7 @@ mount /boot/efi
 mount -a
 ```
 
-在完成所需修复后，清理挂载：
+在完成所需修复后，执行清理：
 
 ```sh
 exit
@@ -1065,13 +1065,13 @@ update-initramfs -c -k all
 RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 ```
 
-请升级或降级 Areca 驱动。在出现此错误的设备上，ZoL 可能不稳定。
+请升级或降级 Areca 驱动。在出现此错误信息的系统上，ZoL 不稳定。
 
 ### MPT2SAS 控制器
 
 本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
-基本问题是，这类控制器上的磁盘在 Linux 内核启动后才可见，而 ZoL 不会热插入池成员。详细说明见 <https://github.com/openzfs/zfs/issues/330>。
+基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/openzfs/zfs/issues/330>。
 
 大多数 LSI 卡可与 ZoL 完全兼容。如果你的 LSI 卡出现了上述问题，可在文件 `/etc/default/zfs` 中设置：
 

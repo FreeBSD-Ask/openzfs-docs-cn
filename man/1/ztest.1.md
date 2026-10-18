@@ -1,7 +1,10 @@
 # ztest(1)
 
+## 名称
 
 `ztest` — 由 ZFS 开发者编写的 ZFS 单元测试工具
+
+## 概述
 
 ```sh
 ztest [-VEG] [-v 每个 vdev 的数量] [-s 每个 vdev 的大小] [-a 对齐偏移] [-m 镜像副本数] [-r raidz 磁盘数 / draid 磁盘数] [-R RAID 校验数] [-K RAID 类型] [-D draid 数据数] [-S draid 备用盘数] [-C vdev 类状态] [-d 数据集] [-t 线程数] [-g 聚合块阈值] [-i 初始化池次数] [-k 杀死比例] [-p 池名] [-T 时间] [-z ZIL 失败率]
@@ -49,7 +52,7 @@ raidz/draid 磁盘数量（raidz 默认 `4`，draid 默认 `16`）
 
 ### `-R`、`--raid-parity=`
 
-RAID 奇偶校验数量（raidz & draid）（默认值: 1）
+RAID 奇偶校验数量（raidz & draid）（默认值: `1`）
 
 ### `-K`、`--raid-kind=`
 
@@ -93,7 +96,7 @@ vdev 文件目录（默认值: `/tmp`）
 
 ### `-M`、`--multi-host`
 
-多主机模式；模拟在远程主机导入池
+多主机模式；创建存储池时启用 `multihost` 属性，使后续导入会执行 MMP 活动检查。需要一个非零的 hostid，可通过 `ZFS_HOSTID` 提供。
 
 ### `-E`、`--use-existing-pool`
 
@@ -113,7 +116,7 @@ vdev 文件目录（默认值: `/tmp`）
 
 ### `-B`、`--alt-ztest=`
 
-`ztest` 的备用 （“兼容”）路径，用于初始化池，并在随机的一半时间内执行测试。parallel 库目录将被添加到 `LD_LIBRARY_PATH` 前面；例如，指定 `-B ./chroots/lenny/usr/bin/ztest` 时，会加载 `./chroots/lenny/usr/lib`。
+`ztest` 的备用（“较旧”）路径，用于驱动测试：它会被用来初始化池，并在随机的一半时间内执行测试。与之并列的 `lib` 目录会被添加到 `LD_LIBRARY_PATH` 前面；例如，指定 `-B ./chroots/lenny/usr/bin/ztest` 时，会加载 `./chroots/lenny/usr/lib`。
 
 ### `-C`、`--vdev-class-state=`
 
@@ -126,6 +129,10 @@ vdev 分配类状态：on | off | random（默认值: random）
 ### `-G`、`--dump-debug`
 
 在错误退出前转储 zfs_dbgmsg 缓冲区
+
+### `-J`、`--fishing=`
+
+指定一个由 64 个十六进制数字组成的种子，用于复现相同的随机数序列；或传入单个 0 以禁用此功能。
 
 ### `-V`、`--verbose`
 
@@ -163,7 +170,7 @@ vdev 分配类状态：on | off | random（默认值: random）
 
 ### `ZFS_STACK_SIZE=堆栈大小`
 
-将默认栈大小限制为 **堆栈大小** 字节，用于检测和调试内核栈溢出。默认值为 *32K*，是 Linux 内核默认栈大小 *16K*  的两倍。实际上，需要将栈大小设置略高一些，因为内核与用户空间的栈使用差异可能导致伪栈溢出（尤其在启用调试时）。指定值会向上取整至 `PTHREAD_STACK_MIN` 的下限，这是用户空间执行 NULL 过程所需的最小栈大小。
+将默认栈大小限制为 **堆栈大小** 字节，用于检测和调试内核栈溢出。默认值为 *32K*，是 Linux 内核默认栈大小 *16K* 的两倍。实际上，需要将栈大小设置略高一些，因为内核与用户空间的栈使用差异可能导致伪栈溢出（尤其在启用调试时）。指定值会向上取整至 `PTHREAD_STACK_MIN` 的下限，这是用户空间执行 NULL 过程所需的最小栈大小。
 
 默认情况下，栈大小限制为 *256K*。
 
@@ -171,4 +178,4 @@ vdev 分配类状态：on | off | random（默认值: random）
 
 zdb(1)、zfs(1)、zpool(1)、spl(4)
 
-2025 年 7 月 12 日 Debian
+2026 年 7 月 5 日 Debian

@@ -3,19 +3,19 @@
 
 ## 注意事项
 
-* 另一种在 Fedora Linux 上安装使用 ZFS 作为根文件系统的方法是使用非官方脚本 [fedora-on-zfs](https://github.com/gregory-lee-bartholomew/fedora-on-zfs)，该脚本更加自动化，能生成更接近官方 Fedora 配置的安装。fedora-on-zfs 脚本与下文方法的区别在于，它使用 Fedora 官方的 kickstart 文件之一（如 `fedora-disk-minimal.ks`、`fedora-disk-workstation.ks`、`fedora-disk-kde.ks` 等）指导安装，同时进行少量修改来增补 ZFS 功能。如有 bug，请提交至 Greg 的 GitHub 仓库 fedora-on-zfs。
+* 作为下文在 ZFS 根文件系统上安装 Fedora Linux 方法的替代方案，你可以使用非官方脚本 [fedora-on-zfs](https://github.com/gregory-lee-bartholomew/fedora-on-zfs)，该脚本更加自动化，能生成更接近官方 Fedora 配置的安装。fedora-on-zfs 脚本与下文方法的区别在于，它使用 Fedora 官方的 kickstart 文件之一（如 `fedora-disk-minimal.ks`、`fedora-disk-workstation.ks`、`fedora-disk-kde.ks` 等）来指导安装，但会进行少量覆盖性修改以添加 ZFS 功能。如有 bug，请提交至 Greg 的 fedora-on-zfs GitHub 仓库。
 
 **ZFSBootMenu**
 
-[ZFSBootMenu](https://zfsbootmenu.org/) 是一种替代引导加载程序，不受上述限制，并支持启动环境。如果计划使用 ZFSBootMenu，请勿参照本文，因为布局不兼容。安装详情请参考其官方网站。
+[ZFSBootMenu](https://zfsbootmenu.org/) 是一种不受此类限制的替代引导加载程序，并支持启动环境。如果你计划使用 ZFSBootMenu，请勿参照本页面上的说明，因为两者的布局并不兼容。安装详情请参考其官方网站。
 
 **自定义配置**
 
 除非另有说明，否则不建议在重启前自定义系统配置。
 
-**仅使用经过充分测试的池功能**
+**仅使用经过充分测试的存储池特性**
 
-应且只应使用经过充分测试的池功能。如果数据完整性至关重要，请避免使用新功能。参考示例：[此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
+你应当只使用经过充分测试的存储池特性。如果数据完整性至关重要，请避免使用新特性。例如，可参见 [此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
 
 **仅支持 UEFI**
 
@@ -25,7 +25,8 @@
 
 1. 禁用安全启动。在启用安全启动时无法加载 ZFS 模块。
 2. 由于最新 Live CD 的内核可能与 ZFS 不兼容，我们将使用默认自带 ZFS 的 Alpine Linux Extended。
-   下载最新的 [Alpine Linux Extended live 镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，并验证 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，然后从该镜像启动。
+
+   下载最新的 extended 变体 [Alpine Linux Live 镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，并验证 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，然后从该镜像启动。
 
    ```sh
    gpg --auto-key-retrieve --keyserver hkps://keyserver.ubuntu.com --verify alpine-extended-*.asc
@@ -47,8 +48,7 @@
    manual netconfig:  n
    ```
 
-5. 如果使用无线网络且未显示，请参阅 [Alpine Linux wiki](https://wiki.alpinelinux.org/wiki/Wi-Fi#wpa_supplicant) 获取详细信息。
-   可使用 `apk add wpa_supplicant` 安装 `wpa_supplicant`，无需网络连接。
+5. 如果使用无线网络但网络未显示在列表中，请参阅 [Alpine Linux wiki](https://wiki.alpinelinux.org/wiki/Wi-Fi#wpa_supplicant) 获取详细信息。可使用 `apk add wpa_supplicant` 安装 `wpa_supplicant`，无需网络连接。
 6. 配置 SSH 服务器：
 
    ```ini
@@ -87,20 +87,21 @@
     ```
 
 12. 目标磁盘
+
     列出可用磁盘：
 
     ```sh
     find /dev/disk/by-id/
     ```
 
-    如果使用 virtio 作为磁盘总线，请关闭虚拟机并为磁盘设置序列号。
-    对于 QEMU，使用：
+    如果使用 virtio 作为磁盘总线，请关闭虚拟机并为磁盘设置序列号。对于 QEMU，使用：
 
     ```sh
     -drive format=raw,file=disk2.img,serial=AaBb
     ```
 
     对于 libvirt，编辑 domain XML。示例请参见 [此页面](https://bugzilla.redhat.com/show_bug.cgi?id=1245013)。
+
     声明磁盘数组：
 
     ```ini
@@ -120,6 +121,7 @@
     ```
 
 14. 设置分区大小：
+
     设置交换分区大小（GB），如果不希望占用过多空间，可设为 1：
 
     ```ini
@@ -132,7 +134,7 @@
     RESERVE=1
     ```
 
-15. 从 Live 镜像安装 ZFS 支持：
+15. 从 Live 安装介质安装 ZFS 支持：
 
     ```ini
     apk add zfs
@@ -174,7 +176,7 @@
    done
    ```
 
-2. 为本次安装设置临时的加密交换分区（仅本次使用）。如果可用内存容量较小，此操作非常有用：
+2. 仅为本次安装设置临时加密 swap。当可用内存较小时，这很有用：
 
    ```bash
    for i in ${DISK}; do
@@ -190,9 +192,9 @@
    modprobe zfs
    ```
 
-4. 创建根池
+4. 创建根存储池
 
-   * 不使用加密的示例：
+   * 未加密：
 
      ```bash
      # shellcheck disable=SC2046
@@ -328,7 +330,7 @@
 
    ```bash
    # 这是第三方仓库！
-   # 我们已经警告过你了！
+   # 你已经被警告过了！
    #
    # 从以下地址选择内核：
    # https://copr.fedorainfracloud.org/coprs/kwizart/
@@ -450,7 +452,7 @@
    zfs snapshot -r rpool@initial-installation
    ```
 
-5. 导出所有池：
+5. 导出所有存储池：
 
    ```bash
    zpool export -a

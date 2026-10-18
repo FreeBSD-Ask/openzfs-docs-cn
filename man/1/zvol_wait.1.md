@@ -2,12 +2,12 @@
 
 ## 名称
 
-`zvol_wait` — 等待 ZFS 卷的设备节点在 `/dev` 中出现
+`zvol_wait` — 等待 ZFS 卷的链接在 `/dev` 中出现
 
 ## 概述
 
 ```sh
-zvol_wait	
+zvol_wait
 ```
 
 ## 说明

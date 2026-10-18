@@ -221,11 +221,15 @@ SLOG 总效率百分比
 
 ### FreeBSD
 
-通过 `sysctl kstat.zfs` 读取统计信息。
+通过 sysctl(8) 从 `kstat.zfs` 树中读取统计信息。
 
 ## 参考文献
 
 zarcstat(1)、zpool-status(8)
+
+## 作者
+
+本手册页由 Christos Longros `<chris.longros@gmail.com>` 编写。
 
 
 2026 年 3 月 9 日 Debian
