@@ -104,6 +104,10 @@
   * [zfs(4)](man/4/zfs.4.md)
 * 文件格式（File Formats (5)）
   * [vdev_id.conf(5)](man/5/vdev_id.conf.5.md)
+* 杂项（Miscellaneous (7)）
+  * [zfsconcepts(7)](man/7/zfsconcepts.7.md)
+  * [dracut.zfs(7)](man/7/dracut.zfs.7.md)
+  * [vdevprops(7)](man/7/vdevprops.7.md)
 
 ## ZFS 消息
 
