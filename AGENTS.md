@@ -204,10 +204,10 @@ man 页译自 openzfs/zfs 仓库的 troff 手册页，目标文件为 `man/<节�
 1. **获取上游结构**：`git clone --depth 1 https://github.com/openzfs/openzfs-docs`（或更新已有克隆），列出 `docs/` 下的 rst 文件树；man 页对照 openzfs/zfs 仓库 `man/` 目录。
 2. **对比差异**：将上游 rst 文件树与本地 `SUMMARY.md` 逐条对比，列出新增、删除、移动、改名的页面。已知待同步差异见“版本与同步”一节。
 3. **补译新页面**：
-   * 按命名规则新建 `.md` 文件并翻译，遵循术语对照表，第二人称用"你"，vdev、zvol、scrub 等保留英文
+   * 按命名规则新建 `.md` 文件并翻译，遵循术语对照表，第二人称用“你”，vdev、zvol、scrub 等保留英文
    * 在 `SUMMARY.md` 对应位置插入条目（保持 `* [标题](路径)` 格式，第一行 `# Table of contents` 不动）
    * 页面 H1 交给 CI 同步，不要手写
-   * 在 CHANGELOG.md 记录新增内容，并更新本文件"当前翻译 git 版本"
+   * 在 CHANGELOG.md 记录新增内容，并更新本文件“当前翻译 git 版本”
 4. **处理重组与改名**：上游移动、改名页面时，同步调整本地目录与文件名（用 `git mv` 保留历史），修复所有受影响的相对链接；被上游删除的页面，先在本文件或 CHANGELOG 中记录再决定去留，不要静默删除。
 5. **验证**：
    * 运行 markdownlint 检查（见下节）
