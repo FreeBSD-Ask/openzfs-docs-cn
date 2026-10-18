@@ -661,11 +661,12 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
     **注意：**
 
-    * 转换服务器密钥可以让 Dropbear 使用与 OpenSSH 相同的密钥，从而避免主机密钥不匹配警告。目前，[dropbearconvert 无法识别新的 OpenSSH 私钥格式](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=955384)，因此需要先使用 `ssh-keygen` 将密钥转换为旧的 PEM 格式。使用相同密钥的缺点是 OpenSSH 的密钥会以未加密形式存在于 initramfs 中。
+    * 转换服务器密钥可以让 Dropbear 使用与 OpenSSH 相同的密钥，从而避免主机密钥不匹配警告。目前，[dropbearconvert 无法识别新的 OpenSSH 私钥格式](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=955384)，因此需要先使用 `ssh-keygen` 将密钥转换为旧的 PEM 格式。为 OpenSSH 和 Dropbear 使用相同密钥的缺点是，OpenSSH 的密钥会以未加密的形式存放在 initramfs 的磁盘上。
     * 之后使用该功能时，在系统启动过程中提示输入口令时，以 root 身份通过 SSH 连接到系统。对于 ZFS 原生加密，运行 `zfsunlock`；对于 LUKS，运行 `cryptroot-unlock`。
     * 你也可以在 `authorized_keys` 行前添加 `command="/usr/bin/zfsunlock"` 或 `command="/bin/cryptroot-unlock"` 来强制执行解锁命令。这样解锁命令会自动运行，且只能运行该命令。
 17. 可选（但我们非常推荐）：安装 popcon
-    `popularity-contest` 软件包会报告系统中已安装的软件包列表。显示 ZFS 的使用率可能有助于其在发行版中获得长期关注。
+
+    `popularity-contest` 软件包会报告系统中已安装的软件包列表。表明 ZFS 的受欢迎程度，可能有助于它在发行版中获得长期关注。
 
     ```sh
     apt install --yes popularity-contest
@@ -730,10 +731,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
      ```sh
      grub-install --target=x86_64-efi --efi-directory=/boot/efi \
           --bootloader-id=debian --recheck --no-floppy
-
-     不需要在这里指定磁盘。如果你正在创建 mirror
-     或 raidz 拓扑，额外的磁盘将在后续步骤中处理。
      ```
+
+     这里不必指定磁盘。如果你正在创建 mirror 或 raidz 拓扑，额外的磁盘将在后续步骤中处理。
 
 7. 修复文件系统挂载顺序：
    我们需要启用 `zfs-mount-generator`。这能让 systemd 识别到各个独立的挂载点，这对于诸如 `/var/log` 和 `/var/tmp` 之类的路径非常重要。相应地，`rsyslog.service` 通过 `local-fs.target` 依赖于 `var-log.mount`，而使用 systemd 的 `PrivateTmp` 特性的服务会自动使用 `After=var-tmp.mount`。
@@ -857,7 +857,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 >**注意**：
 >
->在内存压力极高的系统上，无论 swap 空间多寡，使用 zvol 作为 swap 都可能导致系统死锁。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
+>在内存压力极高的系统上，无论还剩多少 swap 空间可用，使用 zvol 作为 swap 都可能导致系统死锁。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
 1. 创建用于 swap 的 zvol：
 
@@ -873,7 +873,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 2. 配置 swap 设备：
    >**注意**：
    >
-   >在配置文件中应始终使用长别名 `/dev/zvol`，绝不可使用短别名 `/dev/zdX`。
+   >在配置文件中应始终使用完整的 `/dev/zvol` 别名，绝不可使用简短的 `/dev/zdX` 设备名。
 
    ```sh
    mkswap -f /dev/zvol/rpool/swap
@@ -881,7 +881,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    echo RESUME=none > /etc/initramfs-tools/conf.d/resume
    ```
 
-   `RESUME=none` 用于禁用休眠恢复。因为在运行恢复脚本时尚未导入 zvol，如果不禁用，启动过程会因为等待 swap zvol 而出现约 30 秒的等待时间。
+   `RESUME=none` 用于禁用从休眠恢复。这之所以必要，是因为恢复脚本运行之时 zvol 尚不存在（此时存储池尚未导入），恢复功能无法生效。若不将其禁用，启动过程会因等待 swap zvol 出现而停滞约 30 秒。
 3. 启用 swap 设备：
 
    ```sh
@@ -962,7 +962,8 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    >**注意**：
    >
-   >如果出现报错 `osprober`，可忽略。
+   >如果存在来自 `osprober` 的报错，请忽略。
+
 6. 可选：仅针对 LUKS 安装，备份 LUKS 头：
 
    ```sh
@@ -970,7 +971,8 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
        --header-backup-file luks1-header.dat
    ```
 
-   将备份妥善保存（例如存储在云端）。它受你的 LUKS 密码保护，但你可能想使用额外的加密。
+   将备份妥善保存（例如存储在云端）。它受你的 LUKS 口令短语保护，但你可能想使用额外的加密。
+
    >**提示**：
    >
    >如果你创建了镜像或 raidz 拓扑，请对每个 LUKS 卷（如 `luks2` 等）重复此操作。
