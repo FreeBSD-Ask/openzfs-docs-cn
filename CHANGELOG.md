@@ -1,5 +1,8 @@
 # 编辑日志
 
+- 2026.10.18
+  - 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
+  - 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置
 - 2026.3.14
   - 新增“ZFS 消息”
   - 新增“用户命令（User Commands (1)）”

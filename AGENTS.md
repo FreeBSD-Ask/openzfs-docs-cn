@@ -1,50 +1,65 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文件为 AI 助手与贡献者提供本仓库的工作指南。
 
 ## 仓库概览
 
-这是 FreeBSD 官方手册（FreeBSD Handbook）的中文翻译项目。基于 GitBook 格式，发布在 <https://handbook.bsdcn.org>。
+这是 OpenZFS 官方文档（OpenZFS Documentation）的中文翻译项目，由 FreeBSD 中文社区维护。基于 GitBook 格式，由 GitBook 平台自动构建和部署，无需本地构建步骤。
 
-源内容为 Markdown 文件，由 GitBook 平台自动构建和部署，无需本地构建步骤。
+* 原项目在线浏览地址：<https://openzfs.github.io/openzfs-docs/index.html>
+* 原项目仓库：<https://github.com/openzfs/openzfs-docs>
+* 本仓库：<https://github.com/FreeBSD-Ask/openzfs-docs-cn>
 
-## 版本与流程
+源内容为 Markdown 文件。注意：**上游 openzfs-docs 实际使用 Sphinx（rst）格式**，源文件位于其 `docs/` 目录下；本仓库将其转写为 GitBook 格式的 Markdown。上游文件与目录名普遍含空格（如 `Basic Concepts`、`Root on ZFS.rst`），但不含英文冒号，Windows 下直接 `git clone` 即可，无需下载 zip 压缩包。
 
-流程：拉取 git 项目（注意，因为部分文件存在英文冒号，在 Windows 下无法拉取，需要下载 zip 压缩包）：https://github.com/freebsd/freebsd-doc
+**man 手册页不在上游 openzfs-docs 仓库中**：`man/` 目录内容译自 openzfs/zfs 仓库（<https://github.com/openzfs/zfs>）的 `man/man1/`、`man/man4/` 等目录（troff 格式手册页）。`msg/` 目录内容译自上游 openzfs-docs 的 `docs/msg/<消息 ID>/index.rst`。
 
-当前翻译 git 版本：f8d86635bc2f2d2706a1f084c0bbc260468e489f
+## 版本与同步
 
-路径：**documentation/content/en/books/handbook**
+上游仓库：<https://github.com/openzfs/openzfs-docs>（分支 master）。
 
-将 **documentation/content/en/books/handbook** 文件夹内的内容完全复制到 en 路径下，然后进行比较翻译。
+当前翻译 git 版本：259438bd5f12278765eed197237be9d6ab9d5d27（CHANGELOG 2026.3.14 条目）。
 
-最后更新本文中的相关信息（如翻译 git 版本）。
+同步上游或新增翻译后，需同步更新 CHANGELOG.md（记录日期、新增内容与上游 commit）及本文件中的"当前翻译 git 版本"。
 
-需要进一步核查时，才参考 <https://docs.freebsd.org/en/books/handbook/book/>。
+### 与上游的已知结构差异（截至 2026-10，待同步）
+
+上游自同步基点以来结构有较大调整，以下内容尚未同步到本仓库：
+
+* 基础概念（Basic Concepts）已重组为五个子板块：写时复制（Copy-on-write）、池结构（Pool Structure：Caching、Changing Pool Layout、Feature Flags、RAIDZ、Special vdev、VDEVs、dRAID Howto）、数据集（Datasets：ACLs、Datasets and Properties、Quotas and Reservations、Snapshots and Clones、ZVOLs）、数据存储（Data Storage：Block Cloning、Checksums、Compression、Deduplication、Encryption）、操作（Operations：Boot Process、Delegated Administration、Scrub and Resilver、Send and Receive、Sharing、TRIM、Troubleshooting）。本地旧版平铺页面（RAIDZ、VDEV、dRAID、Feature-Flags、Checksums、Troubleshooting）对应其中部分新页，需对照重组。
+* Debian 新增页面：Debian GNU Linux initrd documentation。
+* 项目与社区（Project and Community）新增 FAQ hole birth 页面与板块概述页（index）。
+* 开发资源（Developer Resources）新增板块概述页（index）。
+* 上游已移除 System Administration 与 Developer resources 独立页面（本地仍保留译文，待定夺去留）。
+* Gentoo 相关内容上游已改为外链 Gentoo Wiki（<https://wiki.gentoo.org/wiki/ZFS>），不再维护文档页；本地三页为早期版本译文。
+* openzfs/zfs 仓库的 `zfs(8)`、`zpool(8)`、`zfsprops(7)`、`zfsconcepts(7)` 等 man 页尚未翻译（本地仅覆盖 man1、man4 两个节）。
 
 ## 内容架构
 
 ### 核心文件
 
-- **`SUMMARY.md`** — 全书唯一数据源，定义完整目录结构和导航树。GitBook 用它来生成侧边栏。 **第一行 `# Table of contents` 绝对不能变更** ，否则 GitBook 同步失效。
-- **`mu-lu.md`** — 由 `mulu.yml` CI 工作流从 `SUMMARY.md` 自动复制生成，**不要手动编辑** 。
-- **`yi-zhe-shuo-ming.md`** — 术语翻译对照表，所有术语翻译以此为准。
-- **`CHANGELOG.md`** — 编辑日志，记录翻译进度和同步上游的 commit。
+* **`SUMMARY.md`** — 全书唯一数据源，定义完整目录结构和导航树。GitBook 用它来生成侧边栏。**第一行 `# Table of contents` 绝对不能变更**，否则 GitBook 同步失效。
+* **`mu-lu.md`** — 由 `mulu.yml` CI 工作流从 `SUMMARY.md` 自动复制生成（首行改为 `# 目录`），**不要手动编辑**。
+* **术语对照** — 本项目没有独立的术语对照文件，术语翻译规范以本文件"术语"一节为准。新增术语时先更新该节，再用于译文。
+* **`CHANGELOG.md`** — 编辑日志，记录翻译进度和同步上游的 commit。
 
 ### 目录结构
 
-- 章节目录遵循 `di-X-zhang-<主题>/` 命名模式（拼音 slug）
-- 每节为独立 `.md` 文件，如 `di-1-zhang-jian-jie/1.1.-gai-shu.md`
-- 前言在 `qian-yan/`，附录在 `fu-lu-X/`
-- 分部介绍页如 `di-yi-bu-fen-kuai-su-kai-shi.md`
-- `.gitbook/assets/` — GitBook 静态资源（logo 等）
-- 全书共 35 章（Ch1-Ch35），中文章号与英文原版 1:1 对应；Ch18 为“OCI 容器”，于 2026-06 由英文原版补译
-- 章节结构对比脚本位于 `script/compare_structure_v2.py`，可检测中英文版本子章节级差异
-- `en/` — 英文 AsciiDoc 原版归档（40 个子目录，每个含 `_index.adoc`），用于翻译对照参考；不要修改或翻译其中的内容
+* 各发行版目录沿用上游英文目录名（空格改连字符或直接移除）：`AlpineLinux/`、`ArchLinux/`、`Debian/`、`Fedora/`、`Gentoo/`、`NixOS/`、`openSUSE/`、`RHEL/`、`Slackware/`、`Ubuntu/`
+* 内容板块目录：`Basic-Concepts/`、`Performance-Tuning/`、`Project-and-Community/`、`DeveloperResources/`（历史命名未带连字符，保持不变）
+* `man/<节号>/<命令名>.<节号>.md` — 手册页，如 `man/1/cstyle.1.md`（译自 zfs 仓库 `man/man1/cstyle.1`）
+* `msg/<消息 ID>.md` — ZFS 消息页，如 `msg/ZFS-8000-14.md`（译自上游 `docs/msg/ZFS-8000-14/index.rst`）
+* `.gitbook/assets/` — GitBook 静态资源（logo、插图等），正文中用相对链接引用（如 `../.gitbook/assets/raidz1.png`）
 
-### 标题管理（关键约束）
+### 文件命名约束
 
-`senc-headers.yml` 工作流会在每次 push 时自动将 `SUMMARY.md` 中的标题同步到对应 `.md` 文件的 H1。 **这意味着直接编辑 `.md` 文件的 `# 标题` 会被 CI 覆盖。** 修改章节标题时，只改 `SUMMARY.md` 中对应的 `* [标题](路径)` 条目即可。
+* 新建文件与目录时，沿用上游英文原名：空格删除或改为连字符（如 `Basic Concepts` → `Basic-Concepts`），并与同目录现有文件的命名风格保持一致。
+* 文件名中不得包含中文、空格或英文冒号 `:`，必须兼容 Windows 操作系统对文件名的要求。
+* 不使用拼音命名（上游文件名本身为英文，保留原名便于与上游对照）。
+
+## 标题管理（关键约束）
+
+`sync-headers.yml` 工作流会在每次 push 时自动将 `SUMMARY.md` 中的标题同步到对应 `.md` 文件的 H1。**这意味着直接编辑 `.md` 文件的 `# 标题` 会被 CI 覆盖。** 修改页面标题时，只改 `SUMMARY.md` 中对应的 `* [标题](路径)` 条目即可。
 
 ## CI/CD 工作流
 
@@ -52,67 +67,111 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | 工作流 | 触发条件 | 说明 |
 | ------ | -------- | ---- |
-| `sync-headers.yml` | push | 从 SUMMARY.md 同步一级标题到各 .md 文件 |
-| `mulu.yml` | SUMMARY.md 变更时 push | 复制 SUMMARY.md → mu-lu.md |
-| `markdown-lint2.yml` | workflow_dispatch | markdownlint 检查，规则见 `.github/.markdownlint.json` |
-| `md-padding.yml` | workflow_dispatch | 自动在 CJK 与英文/数字间添加空格 |
-| `AutoCorrect.yml` | --- | 自动修正常见中文笔误与格式问题 |
-| `links.yml` | 定时 + workflow_dispatch | lychee 死链检查，配置见 `.github/lychee.toml` |
-| `file-name-check.yml` | --- | 检查 SUMMARY.md 中引用的文件是否存在 |
-| `create-pdf.yml` | --- | 导出 PDF |
+| `sync-headers.yml` | push；`mulu.yml` 完成后 | 从 SUMMARY.md 同步一级标题到各 .md 文件，有变更自动提交 |
+| `mulu.yml` | SUMMARY.md 变更时 push；手动 | 复制 SUMMARY.md → mu-lu.md（首行改为 `# 目录`），自动提交 |
+| `file-name-check.yml` | push（.md 变更） | 校验 SUMMARY.md 引用的文件是否存在，缺失则自动开 issue（标签 summary-check） |
+| `check-images.yml` | push（.gitbook/assets 变更）；手动 | 运行 `.github/scripts/check_images.py` 校验图片引用与 `.gitbook/assets/` 的对应关系，生成报告并开 issue |
+| `Auto-Assign.yml` | issue、PR 打开时 | 自动指派维护者（配置见 `.github/auto_assign.yml`） |
+| `links.yml` | 每月 15 日 UTC 18:00；手动 | lychee 死链检查，配置见 `.github/lychee.toml` |
+| `create-pdf.yml` | 每周日 UTC 15:30；手动 | 导出 PDF |
+| `link-arch.yml` | 手动 | 运行 `.github/scripts/link.py` 将正文外链替换为存档服务链接，自动创建 PR |
+| `markdown-lint2.yml` | 手动 | markdownlint 检查（规则见 `.github/.markdownlint.json`），失败时自动修复并创建格式化 PR |
+| `md-padding.yml` | 手动 | 自动在中英文、中文与数字之间添加空格 |
+| `AutoCorrect.yml` | 手动 | 自动修正常见中文笔误与格式问题 |
 
 ## 编写规范
 
 ### 格式
 
-- **命令行前缀：** `#` 表示 root 权限，`$` 表示普通用户。不要使用 `sudo`。
-- **提示块：** tip/important/note/warning/caution 使用 `>` 缩进引用，关键词 **加粗**。
-- **代码块：** 无法判断的，再使用 ` `\``sh ` 兜底，禁止使用 text 作为代码块标记，不窜改既有的 ` ```ini ` 标记。
-- **表格：** 一律居中。
-- **禁止 HTML：** 本项目不支持任何 HTML 语法。
-- **文件命名：** 使用拼音 slug，文件名中不得包含空格、中文字符或英文冒号 `:`，必须兼容 Windows 操作系统对文件名的要求。
-- **路径与 IP：** 全书正文中的路径（带 `/` 或 `\` 的，如 `/etc/rc.conf`、`/usr/local/etc/`）和 IP 地址一律使用 **加粗**，不使用反引号 `` ` `` 包裹；不要混合使用 `*` 和 `` ` ``（如 `*`path`*` 是错误的）。
-- **命令、选项、参数：** 命令、选项、可调选项、可调参数等格式使用 `行间代码`（反引号）包裹。注意：不带选项和参数的裸命令，如 mv cp 等，一般不加反引号，不进行包裹。
-- **转义字符：** 除非是命令、选项和参数，否则含转义字符 `\` 的元素一律使用 **加粗** 包裹整个元素，不在正文中直接使用转义字符（如写 **PROTO_TYPE** 而非 `PROTO\_TYPE` 在正文里裸露）。逐个手动修改，禁止批量替换。
-- **避免滥用"已"字：** 如"XX 已新增"应改为"新增 XX"；"已修复"应改为"修复完成"。禁止机械替换。
-- **禁止篡改：** 不要篡改软件版本号、用户名、带圈数字（如 ①②③ 等），确保其位置、数量和英语原文一致。
-- **避免章节交叉引用：** 正文不要出现具体的章节交叉引用（如"参见第 5 章"），改用语义化链接。
-- **代码块注释翻译：** 代码块（` ``` ` 围栏）内的英文注释必须翻译为中文（如 shell 注释 `# This is a comment` → `# 这是一个注释`）。只翻译注释部分，不修改实际命令或代码。保持代码结构和格式不变。
-- **fstab 不翻译：** fstab 文件表头（如 `# Device Mountpoint FStype Options Dump Pass#`）及其相关内容保持英文原样，不翻译。
-- **禁止「」引号：** 正文中不允许出现「」引号，一律替换为“”（中文双引号）。禁止机械替换，需逐个手动修改。
-- **禁止双冒号链接语法：** 不允许使用 AsciiDoc 风格的双冒号链接语法（如 `mini-memstick::`、`xref:file[文本]`、`link:file[文本]`），必须使用标准 markdown 链接 `[文本](路径)` 指向真实位置。
-- **禁止软换行：** 不允许使用 AsciiDoc 风格的行尾 `+` 软换行，所有段落必须在同一行内完成，不得跨行拼接。
+* **命令行：** 代码块内容保持上游原样，不增删 `sudo`、提示符（`#`、`$`）与换行；示例输出沿用上游提示符。仅翻译注释。
+* **提示块：** tip/important/note/warning 使用 `>` 引用块，首行加粗关键词（**提示**、**注意**、**警告**、**重要**），正文另起一行；同一文件内风格保持一致。
+* **代码块：** 语言标记沿用上游（`sh`、`ini` 等），无法判断的用 ` ```sh ` 兜底；禁止使用 text 作为代码块标记，不窜改既有的 ` ```ini ` 标记。
+* **表格：** 分隔行与内容行的管道符位置对齐，管道符两侧各留一个空格；对齐方式与现有译文保持一致（现状多为居中），同一表格内保持一致。
+* **禁止 HTML：** 本项目不支持任何 HTML 语法。
+* **路径、命令与参数：** 路径（如 `/etc/fstab`、`/usr/local/etc/`）、命令、选项、可调参数等一律使用反引号包裹；不带选项和参数的裸命令（如 mv、cp）一般不加反引号。不要混合使用 `*` 和 `` ` ``。
+* **转义字符：** 含转义字符 `\` 的元素整体用反引号包裹，不在正文中裸露转义字符；逐个手动修改，禁止批量替换。
+* **避免滥用"已"字：** 如"XX 已新增"应改为"新增 XX"；"已修复"应改为"修复完成"。禁止机械替换。
+* **禁止篡改：** 不要篡改软件版本号、用户名、邮箱、URL、IP 地址、带圈数字（如 ①②③）、消息 ID（如 ZFS-8000-14），确保其位置、数量与上游原文一致。
+* **避免页面交叉引用：** 正文不写"参见上一节"这类模糊指代；跨页链接优先使用相对链接指向站内中文页面，对应中文页面尚未翻译时可链接英文原站对应页面（如 <https://openzfs.github.io/openzfs-docs/Basic%20Concepts/RAIDZ.html>），与现有译文惯例一致。
+* **代码块注释翻译：** 代码块（` ``` ` 围栏）内的英文注释必须翻译为中文（如 shell 注释 `# This is a comment` → `# 这是一个注释`）。只翻译注释部分，不修改实际命令或代码，保持代码结构和格式不变。
+* **禁止「」引号：** 正文中不允许出现「」引号，一律替换为""（中文双引号）。禁止机械替换，需逐个手动修改。
+* **禁止 rst 残留语法：** 上游为 rst 格式，转写时不得残留 rst 语法：行内交叉引用（`:doc:`、`:ref:`）、行尾 `__` 链接后缀、指令标记（`.. note::`）等必须转为等价 Markdown。必须使用标准 markdown 链接 `[文本](路径)` 指向真实位置。
+* **禁止软换行：** 所有段落必须在同一行内完成，不得跨行拼接。
+* **fstab 与配置文件内容：** 代码块内的文件内容（含 fstab 表头 `# Device Mountpoint FStype Options Dump Pass#`）保持英文原样，不翻译。
 
 ### 术语
 
-- `Ports` 保持英文不翻译，且保持首字母大写（注意区分真正的"端口"）禁止机械替换。
-- "Jail" 保持英文（不翻译为"监狱"、"监牢"）禁止机械替换。
-- "拷贝" → "复制"，"壳/外壳" → "shell"。禁止机械替换。
-- 第二人称一律使用"你"而非"您"
-- `pkgbase` 保持英文不翻译（禁止译为"打包基系统"等任何中文形式），相关概念可表述为"基本系统的软件包"。
-- `base system` 统一翻译为"基本系统"（禁止译为"基础系统"、"基系统"等变体）。
-- `The FreeBSD Foundation` 翻译为"FreeBSD 基金会"（注意前后空格自动调整，省去 The）。
-- `repository` 统一翻译为"存储库"（禁止译为"仓库"等变体）。
-- 所有术语翻译见 `yi-zhe-shuo-ming.md` 对照表
+以下术语对照为全项目唯一权威标准，翻译时以此为准。表中"保留英文"指不翻译且大小写与现有译文一致。
+
+| 术语 | 译法 | 说明 |
+| ---- | ---- | ---- |
+| pool | 存储池 | |
+| dataset | 数据集 | |
+| snapshot | 快照 | |
+| clone | 克隆 | |
+| vdev | 保留英文（小写） | 标题或首次出现可写作"虚拟设备（vdev）" |
+| zvol | 保留英文（小写） | 上游命令输出中的 ZVOL 大写保持原样 |
+| mirror | 镜像 | |
+| stripe、striping | 条带、条带化 | |
+| parity | 校验 | RAIDZ 语境 |
+| redundancy | 冗余 | |
+| scrub | 保留英文 | 描述扫描验证动作时可译"清洗"，全文统一 |
+| resilver | 保留英文 | 泛指重建数据的动作时可译"重建"，全文统一 |
+| ARC、L2ARC、ZIL、SLOG、ZED | 保留英文 | 大小写与现有译文一致 |
+| feature flags | 特性标志 | |
+| checksum | 校验和 | |
+| compression、deduplication、encryption | 压缩、去重、加密 | |
+| quota、reservation | 配额、预留值 | 对应页面尚未翻译，此为建议译法 |
+| send、receive | 发送、接收 | `zfs send/receive` 作为命令名时保留英文 |
+| Root on ZFS | 以 ZFS 为根文件系统 | 页面标题统一句式"构建以 ZFS 为根文件系统的 <发行版>" |
+| distribution | 发行版 | |
+| repository | 仓库 | 本项目统一译"仓库"，不用"存储库" |
+| upstream | 上游 | |
+| man page | 手册页 | |
+| OpenZFS、ZFS | 保留英文 | `zpool`、`zfs`、`zdb` 等命令名保留英文小写 |
+| 消息 ID（ZFS-8000-XX） | 保留原样 | 字符、顺序不得改动 |
+| 拷贝 | 复制 | 禁止使用"拷贝" |
+| shell | shell | 不译"壳"、"外壳" |
+
+其他约定：
+
+* 第二人称一律使用"你"而非"您"。
+* 遇到 FreeBSD 特有概念或本表未收录的术语，先检索现有译文的用法，保持全书一致。
+* 新增术语或对译法有疑问时，先更新本表再动笔，禁止各页自行其是。
 
 ### CJK 空格
 
-中英文、中文与数字之间必须加半角空格。文件和命令名用 `` ` `` 括起来。`md-padding.yml` 和 `AutoCorrect.yml` 工作流会自动检测修复。
+中英文、中文与数字之间必须加半角空格。文件和命令名用反引号括起来。`md-padding.yml` 和 `AutoCorrect.yml` 工作流会自动检测修复。
 
 ### 图片
 
-在正文中插入图片，使用 markdown 格式。
+在正文中插入图片使用 markdown 格式，图片文件存放于 `.gitbook/assets/`，用相对链接引用（如 `![raidz1](../.gitbook/assets/raidz1.png)`）。`check-images.yml` 会校验引用与实际文件的一致性。
 
-### 翻译流程
+## 翻译流程
 
-1. 参考官方英文手册原文进行人工校对
+1. 参考官方英文原文进行人工校对或补译
 2. 提交 PR 到 main 分支
 
-### 翻译校对工作流程（Claude Code）
+### 原文获取
 
-对已翻译章节进行质量审校时，参考以下步骤：
+* **文档正文：** 首选克隆上游仓库读取 `docs/<板块>/<页面>.rst` 源文件；也可通过 WebFetch 抓取已发布页面 `https://openzfs.github.io/openzfs-docs/<页面路径>.html`。
+* **man 手册页：** 以 openzfs/zfs 仓库 `man/man1/`、`man/man4/` 等目录的 troff 原文为准（<https://github.com/openzfs/zfs>），上游 openzfs-docs 中没有 man 页。
+* **ZFS 消息：** 以上游 `docs/msg/<消息 ID>/index.rst` 为准。
 
-1. **获取原文**：通过 `WebFetch` 抓取对应章节的英文原版页面（`https://docs.freebsd.org/en/books/handbook/<chapter-slug>/`），获取完整的英文文本。但是，如果存在 en 文件夹，以 en 文件夹对应目录为基准。
+### rst → Markdown 转写要点
+
+* 标题下划线（`===` 为 H1、`---` 为 H2）按层级转为 `#`、`##`、`###`；页面 H1 由 CI 从 SUMMARY.md 同步，本地只需保证 SUMMARY.md 条目正确。
+* `.. note::`、`.. warning::`、`.. tip::`、`.. important::` 指令转为 `>` 引用块并加粗关键词。
+* `.. code-block:: sh` 与 `::` 引出的字面块转为对应语言的围栏代码块。
+* `:doc:`、`:ref:`、`:numref:` 等交叉引用转为 markdown 链接（站内相对链接或英文原站链接）。
+* 行内字面量转为反引号。
+* `:orphan:`、`__` 后缀、toctree 等构建指令一律丢弃，不得带入译文。
+
+### 翻译校对工作流程（AI 助手）
+
+对已翻译页面进行质量审校时，参考以下步骤：
+
+1. **获取原文**：按"原文获取"一节取得对应页面的完整英文文本。存在 rst 源文件时，以 rst 源文件为基准；已发布网页仅作辅助。
 
 2. **逐句对照**：将中文翻译与英文原文逐句比对，重点检查以下问题类别：
 
@@ -122,107 +181,77 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    | 漏译 | 英文原版有但中文缺失的句子 |
    | 机翻腔/表达生硬 | "在阅读本章后，你将会收获" → "通过阅读本章，你将了解" |
    | 用词不当 | "独家优势"应为"主要优势"（原文 "particular strengths"） |
-   | 版本过时 | 15.0-CURRENT 未同步至 16.0-CURRENT |
+   | 版本过时 | 上游已更新的命令、选项、版本号未同步 |
    | 语法/文字错误 | 重复字词、"非常地"应为"非常" |
    | 欧化汉语、倒装句、后置句、偷换主语、不必要的被动句 | 自行联网制定标准，避免语法错误和非地道汉语表述 |
 
 3. **提交修改**：
-   - 基于 `main` 创建分支 `fix/chapter-X-translation`
-   - 仅提交修改的 `.md` 文件，不要包含无关文件
-   - 提交信息格式：`fix: 修正第 X 章翻译错误及同步英文原版更新`
-   - 用 `gh pr create` 创建 PR，目标分支为 `main`
-   - PR 描述中列出每处修改及原因
+   * 基于 `main` 创建分支 `fix/<页面名>-translation`（新增翻译用 `feat/<页面名>`）
+   * 仅提交修改的 `.md` 文件，不要包含无关文件
+   * 提交信息格式：`fix: 修正 <页面名> 翻译错误及同步英文原版更新`
+   * 用 `gh pr create` 创建 PR，目标分支为 `main`
+   * PR 描述中列出每处修改及原因
+   * 新增页面或同步上游后，更新 CHANGELOG.md
 
 4. **注意事项**：
-   - 不要修改 `# 标题`——会被 `sync-headers.yml` CI 覆盖
-   - 保持术语一致性，参考 `yi-zhe-shuo-ming.md`
-   - 英文原文可能比翻译版本更新，版本号差异（如 15.0 vs 16.0）应以英文原版为准
-   - 添加新内容（如英文原版新增的段落）时，确保翻译风格与上下文一致
-   - 禁止篡改带圈数字，如 ①②③ 等，确保其位置、数量和英语原文一致
-   - 禁止篡改代码块（包括 shell 命令、配置文件内容、ini 段等），仅修改正文翻译
-   - 禁止篡改用户名、邮箱、URL、IP 地址等技术参数
-   - 禁止篡改软件版本号
-   - 以英文原版 `docs.freebsd.org/en/books/handbook/` 为唯一权威源；禁止以中文版已有翻译作为修改依据，避免错误沿袭
+   * 不要修改 `# 标题`——会被 `sync-headers.yml` CI 覆盖
+   * 保持术语一致性，以本文件"术语"一节为准
+   * 英文原文可能比翻译版本更新，内容差异应以英文原版为准
+   * 添加新内容（如上游新增的段落）时，确保翻译风格与上下文一致
+   * 禁止篡改带圈数字，如 ①②③ 等，确保其位置、数量与原文一致
+   * 禁止篡改代码块（包括 shell 命令、配置文件内容、ini 段等），仅修改正文翻译与代码注释
+   * 禁止篡改用户名、邮箱、URL、IP 地址等技术参数
+   * 禁止篡改软件版本号与消息 ID
+   * 以上游 openzfs-docs（文档正文、msg）与 openzfs/zfs（man 页）的最新 master 为唯一权威源；禁止以中文版已有翻译作为修改依据，避免错误沿袭
 
 5. **逐句校对递归工作流**（核心约束）：
-   - **逐行逐句子**遍历内容，检查逻辑一致性，联网复核后修改
-   - **三轮 + 一轮复查**：完整执行三轮逐句校对，然后严格、完整地复查一轮；若仍有问题，继续执行三轮，递归直至无问题
-   - **逐个修改**：修改时禁止机械修改、禁止批量；必须逐个手动修改，禁止使用软件工具批量替换或批量逐个复核
-   - **修改前后复核**：每次修改前确认问题真实存在、修改后确认改动准确且未引入新错误
-   - **不复查旧错**：不得复查以前已经完成三轮的错误；每轮查询内容必须是新的（若与之前的复查重复则跳过、不改，只看是否有新增内容）
-   - **联网复查**：对于不存在的实际访问查询（如失效链接、版本号、API 端点），需联网复查三次后修改
-   - **禁止绕过审查**：不得以任何方式搜索、批量、绕过逐句子审查流程
+   * **逐行逐句子**遍历内容，检查逻辑一致性，联网复核后修改
+   * **三轮 + 一轮复查**：完整执行三轮逐句校对，然后严格、完整地复查一轮；若仍有问题，继续执行三轮，递归直至无问题
+   * **逐个修改**：修改时禁止机械修改、禁止批量；必须逐个手动修改，禁止使用软件工具批量替换或批量逐个复核
+   * **修改前后复核**：每次修改前确认问题真实存在、修改后确认改动准确且未引入新错误
+   * **不复查旧错**：不得复查以前已经完成三轮的错误；每轮查询内容必须是新的（若与之前的复查重复则跳过、不改，只看是否有新增内容）
+   * **联网复查**：对于不存在的实际访问查询（如失效链接、版本号、API 端点），需联网复查三次后修改
+   * **禁止绕过审查**：不得以任何方式搜索、批量、绕过逐句子审查流程
 
-## 章节结构管理工作流
+## 与上游结构同步工作流
 
-当中英文版本章节结构出现差异（如新增章节、删除章节、子节层级错误）时，按本工作流处理。完整执行记录见 `script/章节结构对比最终分析报告.md`。
+当中英文版本页面结构出现差异（上游新增页面、重组板块、删除页面）时，按本工作流处理：
 
-### 1. 检测差异
-
-运行 `script/compare_structure_v2.py` 检测中英文版本子章节级差异（H2 节 / H3 子节 / H4 子子节）。脚本自动处理中文 gitbook 标题层级偏移（中文每节为独立 `.md` 文件，标题比英文 adoc 浅一级，需 `shift=+1`）和文件名按节号自然排序。
-
-### 2. 章节编号 1:1 对应原则
-
-中文章号与英文原版 1:1 对应，**不要保留缺失章节状态**。英文原版新增章节时，中文版必须同步补译并调整后续章节编号。
-
-### 3. 补译新章节
-
-1. 在仓库根目录新建 `di-X-zhang-<拼音 slug>/` 目录
-2. 按英文原版 `_index.adoc` 的 H2 节结构创建对应 `.md` 文件（如 `X.1.-gai-shu.md`、`X.2.-xxx.md`）
-3. 翻译时遵循术语对照表 `yi-zhe-shuo-ming.md`，第二人称用"你"，`ports`/`Jail` 保留英文
-4. 每节 `.md` 文件首行 `# X.Y.标题` 由 `sync-headers.yml` CI 从 `SUMMARY.md` 同步，**不要手动编辑 H1**
-5. 在 `SUMMARY.md` 对应位置插入新章节条目（保持 `* [标题](路径)` 格式）
-
-### 4. 后续章节重命名（倒序处理）
-
-补译新章节导致后续章节编号偏移时，**必须从最大章号开始倒序处理**，避免目录重命名覆盖问题：
-
-1. 修改 `.md` 文件内的章号（如 `## 18.1.` → `## 19.1.`，仅改 H2/H3/H4 的章号前缀，不动小节号）
-2. 重命名 `.md` 文件名前缀（如 `18.1.-gai-shu.md` → `19.1.-gai-shu.md`）
-3. 重命名目录（如 `di-18-zhang-xxx/` → `di-19-zhang-xxx/`）
-4. 临时脚本与日志放在 `script/` 目录，命名如 `rename_chXX_offset.py`、`rename_log.md`
-
-### 5. 跨章节引用修复
-
-重命名后所有跨章节 markdown 链接路径需同步更新。链接路径模式：`](../di-X-zhang-yyy/X.Z.-file.md)`，使用正则匹配更新目录名和文件名章号前缀。
-
-修复脚本示例：`script/fix_xref_paths.py`，扫描所有 `.md` 文件，仅修改 markdown 链接路径，不动正文内容。修复日志写入 `script/xref_fix_log.md`。
-
-### 6. 同步 `SUMMARY.md`
-
-更新 `SUMMARY.md` 中所有受影响章节的 `* [标题](路径)` 条目：章号、目录路径前缀、文件名前缀。`mu-lu.md` 由 `mulu.yml` CI 工作流自动同步，**不要手动编辑**。
-
-### 7. 验证
-
-重新运行 `script/compare_structure_v2.py`，确认总差异数为 0。各章节 H2/H3/H4 数量与英文原版完全一致。
-
-### 8. 子节层级修复
-
-英文 adoc 使用 `=`（H1）、`==`（H2）、`===`（H3）、`====`（H4）；中文 markdown 使用 `#`（H1，由 CI 同步）、`##`（H2）、`###`（H3）、`####`（H4）。修复时：
-
-- 仅修改 H2 及以下层级，**不要修改 H1 章标题**（会被 `sync-headers.yml` CI 覆盖）
-- 层级错误（如应为 H2 却写成 H3）逐个手动修改 `###` → `##`，**禁止批量替换**
-- 英文版用 AsciiDoc 术语列表格式（`KEYWORD::` 描述）的部分，中文版不要改成 `###` 标题，应保持术语列表语义（如加粗 `**KEYWORD**` 后跟描述）
+1. **获取上游结构**：`git clone --depth 1 https://github.com/openzfs/openzfs-docs`（或更新已有克隆），列出 `docs/` 下的 rst 文件树；man 页对照 openzfs/zfs 仓库 `man/` 目录。
+2. **对比差异**：将上游 rst 文件树与本地 `SUMMARY.md` 逐条对比，列出新增、删除、移动、改名的页面。已知待同步差异见"版本与同步"一节。
+3. **补译新页面**：
+   * 按命名规则新建 `.md` 文件并翻译，遵循术语对照表，第二人称用"你"，vdev、zvol、scrub 等保留英文
+   * 在 `SUMMARY.md` 对应位置插入条目（保持 `* [标题](路径)` 格式，第一行 `# Table of contents` 不动）
+   * 页面 H1 交给 CI 同步，不要手写
+   * 在 CHANGELOG.md 记录新增内容，并更新本文件"当前翻译 git 版本"
+4. **处理重组与改名**：上游移动、改名页面时，同步调整本地目录与文件名（用 `git mv` 保留历史），修复所有受影响的相对链接；被上游删除的页面，先在本文件或 CHANGELOG 中记录再决定去留，不要静默删除。
+5. **验证**：
+   * 运行 markdownlint 检查（见下节）
+   * 核对 SUMMARY.md 中每个条目对应的文件都存在（`file-name-check.yml` 会在 push 后自动校验并开 issue）
+   * 核对图片引用（`check-images.yml` 会自动校验并开 issue）
+   * 重新对比上游文件树，确认无遗漏
 
 ## Lint 配置
 
-- **markdownlint**（`.github/.markdownlint.json`）：本地已安装 `markdownlint-cli2 v0.22.1`（基于 `markdownlint v0.40.0`），可在本地直接运行检查与修复
-  - **本地运行命令**（在仓库根目录执行）：
+* **markdownlint**（`.github/.markdownlint.json`）：本地已安装 `markdownlint-cli2 v0.22.1`（基于 `markdownlint v0.40.0`），可在本地直接运行检查与修复
+  * **本地运行命令**（在仓库根目录执行）：
 
     ```sh
-    # 检查全部中文 .md（排除 en/、.github/、.gitbook/、node_modules/、script/）
-    markdownlint-cli2 "**/*.md" "!en/**" "!.github/**" "!.gitbook/**" "!node_modules/**" "!script/**" --config .github/.markdownlint.json
+    # 检查全部中文 .md（排除 .github/、.gitbook/、node_modules/）
+    markdownlint-cli2 "**/*.md" "!.github/**" "!.gitbook/**" "!node_modules/**" --config .github/.markdownlint.json
 
-    # 自动修复可修复的问题（MD012 多余空行、MD047 末尾换行、MD034 裸 URL 等）
-    markdownlint-cli2 "**/*.md" "!en/**" "!.github/**" "!.gitbook/**" "!node_modules/**" "!script/**" --config .github/.markdownlint.json --fix
+    # 自动修复可修复的问题
+    markdownlint-cli2 "**/*.md" "!.github/**" "!.gitbook/**" "!node_modules/**" --config .github/.markdownlint.json --fix
     ```
 
-  - **MD060 表格列风格规则（重要）**：配置为 `"style": "compact"` + `"aligned_delimiter": true`
-    - **compact 风格**：管道符两侧各保留**单个空格**，例如 `| cell1 | cell2 |`；空单元格写作 `| |`（不是 `||` 或 `|  |`）
-    - **aligned_delimiter**：分隔行 `|---|` 的管道符位置必须与表头行的管道符位置对齐
-    - **CJK 显示宽度**：markdownlint 按**显示宽度**计算列位置，**每个中文字符按 2 宽度**计算（与英文 1 宽度不同）。因此含 CJK 的列宽 = CJK 字符数 × 2 + ASCII 字符数 × 1
-    - **分隔行 dash 数量公式**：若某列内容显示宽度为 W，则分隔行该列总宽（含两侧空格）也应为 W，dash 数量 = W − 4（减去前后各 1 空格 + 前后各 1 冒号）。例如列内容 `FreeBSD 版本` 显示宽度 = 7+1+4 = 12，分隔行应为 ` :--------: `（8 个 dash）
-    - **常见错误修复**：当 markdownlint 报 `MD060/table-column-style [Table pipe does not align with header for option "aligned_delimiter"]` 时，需手动扩展分隔行 dash 数量，使管道符位置与表头按显示宽度对齐；`--fix` 无法自动修复此类问题
-  - **MD056 表格列数规则**：表头声明几列，所有数据行都必须有几列；末尾缺空单元格时需补 `| |`，而非省略管道符
-- **textlint**（`.textlintrc`）：仅启用 `ja-space-between-half-and-full-width` 规则，用于 CJK/英文空格检查
-- **lychee**（`.github/lychee.toml`）：6 线程、30 并发、30 秒超时、最多 3 次重试、Chrome UA、排除私有 IP 和 `ftp.freebsd.org`
+  * **与 FreeBSD 手册项目的差异**：本仓库未启用 MD060 表格列风格规则，表格分隔行无需按 CJK 显示宽度对齐；MD012（多余空行）、MD013（行长）、MD029（列表编号）、MD033（内联 HTML）、MD034（裸 URL）、MD040（代码块语言）等均关闭
+  * **需注意的启用规则**：
+    * MD004、MD049、MD050：无序列表使用 `*`（不用 `-`），强调使用 `*`（不用 `_`）
+    * MD046：代码块必须使用围栏（` ``` `），不得使用缩进式代码块
+    * MD024：`siblings_only`，允许不同小节下出现重复标题，同一父级下不得重复
+    * MD007：无序列表嵌套缩进保持 2 空格
+    * MD041：文件首行必须是 H1
+    * MD047：文件末尾保留一个空行
+    * MD055、MD056：表格管道符风格一致、各行列数一致，末尾缺单元格补 `| |`
+* **textlint**：本项目未配置（仓库无 `.textlintrc`），中英文空格由 `md-padding.yml` 与 `AutoCorrect.yml` 处理
+* **lychee**（`.github/lychee.toml`）：6 线程、30 并发、30 秒超时、最多 3 次重试、Chrome UA；接受状态码 200、429、403、418、402；排除 `.github/` 路径、私有 IP、`localhost` 及含 `$` 的占位链接；启用 `include_verbatim`（代码块内链接也检查）
