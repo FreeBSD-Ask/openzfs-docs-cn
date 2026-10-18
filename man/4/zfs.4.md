@@ -267,6 +267,18 @@ L2ARC 缓冲首次缓存到 L2ARC 时的 ARC 状态，可通过 **l2arc_mru_asiz
 当不使用“尽力”策略时，我们只考虑数量有限的最佳 metaslab。这能提升性能，尤其是在每个 vdev 上 metaslab 数量很多且当前分配无法满足时（否则系统将会遍历所有 metaslab）。
 
 
+### **zfs_metaslab_sm_blksz_no_log = 16384** B (16 KiB) (int)
+
+在禁用了 **log_spacemap** 功能的池中，metaslab 空间映射的块大小。每个事务组会修改多个 metaslab，因此较小的块大小可以发出更多分散的 I/O 操作。必须是大于 **4096** 的 2 的幂。此参数仅能在模块加载时设置。
+
+### **zfs_metaslab_sm_blksz_with_log = 131072** B (128 KiB) (int)
+
+在启用了 **log_spacemap** 功能的池中，metaslab 空间映射的块大小。变更会在每个池的日志空间映射中批量处理，仅偶尔刷新到各 metaslab 的空间映射，因此更大的块大小效率更高。必须是大于 **4096** 的 2 的幂。此参数仅能在模块加载时设置。
+
+### **zfs_metaslab_condense_pct = 200** % (uint)
+
+当磁盘上的空间映射大小超过其内存表示大小的此百分比时，对其进行压缩（condense）。最小值为 **100**。
+
 ### **zfs_vdev_default_ms_count = 200** (uint)
 
 新增 vdev 时，每个顶层 vdev 的目标 metaslab 数量。
@@ -303,6 +315,14 @@ metaslab 大小的默认上限。
 ### **zfs_vdev_ms_count_limit = 131072** (128k) (uint)
 
 顶层 vdev 的 metaslab 总数的实际上限。
+
+### **zfs_vdev_dtl_sm_blksz = 4096** B (4 KiB) (int)
+
+由于 vdev 的 DTL 空间映射预计不会有太多条目，其块大小默认为 4K。
+
+### **zfs_vdev_standard_sm_blksz = 131072** B (128 KiB) (int)
+
+在每个事务结束时会有大量条目写入的 vdev 级空间映射可以从更高的 I/O 带宽中受益（例如 **vdev_obsolete_sm**），因此其块大小默认为 128K。
 
 ### **metaslab_preload_enabled = 1 | 0** (int)
 
