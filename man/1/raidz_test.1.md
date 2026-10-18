@@ -24,25 +24,25 @@ raidz_test [-StBevTD] [-a 对齐位数 (ashift)] [-o ZIO 偏移量 (zio_off_shif
 
 设置 ashift 值。
 
-### `-o` zio_off_shift（默认值：0）
+### `-o` zio_off_shift（默认值: `0`）
 
 每个 RAID-Z 块的 ZIO 偏移量。实际偏移量为 `2^zio_off_shift`。
 
-### `-d` raidz_data_disks（默认值：8）
+### `-d` raidz_data_disks（默认值: `8`）
 
 RAID-Z 数据盘数量。额外的磁盘将用于奇偶校验。
 
-### `-s` zio_size_shift（默认值：19）
+### `-s` zio_size_shift（默认值: `19`）
 
 RAID-Z 块的数据大小。实际大小为 `2^zio_size_shift`。
 
-### `-r` reflow_offset（默认值：uint max）
+### `-r` reflow_offset（默认值: `uint max`）
 
 设置 RAID-Z 扩展偏移。扩展的 RAID-Z 映射分配函数会根据此值生成不同的映射配置。
 
 ### `-S`（Sweep）
 
-在验证 RAID-Z 实现的同时扫描参数空间。此选项会穷尽 `-aods` 选项的大部分有效值，运行时间较长。
+在验证 RAID-Z 实现的同时扫描参数空间。此选项会遍历 `-aods` 选项的大部分有效值，运行时间较长。
 
 ### `-t`（Timeout）
 

@@ -203,7 +203,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 >
 >更多信息请参阅 `zpool-features` 手册页中关于“Compatibility feature sets”的章节。
 
-   **提示：**
+**提示：**
 
 * 如果你要创建 mirror 拓扑，可以使用：
 
@@ -215,7 +215,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
          /dev/disk/by-id/scsi-SATA_disk2-part3
      ```
 
-* 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，再列出来自其他磁盘的分区。
+* 对于 raidz 拓扑，请将上述命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出来自其他磁盘的分区。
 * 存储池名称是任意的。如果更改了名称，必须在后续步骤中保持一致。`bpool` 这一约定源自本教程。
 
 5. 创建根存储池：
@@ -272,7 +272,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 **注意事项：**
 
 * 这里推荐使用 `ashift=12`，因为如今许多磁盘即使对外呈现为 512 B 逻辑扇区，实际上也具有 4 KiB（或更大）的物理扇区。此外，后续更换的磁盘也可能具有 4 KiB 物理扇区（此时 `ashift=12` 是理想选择），或者具有 4 KiB 逻辑扇区（此时 `ashift=12` 是必需的）。
-* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 journald 需要 ACL。
+* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 [journald 需要 ACL](https://askubuntu.com/questions/970886/journalctl-says-failed-to-search-journal-acl-operation-not-supported)。
 * 设置 `xattr=sa` 可以极大地提升扩展属性的性能。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，一些桌面 GUI 应用会用到它们。Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的。需要注意的是，`xattr=sa` 是 Linux 特有的。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍然可以）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
 * 设置 `normalization=formD` 可以消除与 UTF-8 文件名规范化相关的一些极端情况。它还隐含启用了 `utf8only=on`，这意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请勿使用此选项。关于为何强制要求 UTF-8 文件名可能不是一个好主意的讨论，请参见相关链接。
 * `recordsize` 未设置（保持默认的 128 KiB）。如果你希望进行调优（例如 `-O recordsize=1M`），请参阅相关博客文章。
