@@ -45,7 +45,7 @@
 
 ```sh
 /dev/sda1 # EFI 系统分区
-/dev/sda2 # ZFS 池（包含“根”文件系统）
+/dev/sda2 # ZFS 存储池（包含“根”文件系统）
 ```
 
 由于我们是在磁盘分区内创建 zpool（而不是占用整个磁盘），请确保分区类型设置正确（GPT 下，54、67 都是合适的选择）。
@@ -63,7 +63,7 @@ zfs create -o mountpoint=legacy -o compression=zstd tank/root
 # zfs create -o mountpoint=legacy [..] tank/opt
 ```
 
-可以根据个人需求调整选项；虽然必须为根文件系统设置 `mountpoint=legacy`，但这对其他文件系统并非必需。在上述示例中，我们对所有文件系统都应用了该选项，这只是个人偏好问题。同样，可根据需求选择，将 zpool 本身设置为 `mountpoint=none`，即默认不挂载（注意 zpool 的 `mountpoint=none` 需要大写 `-O`）。
+可以根据个人需求调整选项；虽然必须为根文件系统设置 `mountpoint=legacy`，但这对其他文件系统并非必需。在上述示例中，我们对所有文件系统都应用了该选项，这只是个人偏好问题；将存储池本身设置为 `mountpoint=none`（使其默认不挂载到任何位置）同样如此（注意 zpool 的 `mountpoint=none` 需要大写 `-O`）。
 
 可以通过以下命令检查设置：
 
@@ -82,7 +82,7 @@ tank/root    /       zfs   defaults   0   0
 # tank/opt     /opt    zfs   defaults   0   0
 ```
 
-这样，在使用 `zpool import tank` 导入池后，我们就可以像平常一样挂载和卸载这些文件系统。接下来就是…
+这样，在使用 `zpool import tank` 导入存储池后，我们就可以像平常一样挂载和卸载这些文件系统。接下来就是…
 
 ## 修补并重建 initrd
 
@@ -135,7 +135,7 @@ fi
 mkinitrd -m zfs
 ```
 
-建议使用选项 `-o`，将 initrd.gz 创建在另一个文件中以防万一。更多细节可参考 `/boot/README.initrd`。
+建议使用选项 `-o`，将 `initrd.gz` 创建在另一个文件中以防万一。更多细节可参考 `/boot/README.initrd`。
 
 重建 initrd 时，也会将所需的库（如 `libzfs.so` 等）复制到 `/lib/` 下；可通过以下命令验证：
 
@@ -164,7 +164,7 @@ image=vmlinuz
   append="root=tank/root rootfstype=zfs"
 ```
 
-不言而喻，请确保 `initrd` 所引用的文件是你刚生成的文件（例如使用 ESP 时，确保已将新建的 initrd 复制过去）。
+这一点不言而喻，但请仔细核对 `initrd` 所引用的文件是否为你刚生成的文件（例如使用 ESP 时，确保已将新建的 initrd 复制过去）。
 
 ## 重启之前
 
