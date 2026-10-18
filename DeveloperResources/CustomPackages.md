@@ -28,7 +28,9 @@ sudo yum install epel-release gcc make autoconf automake libtool rpm-build libti
 sudo yum install --enablerepo=epel dkms python-packaging
 ```
 
-**注意：** RHEL/CentOS 7 生命周期已结束。在下面的安装说明中请使用 dnf 而非 yum。
+>**注意：**
+>
+>RHEL/CentOS 7 生命周期已结束。在下面的安装说明中请使用 dnf 而非 yum。
 
 * **RHEL/CentOS 8**：
 
@@ -52,7 +54,7 @@ sudo dnf install gcc make autoconf automake libtool rpm-build kernel-rpm-macros 
 sudo dnf install python3-packaging dkms
 ```
 
-[下载源代码](https://openzfs.github.io/openzfs-docs/Developer%20Resources/Custom%20Packages.html#get-the-source-code)。
+[获取源代码](https://openzfs.github.io/openzfs-docs/Developer%20Resources/Custom%20Packages.html#get-the-source-code)。
 
 ### DKMS
 

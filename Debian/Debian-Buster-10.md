@@ -269,15 +269,15 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 **注意事项：**
 
 * 这里推荐使用 `ashift=12`，因为如今许多磁盘即使对外呈现为 512 B 逻辑扇区，实际上也具有 4 KiB（或更大）的物理扇区。此外，后续更换的磁盘也可能具有 4 KiB 物理扇区（此时 `ashift=12` 是理想选择），或者具有 4 KiB 逻辑扇区（此时 `ashift=12` 是必需的）。
-* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 journald 需要 ACL。
-* 设置 `normalization=formD` 可以消除与 UTF-8 文件名规范化相关的一些极端情况。它还隐含启用了 `utf8only=on`，这意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请勿使用此选项。关于为何强制要求 UTF-8 文件名可能不是一个好主意的讨论，请参见相关链接。
-* `recordsize` 未设置（保持默认的 128 KiB）。如果你希望进行调优（例如 `-O recordsize=1M`），请参阅相关博客文章。
-* 设置 `xattr=sa` 可以极大地提升扩展属性的性能。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，一些桌面 GUI 应用会用到它们。Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的。需要注意的是，`xattr=sa` 是 Linux 特有的。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍然可以）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
-* 设置 `relatime=on` 在传统 POSIX `atime` 行为（具有显著性能开销）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间取得了折中。自 Linux 2.6.30 起，`relatime` 已成为其他文件系统的默认选项。更多信息请参见 RedHat 的文档。
-* 请务必包含驱动器路径中的 `-part4` 这一部分。如果忘记这一点，就会指定整个磁盘，ZFS 将重新对其分区，从而导致你丢失 bootloader 分区。
-* ZFS 原生加密现在默认使用 `aes-256-gcm`。
+* 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 [journald 需要 ACL](https://askubuntu.com/questions/970886/journalctl-says-failed-to-search-journal-acl-operation-not-supported)。
+* 设置 `normalization=formD` 可以消除与 UTF-8 文件名规范化相关的一些极端情况。它还隐含启用了 `utf8only=on`，这意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请勿使用此选项。关于为何强制要求仅使用 UTF-8 文件名可能并非好主意的讨论，请参见 [The problems with enforced UTF-8 only filenames](http://utcc.utoronto.ca/~cks/space/blog/linux/ForcedUTF8Filenames)。
+* `recordsize` 未设置（保持默认的 128 KiB）。如果你希望进行调优（例如 `-O recordsize=1M`），请参阅[这些](https://jrs-s.net/2019/04/03/on-zfs-recordsize/) [博客](http://blog.programster.org/zfs-record-size) [文章](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSFileRecordsizeGrowth) [帖子](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSRecordsizeAndCompression)。
+* 设置 `xattr=sa` [可以极大地提升扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，[一些桌面 GUI 应用会用到它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)。[Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。需要注意的是，`xattr=sa` [是 Linux 特有的](https://openzfs.org/wiki/Platform_code_differences)。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍可读取）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
+* 设置 `relatime=on` 在传统 POSIX `atime` 行为（具有显著性能开销）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间取得了折中。自 Linux 2.6.30 起，`relatime` 已成为其他文件系统的默认选项。更多信息请参见 [RedHat 的文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/power_management_guide/relatime)。
+* 请务必包含驱动器路径中的 `-part4` 这一部分。如果忘记这一点，就会指定整个磁盘，ZFS 将重新对其分区，从而导致你丢失引导加载器分区。
+* ZFS 原生加密[现](https://github.com/openzfs/zfs/commit/31b160f0a6c673c8f926233af2ed6d5354808393)默认使用 `aes-256-gcm`。
 * 对于 LUKS，这里选择的密钥长度是 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥会被一分为二。也就是说，`-s 512` 实际表示 AES-256。
-* 你的口令短语很可能是最薄弱的一环。请慎重选择。相关指导请参见 cryptsetup FAQ 的第 5 节。
+* 你的口令短语很可能是最薄弱的一环。请慎重选择。相关指导请参见 [cryptsetup FAQ 的第 5 节](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions#5-security-aspects)。
 
 **提示：**
 
