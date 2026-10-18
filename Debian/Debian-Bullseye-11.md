@@ -1060,7 +1060,7 @@ update-initramfs -c -k all
 RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 ```
 
-请升级或降级 Areca 驱动。在出现此错误的设备上，ZoL 可能不稳定。
+请升级或降级 Areca 驱动。在出现此错误信息的系统上，ZoL 不稳定。
 
 ### MPT2SAS 控制器
 
