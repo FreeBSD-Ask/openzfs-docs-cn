@@ -287,7 +287,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 * 这里推荐使用 `ashift=12`，因为如今许多磁盘即使对外呈现为 512 B 逻辑扇区，实际上也具有 4 KiB（或更大）的物理扇区。此外，后续更换的磁盘也可能具有 4 KiB 物理扇区（此时 `ashift=12` 是理想选择），或者具有 4 KiB 逻辑扇区（此时 `ashift=12` 是必需的）。
 * 设置 `-O acltype=posixacl` 将在全局启用 POSIX ACL。如果你不希望如此，可以移除此选项，但需要在之后为 `/var/log` 的 `zfs create` 命令添加 `-o acltype=posixacl`（注意：小写的“o”），因为 [journald 需要 ACL](https://askubuntu.com/questions/970886/journalctl-says-failed-to-search-journal-acl-operation-not-supported)。
-* 设置 `xattr=sa` [可以极大地提升扩展属性的性能](https://github.com/openzfs/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，[一些桌面 GUI 应用会用到它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)。[Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。需要注意的是，`xattr=sa` [是 Linux 特有的](https://openzfs.org/wiki/Platform_code_differences)。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍可读取）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
+* 设置 `xattr=sa` [可以极大地提升扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用程序使用，[一些桌面 GUI 应用会用到它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)。[Samba 也可以使用扩展属性来存储 Windows ACL 和 DOS 属性；它们对于 Samba Active Directory 域控制器是必需的](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。需要注意的是，`xattr=sa` [是 Linux 特有的](https://openzfs.org/wiki/Platform_code_differences)。如果你将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的其他 OpenZFS 实现上，扩展属性将无法读取（但数据本身仍可读取）。如果扩展属性的可移植性对你很重要，请省略上面的 `-O xattr=sa`。即使你不希望整个存储池使用 `xattr=sa`，对 `/var/log` 使用它通常也是合适的。
 * 设置 `normalization=formD` 可以消除与 UTF-8 文件名规范化相关的一些极端情况。它还隐含启用了 `utf8only=on`，这意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请勿使用此选项。关于为何强制要求仅使用 UTF-8 文件名可能并非好主意的讨论，请参见 [The problems with enforced UTF-8 only filenames](http://utcc.utoronto.ca/~cks/space/blog/linux/ForcedUTF8Filenames)。
 * `recordsize` 未设置（保持默认的 128 KiB）。如果你希望进行调优（例如 `-O recordsize=1M`），请参阅[这些](https://jrs-s.net/2019/04/03/on-zfs-recordsize/) [博客](http://blog.programster.org/zfs-record-size) [文章](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSFileRecordsizeGrowth) [帖子](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSRecordsizeAndCompression)。
 * 设置 `relatime=on` 在传统 POSIX `atime` 行为（具有显著性能开销）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间取得了折中。自 Linux 2.6.30 起，`relatime` 已成为其他文件系统的默认选项。更多信息请参见 [RedHat 的文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/power_management_guide/relatime)。
@@ -1066,7 +1066,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
-基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/openzfs/zfs/issues/330>。
+基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/zfsonlinux/zfs/issues/330>。
 
 大多数 LSI 卡可与 ZoL 完全兼容。如果你的 LSI 卡出现了上述问题，可在文件 `/etc/default/zfs` 中设置：
 

@@ -278,7 +278,7 @@ cat /proc/spl/kstat/zfs/fletcher_4_bench
 
 >**提示**
 >
->推荐使用物理设备来使用 ZFS。对于“空白”设备，并不需要进行分区，ZFS 会自动进行处理。
+>推荐对 ZFS 使用物理设备。对于“空白”设备，并不需要进行分区，ZFS 会自动进行处理。
 
 >**警告**
 >
@@ -1327,7 +1327,7 @@ zpool_test/fds4  referenced         4.58G     -
 zpool_test/fds4  refcompressratio      2.13x  -
 ```
 
-* `logicalreferenced`：逻辑数据量（未考虑压缩前的实际大小）
+* `logicalreferenced`：逻辑数据量（压缩前的实际大小）
 * `referenced`：物理存储实际占用大小
 
 压缩开启时，`logicalreferenced` 通常大于 `referenced`。另一个验证方式：
@@ -1432,7 +1432,7 @@ zfs get all zpool_test
 | setuid      | `on\|off`                                        | 控制 SUID/SGID 位是否生效。值为 `off` 相当于 `mount -o nosuid ...`。                                                                                                                                                         |
 | readonly    | `on\|off`                                        | 控制文件系统是否只读（`on`）或可写（`off`）。                                                                                                                                                                                    |
 | atime       | `on\|off`                                        | 控制是否更新文件访问时间。若无需访问时间，可关闭以减少大量文件访问时的额外开销。                                                                                                                                                                       |
-| xattr       | `on\|off\|sa`                                    | 控制是否启用扩展属性。默认 `on` 使用目录级属性，可能带来 I/O 开销；设置为 `sa` 可缓解开销。MDAC 系统如 SELinux 需启用扩展属性，POSIX ACL（Linux）同样需要。NFSv4（FreeBSD）不存储在扩展属性中。                                                                                   |
+| xattr       | `on\|off\|sa`                                    | 控制是否启用扩展属性。默认 `on` 使用目录级属性，可能带来 I/O 开销；设置为 `sa` 可缓解开销。MAC 系统如 SELinux 需启用扩展属性，POSIX ACL（Linux）同样需要。NFSv4（FreeBSD）不存储在扩展属性中。                                                                                   |
 | encryption  | `on\|off\|algorithm`                             | 控制数据是否加密（`on`）或不加密（`off`）。默认使用 AES-256-GCM，亦可指定算法。zpool 必须启用 `feature@encrypted`，创建数据集时需提供 *keyformat*。加密时，ZFS 会加密数据及部分元数据，但 **不会加密 zpool 结构**。可在后续更改密钥（如密钥泄露或其他原因）。详见 *zfs-load-key(8)*。                       |
 
 >**提示**
@@ -1799,7 +1799,7 @@ zpool_test/testfsds1                               4.50G   433M     4.50G  /zpoo
 zpool_test/testfsds1@snap1                            0B      -     4.50G  -
 ```
 
-乍一看，快照使用了 0 字节（USED 显示 `0`），因为数据没有变化。换句话说，文件系统数据集`zpool_test/testfsds1` 与其快照 `zpool_test/testfsds1@snap1` 指向完全相同的数据块。
+乍一看，快照使用了 0 字节（USED 显示 `0`），因为数据没有变化。换句话说，文件系统数据集 `zpool_test/testfsds1` 与其快照 `zpool_test/testfsds1@snap1` 指向完全相同的数据块。
 
 换一个角度来看：
 
@@ -2231,7 +2231,7 @@ zpool iostat 6
 
 #### ARC
 
-OpenZFS 使用 [ARC](https://en.wikipedia.org/wiki/Adaptive_replacement_cache)（自适应替换缓存）页面替换算法，而不是其他文件系统使用的最近最少使用（LRU）算法。ARC 命中率更高，因此提供了更好的性能。ZFS 中 ARC 的实现与原论文有所不同：作为缓存使用的内存量是可变的。将能在系统内存紧张时通过内核的 shrinker 机制回收 ARC 内存，并在系统有空闲内存时扩展。ARC 分配的最小和最大内存量随系统内存而异。默认最小值为总内存的 1/32 或 64MB（取较大者），默认最大值为系统内存的 1/2 或 64MB（取较大者）。
+OpenZFS 使用 [ARC](https://en.wikipedia.org/wiki/Adaptive_replacement_cache)（自适应替换缓存）页面替换算法，而不是其他文件系统使用的最近最少使用（LRU）算法。ARC 命中率更高，因此提供了更好的性能。ZFS 中 ARC 的实现与原论文有所不同：作为缓存使用的内存量是可变的。当系统内存紧张时，可通过内核的 shrinker 机制回收 ARC 内存，并在系统有空闲内存时扩展。ARC 分配的最小和最大内存量随系统内存而异。默认最小值为总内存的 1/32 或 64MB（取较大者），默认最大值为系统内存的 1/2 或 64MB（取较大者）。
 
 Linux 对 ARC 使用的内存计量方式与页缓存不同。具体来说，ARC 使用的内存显示在 `free` 输出中的“used”项下，而非“cached”。这并不妨碍系统在内存不足时释放这些内存，但可能让人误以为 ARC（及 ZFS）会尽可能使用全部系统内存。
 

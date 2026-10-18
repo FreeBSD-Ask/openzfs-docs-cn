@@ -479,7 +479,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
 3. 使用 zypper 安装 openSUSE Leap：
-   如果只安装基本的 pattern，zypper 会安装 busybox-grep，从而屏蔽默认内核包。因此建议新手安装 enhanced_base pattern。但 enhanced_base 包含的冗余包可能会在服务器环境中带来困扰。你需要根据用途选择：
+   如果安装 base pattern，zypper 会安装 busybox-grep，从而屏蔽默认内核包。因此建议新手安装 enhanced_base pattern。但 enhanced_base 包含的冗余包可能会在服务器环境中带来困扰。你需要根据用途选择：
 
    1. 使用 zypper 安装 openSUSE Leap 的基础包（推荐服务器环境）：
 
@@ -588,7 +588,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    ```
 
 5. 可选：重新安装以增强稳定性：
-   安装后可能需要重新安装某些软件包以修复小问题。openSUSE 没有类似 `dpkg-reconfigure` 的命令，可用 `zypper install -f` 作为替代：
+   安装后可能需要进行此步骤，因为某些软件包可能存在小问题。如果你愿意，可以执行以下操作。由于 openSUSE 中没有类似 `dpkg-reconfigure` 的命令，[`zypper install -f` 被视作其替代方案](https://lists.opensuse.org/opensuse-factory/2009-07/msg00188.html)，但它会重新安装软件包。
 
    ```sh
    zypper install -f permissions-config iputils ca-certificates ca-certificates-mozilla pam shadow dbus libutempter0 suse-module-tools util-linux

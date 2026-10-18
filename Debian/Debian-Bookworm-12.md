@@ -1046,7 +1046,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
-基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/openzfs/zfs/issues/330>。
+基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/zfsonlinux/zfs/issues/330>。
 
 大多数 LSI 卡可与 ZoL 完全兼容。如果你的 LSI 卡出现了上述问题，可在文件 `/etc/default/zfs` 中设置：
 

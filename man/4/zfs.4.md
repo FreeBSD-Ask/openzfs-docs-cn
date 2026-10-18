@@ -94,7 +94,7 @@ L2ARC 缓冲首次缓存到 L2ARC 时的 ARC 状态，可通过 **l2arc_mru_asiz
 
 ### **l2arc_meta_percent = 33** % (uint)
 
-允许用于 L2ARC 专用头的 ARC 大小百分比。由于 L2ARC 缓冲区在内存压力下不会被淘汰，如果系统的 L2ARC 过大且头部过多，可能会导致性能下降或无法使用。此参数限制 L2ARC 写入和重建，以达到目标。
+允许用于 L2ARC 专用头的 ARC 大小百分比。由于 L2ARC 缓冲区在内存压力下不会被淘汰，如果系统的 L2ARC 大得不合理且头部过多，可能使其变慢甚至无法使用。此参数限制 L2ARC 写入和重建，以达到目标。
 
 ### **l2arc_trim_ahead = 0** % (u64)
 
@@ -104,7 +104,7 @@ L2ARC 缓冲首次缓存到 L2ARC 时的 ARC 状态，可通过 **l2arc_mru_asiz
 
 如果缓冲区是被预取但未被应用程序使用的，则不将其写入 L2ARC。如果 L2ARC 中已有预取缓冲区，之后设置此选项，则不会从 L2ARC 读取这些预取缓冲区。取消设置此选项对将磁盘的顺序读取缓存到 L2ARC 并在之后从 L2ARC 提供这些读取可能有用。当 L2ARC 设备在顺序读取上明显快于池中的磁盘时，这尤其有利。
 
-使用 **1** 禁用，将预取缓存写入/读取到 L2ARC；使用 **0** 启用。
+使用 **1** 禁用；使用 **0** 启用将预取缓存写入/读取到 L2ARC。
 
 ### **l2arc_norw = 0 | 1** (int)
 
@@ -227,7 +227,7 @@ L2ARC 缓冲首次缓存到 L2ARC 时的 ARC 状态，可通过 **l2arc_mru_asiz
 
 如果未向前搜索（由于 **metaslab_df_max_search**、**metaslab_df_free_pct** 或 **metaslab_df_alloc_threshold**），该可调参数控制使用哪个段。设置为 1 时使用最大空闲段；未设置时使用至少满足请求大小的段。
 
-### **zfs_metaslab_max_size_cache_sec = 3600**秒 (1 小时) (u64)
+### **zfs_metaslab_max_size_cache_sec = 3600** 秒 (1 小时) (u64)
 
 当我们卸载一个 metaslab 时，会缓存其最大空闲块的大小。我们使用这个缓存的大小来决定在进行分配时是否加载该 metaslab。随着该 metaslab 在未加载状态下的空闲块数量不断增加，缓存的最大块大小会越来越不准确。在经过由此可调参数控制的若干秒后，我们将不再使用缓存的最大块大小，而只考虑直方图信息。
 
@@ -425,7 +425,7 @@ SPA 配置文件路径。
 
 ### **zap_micro_max_size = 131072** B (128 KiB) (int)
 
-微型 ZAP 的最大尺寸。超过该大小后，“微型” ZAP 会升级为“胖” ZAP。默认最大 128 KiB，除非启用 **large_microzap** 功能。
+微型 ZAP 的最大尺寸。超过该大小后，“微型” ZAP 会升级为“胖” ZAP。除非启用 **large_microzap** 功能，否则大于 128 KiB 的尺寸会被限制为 128 KiB。
 
 ### **zap_shrink_enabled = 1 | 0** (int)
 
@@ -648,7 +648,7 @@ Vdev 间接层（用于设备移除）在生成映射时会休眠指定毫秒数
 
 ### **zfs_dbgmsg_enable = 1 | 0** (int)
 
-在内部，ZFS 会维护一个小型日志以便调试。该日志默认启用，可以通过取消设置此选项来禁用。日志内容可通过读取 /proc/spl/kstat/zfs/dbgmsg 访问。向该文件写入 **0** 会清空日志。
+在内部，ZFS 会维护一个小型日志以便调试。该日志默认启用，可以通过取消设置此选项来禁用。日志内容可通过读取 `/proc/spl/kstat/zfs/dbgmsg` 访问。向该文件写入 **0** 会清空日志。
 
 此设置不影响 **zfs_flags** 引起的调试输出。
 
@@ -658,7 +658,7 @@ ZFS 内部调试日志的最大大小。
 
 ### **zfs_dbuf_state_index = 0** (int)
 
-历史上用于控制 /proc/spl/kstat/zfs 下可用的报告内容，但现在没有任何作用。
+历史上用于控制 `/proc/spl/kstat/zfs` 下可用的报告内容，但现在没有任何作用。
 
 ### **zfs_deadman_checktime_ms = 60000** ms (1 min) (u64)
 
@@ -666,7 +666,7 @@ ZFS 内部调试日志的最大大小。
 
 ### **zfs_deadman_enabled = 1 | 0** (int)
 
-当池同步操作耗时超过 **zfs_deadman_synctime_ms**，或单个 I/O 操作耗时超过 **zfs_deadman_ziotime_ms** 时，该操作被视为“挂起”。如果 **zfs_deadman_enabled** 已启用，则会根据 **zfs_deadman_failmode** 调用 deadman 行为。默认情况下，deadman 已启用且设置为 **wait**，这会导致仅记录“挂起”的 I/O 操作。当池被挂起时，deadman 会自动禁用。
+当池同步操作耗时超过 **zfs_deadman_synctime_ms**，或单个 I/O 操作耗时超过 **zfs_deadman_ziotime_ms** 时，该操作被视为“挂起”。如果启用了 **zfs_deadman_enabled**，则会根据 **zfs_deadman_failmode** 调用 deadman 行为。默认情况下，deadman 处于启用状态并设置为 **wait**，这会导致仅记录“挂起”的 I/O 操作。当池被挂起时，deadman 会自动禁用。
 
 ### **zfs_deadman_events_per_second = 1**/s (int)
 
@@ -769,7 +769,7 @@ Deadman 生成 zevent（报告挂起 I/O）的速率限制，每秒允许数量�
 
 ### **zfs_object_mutex_size = 64** (uint)
 
-用于 znode 哈希表的锁大小。
+用于持有的 znode 哈希表的大小。
 由于对象可能尚不存在，内核不会为每个对象创建互斥锁，而是使用哈希表管理，哈希冲突时对象会等待，即使实际上没有同对象的竞争。
 
 ### **zfs_slow_io_events_per_second = 20** /s (int)
@@ -812,11 +812,11 @@ ZFS 允许用于未刷写元数据变更的系统总内存比例，以百万分�
 
 定义大文件的阈值。大于 **zfs_delete_blocks** 的文件将异步删除，小于该值的文件同步删除。降低此值可减少 unlink(2) 系统调用的执行时间，但会延长释放空间的延迟。仅适用于 Linux。
 
-### **zfs_dirty_data_max =**(int)
+### **zfs_dirty_data_max =** (int)
 
 定义脏数据空间的上限（字节）。超过此上限后，新写入将被阻塞，直至空间释放。此参数优先于 **zfs_dirty_data_max_percent**。默认值为 **physical_ram/10**，并受 **zfs_dirty_data_max_max** 限制。
 
-### **zfs_dirty_data_max_max =**(int)
+### **zfs_dirty_data_max_max =** (int)
 
 **zfs_dirty_data_max** 的最大允许值（字节）。此限制仅在模块加载时生效，如果之后修改 **zfs_dirty_data_max** 将被忽略。该参数优先于 **zfs_dirty_data_max_max_percent**。默认值为 **min(physical_ram/4, 4GiB)**，32 位系统为 **min(physical_ram/4, 1GiB)**。
 
@@ -1039,7 +1039,7 @@ BIO 可添加的最大段数（最小为 4）。如果超过设备队列或内�
 
 ### **zfs_free_leak_on_eio = 0 | 1** (int)
 
-当销毁操作在读取元数据（如间接块）时遇到 **EIO** 错误，通常引用这些缺失元数据的空间无法释放。默认情况下，这会导致后台销毁“暂停”，因为无法继续前进。在暂停状态下，所有待释放的空间会“暂时泄漏”。
+当销毁操作在读取元数据（如间接块）时遇到 **EIO** 错误，通常引用这些缺失元数据的空间无法释放。默认情况下，这会导致后台销毁“暂停”，因为无法继续前进。在暂停状态下，来自遇到错误的文件系统的所有待释放空间都会“暂时泄漏”。
 设置此标志会忽略 **EIO** 错误，永久泄漏无法读取的间接块空间，同时继续释放其余可释放空间。
 
 默认的“暂停”行为在存储部分失败（即部分 I/O 操作失败）然后恢复的情况下非常有用。此时可以在部分失败期间继续池操作，并在恢复后继续释放空间，无泄漏。然而，这种情况实际较少发生。
@@ -1051,7 +1051,7 @@ BIO 可添加的最大段数（最小为 4）。如果超过设备队列或内�
 
 对于第一种情况，此设置无影响，因为池会被挂起，同步线程无法前进。对于第二种情况，由于错误是永久性的，设置此标志可以最小化空间泄漏。因此，通常可以设置该标志，但出于保守考虑，默认不设置，以避免在“部分暂时性”失败情况下泄漏空间。
 
-### **zfs_free_min_time_ms = 500** 毫秒(uint)
+### **zfs_free_min_time_ms = 500** 毫秒 (1 秒) (uint)
 
 在使用 **async_destroy** 功能的 `zfs destroy` 操作中，每个 TXG 至少花费此时间用于释放块。
 
@@ -1073,7 +1073,7 @@ BIO 可添加的最大段数（最小为 4）。如果超过设备队列或内�
 
 ### **zfs_initialize_value = 16045690984833335022** (0xDEADBEEFDEADBEEE) (u64)
 
-由 zpool-initialize(8) 写入 vdev 空闲空间的模式值。
+由 zpool-initialize(8) 写入 vdev 空闲空间的默认模式值，除非 `zpool initialize -z` 请求改为全零。设备开始初始化时生效的值会按设备记录，并在运行被挂起后恢复时复用。
 
 ### **zfs_initialize_chunk_size = 1048576** B (1 MiB) (u64)
 
@@ -1129,7 +1129,7 @@ spacemap 日志摘要允许的最大行数。
 
 ### **zfs_max_recordsize = 16777216** (16 MiB) (uint)
 
-支持的块大小范围为 512 B 至 16 MiB。大块可提高 I/O 效率，但修改单字节时需 COW 整块，可能影响 I/O 延迟和内存分配器。历史上默认禁止创建大于 1 MiB 的块，但可以通过调整创建更大块。x86_32 系统默认仍限制为 1 MiB，因为 Linux 3G/1G 内存划分无法容纳 16 MiB 块。
+支持的块大小范围为 512 B 至 16 MiB。大块可提高 I/O 效率，但修改单字节时需 COW 整块，可能影响 I/O 延迟和内存分配器。历史上禁止创建大于 1 MiB 的块，但可以通过调整此值创建更大块；无论此设置如何，包含更大块的池始终可以导入和使用。x86_32 系统默认仍限制为 1 MiB，因为 Linux 3G/1G 内存划分无法容纳 16 MiB 块。
 
 ### **zfs_allow_redacted_dataset_mount = 0 | 1** (int)
 
@@ -1466,7 +1466,7 @@ TRIM 命令的最小大小。小于此范围的 TRIM 将被跳过，除非它们
 
 ### **zfs_txg_history = 100** (uint)
 
-/proc/spl/kstat/zfs/⟨pool⟩/TXGs 中可查看最近 **100** 个 TXG 的历史统计信息。
+`/proc/spl/kstat/zfs/⟨pool⟩/TXGs` 中可查看最近 **100** 个 TXG 的历史统计信息。
 
 ### **zfs_txg_timeout = 5** 秒 (uint)
 
@@ -1675,14 +1675,14 @@ zvol 块设备的主设备号。
 对 zvol 执行的丢弃（TRIM）操作将按此数量的块分批进行，其中块大小由 zvol 的 **volblocksize** 属性决定。
 
 
-### **zvol_prefetch_bytes = 131072B** (128 KiB) (uint)
+### **zvol_prefetch_bytes = 131072** B (128 KiB) (uint)
 
 向系统添加 zvol 时，从卷的起始和末尾预取此数量的字节。预取卷的这些区域是有益的，因为它们很可能会被 blkid(8) 和内核分区程序立即访问。
 
 
 ### **zvol_request_sync = 0 | 1** (uint)
 
-在处理 zvol 的 I/O 请求时，以同步方式提交。这实际上将每个 I/O 提交者的队列深度限制为 *1*。如果未设置，请求将由线程池异步处理。可并发处理的请求数量由 **zvol_threads** 控制。在支持块多队列（`blk-mq`）的内核上，**zvol_request_sync** 会被忽略。
+在处理 zvol 的 I/O 请求时，以同步方式提交。这实际上将每个 I/O 提交者的队列深度限制为 *1*。如果未设置，请求将由线程池异步处理。可并发处理的请求数量由 **zvol_threads** 控制。无论 **zvol_use_blk_mq** 如何设置，此参数都适用。
 
 ### **zvol_num_taskqs = 0** (uint)
 
