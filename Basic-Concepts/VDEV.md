@@ -44,19 +44,19 @@ vdev 是 ZFS 存储池的构建单元。存储池（zpool）通过组合一个�
 下面的示例布局来自 [zpool-status(8)](https://openzfs.github.io/openzfs-docs/man/master/8/zpool-status.8.html) 输出，展示了一个拥有两个 RAIDZ1 顶级 vdev 和 10 个叶子 vdev 的存储池：
 
 ```sh
-数据池名 (根 vdev)
-raidz1-0 (顶级 vdev)
-/dev/dsk/disk0 (叶子 vdev)
-/dev/dsk/disk1 (叶子 vdev)
-/dev/dsk/disk2 (叶子 vdev)
-/dev/dsk/disk3 (叶子 vdev)
-/dev/dsk/disk4 (叶子 vdev)
-raidz1-1 (顶级 vdev)
-/dev/dsk/disk5 (叶子 vdev)
-/dev/dsk/disk6 (叶子 vdev)
-/dev/dsk/disk7 (叶子 vdev)
-/dev/dsk/disk8 (叶子 vdev)
-/dev/dsk/disk9 (叶子 vdev)
+   datapoolname (root vdev)
+     raidz1-0 (top-level vdev)
+       /dev/dsk/disk0 (leaf vdev)
+       /dev/dsk/disk1 (leaf vdev)
+       /dev/dsk/disk2 (leaf vdev)
+       /dev/dsk/disk3 (leaf vdev)
+       /dev/dsk/disk4 (leaf vdev)
+     raidz1-1 (top-level vdev)
+       /dev/dsk/disk5 (leaf vdev)
+       /dev/dsk/disk6 (leaf vdev)
+       /dev/dsk/disk7 (leaf vdev)
+       /dev/dsk/disk8 (leaf vdev)
+       /dev/dsk/disk9 (leaf vdev)
 ```
 
 

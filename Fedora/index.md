@@ -18,7 +18,7 @@
    dnf install -y https://zfsonlinux.org/fedora/zfs-release-3-0$(rpm --eval "%{dist}").noarch.rpm
    ```
 
-   旧版 zfs-release RPM 列表可见 [此处](https://github.com/zfsonlinux/zfsonlinux.github.com/tree/master/fedora)。
+   可在 [此处](https://github.com/zfsonlinux/zfsonlinux.github.com/tree/master/fedora) 查看旧版 zfs-release RPM 的列表。
 
 3. 安装内核头文件：
 
@@ -71,7 +71,7 @@
    echo 'zfs' > /etc/dnf/protected.d/zfs.conf
    ```
 
-   非内核更新仍可执行：
+   待处理的非内核更新仍可应用：
 
    ```sh
    dnf update --exclude=kernel*

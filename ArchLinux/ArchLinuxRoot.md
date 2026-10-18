@@ -39,7 +39,7 @@
    network interface: wlan0
    WiFi name:         <ssid>
    ip address:        dhcp
-   <按回车键以完成网络设置>
+   <输入 done 完成网络配置>
    manual netconfig:  n
    ```
 
@@ -317,7 +317,7 @@
    #,Include = /etc/pacman.d/mirrorlist-archzfs
    EOF
 
-   # 这个 #, 前缀是 CI/CD 测试的解决方法
+   # 这个 #, 前缀是 CI/CD 测试的变通方案
    # 移除它们
    sed -i 's|#,||' /etc/pacman.d/mirrorlist-archzfs
    sed -i 's|#,||' /etc/pacman.conf

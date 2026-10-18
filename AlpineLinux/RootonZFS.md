@@ -37,7 +37,7 @@
    network interface: wlan0
    WiFi name:         <ssid>
    ip address:        dhcp
-   <此处按回车完成网络配置>
+   <输入 done 完成网络配置>
    manual netconfig:  n
    ```
 
@@ -125,7 +125,7 @@
     RESERVE=1
     ```
 
-15. 通过安装介质安装 ZFS 支持：
+15. 从 Live 安装介质安装 ZFS 支持：
 
     ```sh
     apk add zfs

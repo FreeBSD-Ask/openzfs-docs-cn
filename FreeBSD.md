@@ -21,7 +21,7 @@ ZFS 工具将安装在 `/usr/local/sbin/`，请确保相应地调整你的路径
 
 ## 在 FreeBSD 上开发 OpenZFS
 
-构建 FreeBSD 上的 OpenZFS 需要以下依赖：
+在 FreeBSD 上构建 OpenZFS 需要以下依赖：
 
 * FreeBSD 源码，位于 `/usr/src` 或通过环境变量 `SYSDIR` 来指定的其他路径。如果尚未安装源码，可以用 git 安装：
 
@@ -100,7 +100,7 @@ zfs_load="YES"
 openzfs_load="YES"
 ```
 
-FreeBSD 自带的 ZFS 二进制文件安装在 `/sbin`，通过 Ports/pkg 或手动源码安装的 OpenZFS 二进制文件安装在 `/usr/local/sbin`。要使用 OpenZFS 二进制文件，请将 `/usr/local/sbin` 放在 `/sbin` 之前，否则系统将使用原生的 ZFS 二进制文件。
+FreeBSD 自带的 ZFS 二进制文件安装在 `/sbin`，通过 Ports/pkg 或从源码手动安装的 OpenZFS 二进制文件安装在 `/usr/local/sbin`。要使用 OpenZFS 二进制文件，请将 `/usr/local/sbin` 放在 `/sbin` 之前，否则系统将使用原生的 ZFS 二进制文件。
 
 例如，将 `~/.profile`、`~/.bashrc`、`~/.cshrc` 中的 PATH 从：
 

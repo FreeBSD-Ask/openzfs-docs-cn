@@ -4,7 +4,7 @@
 
 ### 提供了更新的版本
 
-* 新安装请参阅《[根文件系统使用 ZFS 的 Debian 13 Trixie](Debian-Trixie-13.md)》。本指南将归档，仅作为遵循本指南完成既有安装的参考。
+* 新安装请参阅 [构建以 ZFS 为根文件系统的 Debian 13 (Trixie)](Debian-Trixie-13.md)。本指南将继续保留，供已完成本指南所述安装的既有系统参考。
 
 ### 注意事项
 
@@ -15,10 +15,10 @@
 ### 系统要求
 
 * [64 位 Debian GNU/Linux Bookworm Live CD（带 GUI，例如 gnome ISO）](https://cdimage.debian.org/mirror/cdimage/release/current-live/amd64/iso-hybrid/)
-* 强烈建议使用 [64-bit 内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
-* 在逻辑扇区为 4 KiB（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[GRUB 在 legacy（BIOS）启动模式下无法也不会支持 4K 扇区。](http://savannah.gnu.org/bugs/?46700)
+* 强烈建议使用 [64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
+* 在提供 4 KiB 逻辑扇区（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有的问题。[在 4Kn 磁盘上使用传统（BIOS）启动时，GRUB 不能也不会工作](http://savannah.gnu.org/bugs/?46700)。
 
-内存小于 2 GiB 的计算机运行 ZFS 时会非常缓慢。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication），则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
+内存小于 2 GiB 的计算机运行 ZFS 会很慢。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication），则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
 
 ### 加密
 
@@ -26,9 +26,9 @@
 
 不加密自然不会对任何内容进行加密。在未加密的情况下，该方案自然具有最佳性能。
 
-ZFS 原生加密会对根池中的数据以及大多数元数据进行加密。它不会加密数据集或快照的名称和属性。完全不会加密启动池，但启动池只有引导加载器、内核和 initrd（除非你在 `/etc/fstab` 中设置了密码，否则 initrd 中通常未包含敏感数据）。系统在控制台输入口令之前无法启动。性能表现良好。由于加密发生在 ZFS 内部，即使使用多块磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
+ZFS 原生加密会对根池中的数据以及大多数元数据进行加密。它不会加密数据集或快照的名称和属性。完全不会加密启动池，但它只包含引导加载器、内核和 initrd（除非你在 `/etc/fstab` 中设置了密码，否则 initrd 中通常未包含敏感数据）。系统在控制台输入口令之前无法启动。性能表现良好。由于加密发生在 ZFS 内部，即使使用多块磁盘（mirror 或 raidz 拓扑），数据也只需要加密一次。
 
-LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加载器、内核和 initrd。系统在控制台输入口令之前无法启动。性能表现良好，但 LUKS 位于 ZFS 的底层，因此如果使用多块磁盘（mirror 或 raidz 拓扑），数据需要在每块磁盘上分别加密一次。
+LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加载器、内核和 initrd。系统在控制台输入口令之前无法启动。性能表现良好，但 LUKS 位于 ZFS 之下，因此如果使用多块磁盘（mirror 或 raidz 拓扑），数据需要在每块磁盘上分别加密一次。
 
 ## 步骤 1：准备安装环境
 
@@ -48,7 +48,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
 3. 可选：在 Live CD 环境中安装并启动 OpenSSH 服务器：
-   如果你有第二台设备，通过 SSH 访问目标系统会更方便：
+   如果你有第二台系统，通过 SSH 访问目标系统会更方便：
 
    ```sh
    sudo apt install --yes openssh-server

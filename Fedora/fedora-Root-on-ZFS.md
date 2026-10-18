@@ -3,7 +3,7 @@
 
 ## 注意事项
 
-* 作为下文在 ZFS 根文件系统上安装 Fedora Linux 方法的替代方案，你可以使用非官方脚本 [fedora-on-zfs](https://github.com/gregory-lee-bartholomew/fedora-on-zfs)，该脚本更加自动化，能生成更接近官方 Fedora 配置的安装。fedora-on-zfs 脚本与下文方法的区别在于，它使用 Fedora 官方的 kickstart 文件之一（如 `fedora-disk-minimal.ks`、`fedora-disk-workstation.ks`、`fedora-disk-kde.ks` 等）来指导安装，但会进行少量覆盖性修改以添加 ZFS 功能。如有 bug，请提交至 Greg 的 fedora-on-zfs GitHub 仓库。
+* 除了下文介绍的在 ZFS 根文件系统上安装 Fedora Linux 的方法外，你还可以使用非官方脚本 [fedora-on-zfs](https://github.com/gregory-lee-bartholomew/fedora-on-zfs)。该脚本更加自动化，能生成更接近官方 Fedora 配置的安装。fedora-on-zfs 脚本与下文方法的区别在于，它使用 Fedora 官方的 kickstart 文件之一（如 `fedora-disk-minimal.ks`、`fedora-disk-workstation.ks`、`fedora-disk-kde.ks` 等）来指导安装，但会进行少量覆盖性修改以添加 ZFS 功能。如有 bug，请提交至 Greg 的 fedora-on-zfs GitHub 仓库。
 
 **ZFSBootMenu**
 
@@ -34,7 +34,7 @@
    dd if=input-file of=output-file bs=1M
    ```
 
-3. 使用 root 用户登录，初始无密码。
+3. 以 root 用户登录。密码为空。
 4. 配置网络：
 
    ```sh
@@ -44,7 +44,7 @@
    network interface: wlan0
    WiFi name:         <ssid>
    ip address:        dhcp
-   <此处按回车键完成网络配置>
+   <输入 done 完成网络配置>
    manual netconfig:  n
    ```
 
