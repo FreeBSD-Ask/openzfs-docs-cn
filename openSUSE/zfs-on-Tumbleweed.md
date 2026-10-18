@@ -89,7 +89,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    * `ls -la /dev/disk/by-id` 会列出别名。
    * 你是在虚拟机中操作吗？如果虚拟磁盘在 `/dev/disk/by-id` 中缺失，使用 KVM virtio 时可用 `/dev/vda`；否则，请参考[故障排查](https://openzfs.github.io/openzfs-docs/Getting%20Started/openSUSE/openSUSE%20Leap%20Root%20on%20ZFS.html#troubleshooting)部分。
 
-3. 如果重复使用磁盘，根据需要清理：
+2. 如果重复使用磁盘，根据需要清理：
    如果磁盘之前用于 MD 阵列：
 
    ```sh
@@ -120,7 +120,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    如果新分区仍未显示，可重启并重新开始（此步骤可跳过）。
 
-4. 分区你的磁盘：
+3. 分区你的磁盘：
    如果需要传统（BIOS）启动，运行：
 
    ```sh
@@ -133,7 +133,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    sgdisk     -n2:1M:+512M   -t2:EF00 $DISK
    ```
 
-   为启动池创建分区：
+   为启动存储池创建分区：
 
    ```sh
    sgdisk     -n3:0:+1G      -t3:BF01 $DISK
@@ -153,9 +153,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
      sgdisk     -n4:0:0        -t4:8309 $DISK
      ```
 
-   * 如果创建镜像或 raidz 拓扑，请对将加入池的所有磁盘重复分区命令。
+   * 如果创建镜像或 raidz 拓扑，请对将加入存储池的所有磁盘重复分区命令。
 
-5. 创建启动池：
+4. 创建启动存储池：
 
    ```sh
    zpool create \
@@ -179,10 +179,10 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
        bpool ${DISK}-part3
    ```
 
-   对启动池无需自定义选项。
+   对启动存储池无需自定义选项。
 
-   GRUB 不支持全部的 zpool 功能。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
-   此步骤为 `/boot` 创建了独立的启动池，其功能仅限于 GRUB 支持的功能，从而能够让根池使用任意功能。注意 GRUB 以只读方式打开池，因此所有只读兼容功能均被 GRUB“支持”。
+   GRUB 不支持全部的 zpool 特性。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
+   此步骤为 `/boot` 创建了独立的启动存储池，其特性仅限于 GRUB 支持的特性，从而能够让根存储池使用任意特性。注意 GRUB 以只读方式打开存储池，因此所有只读兼容特性均被 GRUB“支持”。
 
    **提示：**
 
@@ -197,7 +197,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
      ```
 
    * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
-   * 池名称可自定义。若更改，新名称必须保持一致使用。`bpool` 命名约定来源于本教程。
+   * 存储池名称可自定义。若更改，新名称必须保持一致使用。`bpool` 命名约定来源于本教程。
 
    **功能说明：**
 
