@@ -7,7 +7,7 @@ OpenZFS 的官方源代码由 [openzfs](https://github.com/openzfs/) 组织在 G
 该仓库中有两个主要组成部分：
 
 * **ZFS**：ZFS 仓库是上游的 OpenZFS 代码，该代码已针对 Linux 和 FreeBSD 进行了适配和扩展。绝大多数核心 OpenZFS 代码是自包含的，可以无需修改直接使用。
-* **SPL**：SPL 是个轻的 shim 层，负责实现 OpenZFS 所需的基础接口。正是这一层使 OpenZFS 能够在多个平台上使用。SPL 以前在单独的仓库中维护，但在 `0.8` 主版本中被合并进 [zfs](https://github.com/openzfs/zfs) 仓库。
+* **SPL**：SPL 是一个轻量的 shim 层，负责实现 OpenZFS 所需的基础接口。正是这一层使 OpenZFS 能够在多个平台上使用。SPL 以前在单独的仓库中维护，但在 `0.8` 主版本中被合并进 [zfs](https://github.com/openzfs/zfs) 仓库。
 
 ## 安装依赖
 
@@ -46,7 +46,7 @@ pkg install autoconf automake autotools gettext git gmake python devel/py-sysctl
 构建 OpenZFS 有两种方案；如何选择在很大程度上取决于你的需求。
 
 * **软件包**：通常，从 git 构建可安装到系统上的自定义软件包是很有用的。这是进行与 systemd、dracut 和 udev 集成测试的最佳方式。使用软件包的缺点是会大大增加构建、安装和测试每次更改所需的时间。
-* **树内**：开发可以完全在 SPL/ZFS 源码树内完成。这通过赋能开发者快速迭代补丁来加快开发速度。在树内工作时，开发者可以利用增量构建、加载/卸载内核模块、执行工具，然后使用 ZFS 测试套件验证所有更改。
+* **树内**：开发可以完全在 SPL/ZFS 源码树内完成。这使开发者能够快速迭代补丁，从而加快开发速度。在树内工作时，开发者可以利用增量构建、加载/卸载内核模块、执行工具，然后使用 ZFS 测试套件验证所有更改。
 
 本页其余部分重点介绍 **树内** 方案，这是大多数修改推荐的开发方法。有关构建自定义软件包的更多信息，请参阅 [自定义软件包](https://openzfs.github.io/openzfs-docs/Developer%20Resources/Custom%20Packages.html) 页面。
 
@@ -147,7 +147,7 @@ pkg install base64 bash checkbashisms fio hs-ShellCheck ksh93 pamtester devel/py
 
 在顶层 scripts 目录中提供了一些辅助脚本，可帮助开发者进行树内构建开发。
 
-* **zfs-helpers.sh** 某些功能（例如 `/dev/zvol/`）依赖于系统中已安装的 ZFS 提供的 udev 辅助脚本。该脚本可用于在系统中从安装位置到树内辅助脚本创建符号链接。要成功运行 ZFS 测试套件，必须存在这些链接。可以使用选项 **-i** 和 **-r** 来安装和移除这些符号链接。
+* **zfs-helpers.sh** 某些功能（例如 `/dev/zvol/`）依赖于系统中已安装的 ZFS 提供的 udev 辅助脚本。该脚本可用于在系统上创建从安装位置指向树内辅助脚本的符号链接。要成功运行 ZFS 测试套件，必须存在这些链接。可以使用选项 **-i** 和 **-r** 来安装和移除这些符号链接。
 
 ```sh
 sudo ./scripts/zfs-helpers.sh -i
@@ -159,7 +159,7 @@ sudo ./scripts/zfs-helpers.sh -i
 sudo ./scripts/zfs.sh
 ```
 
-* **zloop.sh** 用于使用随机参数反复运行 ztest 的封装脚本。ztest 命令是用户空间的压力测试工具，通过并发运行一组随机测试用例来检测正确性问题。如果发生崩溃，将收集 ztest 日志、一切相关的 vdev 文件以及转储文件（如有），然后将其移动到输出目录以供分析。
+* **zloop.sh** 用于使用随机参数反复运行 ztest 的封装脚本。ztest 命令是用户空间的压力测试工具，通过并发运行一组随机测试用例来检测正确性问题。如果发生崩溃，将收集 ztest 日志、任何相关的 vdev 文件以及转储文件（如有），然后将其移动到输出目录以供分析。
 
 ```sh
 sudo ./scripts/zloop.sh

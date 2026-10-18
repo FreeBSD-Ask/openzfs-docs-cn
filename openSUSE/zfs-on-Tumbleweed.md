@@ -764,7 +764,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    # 设置：GRUB_CMDLINE_LINUX="root=ZFS=rpool/ROOT/suse"
    ```
 
-   4. 可选（但强烈建议）：便于调试 GRUB：
+4. 可选（但强烈建议）：便于调试 GRUB：
 
    ```sh
    vi /etc/default/grub
@@ -812,7 +812,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
       如果创建了 mirror 或 raidz 拓扑，需要对存储池中每块磁盘重复执行该命令。
 
-2. 对于 UEFI 启动，将 GRUB 安装到 ESP 分区：
+   2. 对于 UEFI 启动，将 GRUB 安装到 ESP 分区：
 
       ```sh
       grub2-install --target=x86_64-efi --efi-directory=/boot/efi \

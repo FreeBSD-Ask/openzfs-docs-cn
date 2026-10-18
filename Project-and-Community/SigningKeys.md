@@ -1,12 +1,12 @@
 # 签名密钥
 
-所有带 Tag 的 ZFS on Linux [RELEASE](https://github.com/zfsonlinux/zfs/releases) 都由该分支的官方维护者签名。这些签名会被 GitHub 自动验证，也可以通过下载维护者的公钥在本地进行验证。
+所有带标签的 ZFS on Linux [发布版本](https://github.com/zfsonlinux/zfs/releases) 都由官方维护者之一签名。这些签名会被 GitHub 自动验证，也可以通过下载维护者的公钥在本地进行验证。
 
 ## 维护者
 
 ### 发布分支 (spl/zfs-*-release)
 
-**维护者：** [Ned Bass](https://github.com/nedbass)
+**维护者（非活跃）：** [Ned Bass](https://github.com/nedbass)
 
 **下载：** [pgp.mit.edu](http://pgp.mit.edu/pks/lookup?op=vindex&search=0xB97467AAC77B9667&fingerprint=on)
 

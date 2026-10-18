@@ -19,13 +19,13 @@
 
 kmem 缓存 slab 的最大大小（MiB）。这实际上将缓存对象的最大大小限制为 **spl_kmem_cache_max_size**/**spl_kmem_cache_obj_per_slab**。
 
-缓存所创建的对象，其最大尺寸受制于此限制。
+无法创建对象尺寸大于此限制的缓存。
 
 ### `spl_kmem_cache_slab_limit=16384`（无符号整数类型 uint）
 
-对于小对象，应使用 Linux slab 分配器以最有效地利用内存。可是 Linux slab 不支持大对象，因此建议使用 SPL 实现。该值用于确定小对象和大对象的分界点。
+对于小对象，应使用 Linux slab 分配器以最有效地利用内存。对于大对象，则首选 SPL 实现。该值用于确定小对象和大对象的分界点。该分界点只适用于自动选择缓存的情况。显式请求 Linux slab 缓存或 SPL 缓存时，将覆盖该值。
 
-体积为 **spl_kmem_cache_slab_limit** 及更小的对象将使用 Linux slab 分配器分配，较大的对象使用 SPL 分配器。对于使用 4K 页的架构，16K 的分界被认为是最优的。
+当自动选择缓存时，体积为 **spl_kmem_cache_slab_limit** 及更小的对象将使用 Linux slab 分配器分配，更大的对象则使用 SPL 分配器。对于使用 4K 页的架构，16K 的分界被认为是最优的。
 
 ### `spl_kmem_alloc_warn=32768`（无符号整数类型 uint）
 

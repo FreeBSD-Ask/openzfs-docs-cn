@@ -22,7 +22,7 @@
 ## 技术实现文档
 
 * 源代码链接位于 [发行版](https://openzfs.org/wiki/Distributions) 页面
-* 关于通用 OpenZFS 概念的架构 / 高层级文档
+* 关于通用 OpenZFS 概念的架构 / 高层文档
   * [zfs send](https://openzfs.org/wiki/Documentation/ZfsSend)
   * [管理命令](https://openzfs.org/wiki/Documentation/Administrative_Commands)（例如 `zfs snapshot -r pool/fs@snap`）
   * [zfs I/O](https://openzfs.org/wiki/Documentation/ZFS_I/O)

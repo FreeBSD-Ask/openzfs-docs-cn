@@ -1,16 +1,16 @@
 # 自定义软件包
 
-以下说明假定你是从官方的 [tar 发行版压缩包](https://github.com/zfsonlinux/zfs/releases/latest)（版本 0.8.0 或更新）或直接从 [git 仓库](https://github.com/zfsonlinux/zfs) 进行构建。大多数用户不需要这样做，应优先使用发行版提供的软件包。一般而言，发行版的软件包集成度更高、经过广泛测试、支持更完善。然而，如果你选择的发行版未提供软件包，或者你是开发者并想自己构建，下面是操作方法。
+以下说明假定你是从官方的 [发布 Tar 归档包](https://github.com/zfsonlinux/zfs/releases/latest)（版本 0.8.0 或更新）或直接从 [git 仓库](https://github.com/zfsonlinux/zfs) 进行构建。大多数用户不需要这样做，应优先使用发行版提供的软件包。一般而言，发行版的软件包集成度更高、经过广泛测试、支持更完善。然而，如果你选择的发行版未提供软件包，或者你是开发者并想自己构建，下面是操作方法。
 
 首先需要注意的是，构建系统能够生成几种不同类型的软件包。要选择的软件包类型取决于你的平台支持情况以及具体需求。
 
 * **DKMS** 软件包只包含用于重建内核模块的源代码和脚本。安装 DKMS 软件包后，将为所有可用内核构建内核模块。此外，当更新内核时，会自动为该内核构建新的内核模块。这对于经常接收内核更新的桌面系统尤其方便。缺点是由于 DKMS 软件包从源代码构建内核模块，因此需要完整的开发环境，这对于大规模部署可能不合适。
 * **kmods** 软件包是针对特定内核版本编译的二进制内核模块。这意味着如果你更新内核，必须编译、安装新的 kmod 软件包。如果你不经常更新内核，或者管理着大批量系统，那么 kmod 软件包是个不错的选择。
-* **kABI-tracking kmod** 软件包类似于标准的二进制 kmods，可用于企业级 Linux 发行版，如 Red Hat 和 CentOS。这些发行版提供稳定的 kABI（内核应用二进制接口），可在提供的新版本发行版内核上使用相同的二进制模块。注意，这些软件包并不完全遵循 Red Hat 的规则，因此在新内核上有小概率失败的可能性。概率较低，但我们建议在生产服务器上使用这些构建时禁用自动内核更新。
+* **kABI-tracking kmod** 软件包类似于标准的二进制 kmods，可用于企业级 Linux 发行版，如 Red Hat 和 CentOS。这些发行版提供稳定的 kABI（内核应用二进制接口），使得相同的二进制模块可用于发行版提供的新版本内核。注意，这些软件包并不完全遵循 Red Hat 的规则，因此在新内核上有小概率失败的可能性。概率较低，但我们建议在生产服务器上使用这些构建时禁用自动内核更新。
 
 在默认情况下，构建系统将生成用户软件包，并同时生成 DKMS 和 kmod 风格的内核软件包（如果可能）。用户软件包可与任一内核软件包一起使用，在内核更新时无需重新构建用户软件包。你也可以通过仅构建 DKMS 或 kmod 软件包来简化构建过程，如下所示。
 
-请注意，当直接从 git 仓库构建时，必须首先运行 *autogen.sh* 脚本来生成 *configure* 脚本。这需要安装对应发行版的软件包 GNU autotools。要执行任何构建，必须安装该发行版所需的所有开发工具和头文件。
+请注意，当直接从 git 仓库构建时，必须首先运行 *autogen.sh* 脚本来生成 *configure* 脚本。这需要为你的发行版安装 GNU autotools 软件包。要执行任何构建，必须安装该发行版所需的所有开发工具和头文件。
 
 需要注意，如果当前运行的内核的开发内核头文件未安装，将无法正确编译模块。
 
@@ -78,7 +78,7 @@ $ sudo dnf install *.$(uname -m).rpm *.noarch.rpm
 
 >**注意：**
 >
->Fedora 41 Workstation 内置 rpm 软件包 zfs-fuse，会妨碍安装你自己的软件包。在执行 `dnf install` 之前请先仅删除该软件包：
+>Fedora 41 Workstation 内置 rpm 软件包 zfs-fuse，会妨碍安装你自己的软件包。在执行 `dnf install` 之前请先删除该软件包：
 
 ```sh
 $ sudo rpm -e --nodeps zfs-fuse
@@ -86,7 +86,7 @@ $ sudo rpm -e --nodeps zfs-fuse
 
 ### kABI-tracking kmod
 
-构建 kABI-tracking kmod 的过程与构建普通 kmod 几乎相同。然而，仅在该发行版支持稳定 kABI 的情况下，才会生成可被多个内核使用的二进制文件。要请求 kABI-tracking 软件包，必须在 configure 时传入选项 *--with-spec=redhat*。
+构建 kABI-tracking kmod 的过程与构建普通 kmod 几乎相同。然而，仅在该发行版支持稳定 kABI 的情况下，才会生成可被多个内核使用的二进制文件。要获得 kABI-tracking 软件包，必须在 configure 时传入选项 *--with-spec=redhat*。
 
 请注意，这些软件包并不完全遵循 Red Hat 的规则，因此有小概率在新内核上无法使用。我们建议在生产服务器上使用这些构建时禁用自动内核更新。
 
@@ -210,7 +210,7 @@ $ sudo apt-get install --fix-missing ../*.deb
 
 ### 发布 Tar 归档包
 
-发布的 Tar 归档包是经过充分测试和已发布的最新 ZFS 版本。这是生产系统中使用的首选源代码位置。如果你想使用官方发布的 Tar 归档包，可以使用以下命令获取、准备源代码：
+发布的 Tar 归档包是经过充分测试并发布的最新 ZFS 版本。这是生产系统中使用的首选源代码位置。如果你想使用官方发布的 Tar 归档包，可以使用以下命令获取、准备源代码：
 
 ```sh
 $ wget http://archive.zfsonlinux.org/downloads/zfsonlinux/zfs/zfs-x.y.z.tar.gz
@@ -219,7 +219,7 @@ $ tar -xzf zfs-x.y.z.tar.gz
 
 ### Git 主分支
 
-Git *master* 分支是最新版本的软件，且可能包含那些未内置在已发布 Tar 归档包中的修复。这是打算修改 ZFS 的开发者的首选源代码位置。如果你想使用 git 版本，可以从 Github 克隆并按如下方式准备源代码：
+Git *master* 分支包含最新版本的软件，且可能包含那些出于某些原因未纳入发布 Tar 归档包中的修复。这是打算修改 ZFS 的开发者的首选源代码位置。如果你想使用 git 版本，可以从 Github 克隆并按如下方式准备源代码：
 
 ```sh
 $ git clone https://github.com/zfsonlinux/zfs.git

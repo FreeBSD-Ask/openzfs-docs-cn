@@ -139,7 +139,7 @@ git push origin master
 
 用户可能希望将 `master` 分支中的提交回移植到某个发布分支。为此，首先切换到你希望引入提交的发布版本对应的“staging”分支。例如，如果你想将 `master` 中的提交 XYZ 回移植到未来的 `zfs-2.3.6` 发布版本，先切换到 `zfs-2.3.6-staging` 分支，然后使用 `git cherry-pick XYZ` 拉取该提交（并解决任何合并冲突）。随后，你可以针对 `zfs-2.3.6-staging` 分支打开一个 PR（确保在 PR 目标下拉框中选择该分支）。
 
-在进行回移植时，请保持 commit message 不变。这意味着作者保持不变，所有证明行也保持不变（Signed-off-by、Reviewed-by 等）。这些证明行被认为是指向 `master` 中的原始提交，而不一定是回移植后的提交（即使回移植过程中可能需要进行修改）。
+在进行回移植时，请保持 commit message 不变。这意味着作者保持不变，所有签名行也保持不变（Signed-off-by、Reviewed-by 等）。这些签名行所指的应当是 `master` 中的原始提交，而不一定是回移植后的提交（即使回移植过程中可能需要进行修改）。
 
 如果需要，你可以选择性地添加一行 `Backported-by:` 并附上你的名字。
 
