@@ -812,7 +812,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
       如果创建了 mirror 或 raidz 拓扑，需要对存储池中每块磁盘重复执行该命令。
 
-8. 对于 UEFI 启动，将 GRUB 安装到 ESP 分区：
+2. 对于 UEFI 启动，将 GRUB 安装到 ESP 分区：
 
       ```sh
       grub2-install --target=x86_64-efi --efi-directory=/boot/efi \
@@ -1004,7 +1004,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 >**注意**：
 >
->在内存压力极高的系统上，无论 swap 空间剩余多少，使用 zvol 作为 swap 设备都可能导致系统锁死。[上游已有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
+>在内存压力极高的系统上，无论 swap 空间剩余多少，使用 zvol 作为 swap 设备都可能导致系统锁死。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
 1. 创建用于 swap 的 zvol（卷数据集）：
 
@@ -1017,9 +1017,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    你可以根据需求调整大小（这里为 `4G`）。
 
-   压缩算法使用 `zle`，因为这是开销最小的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），4 KiB 页面大小情况下，没有压缩算法能减少 I/O。唯一例外是全零页面，会被 ZFS 丢弃，但必须启用某种压缩才能实现这一行为。
+   压缩算法使用 `zle`，因为这是开销最小的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），在常见的 4 KiB 页面大小下，没有任何压缩算法能减少 I/O。唯一例外是全零页面，会被 ZFS 丢弃，但必须启用某种压缩才能实现这一行为。
 
-3. 配置 swap 设备：
+2. 配置 swap 设备：
 
    >**注意**：
    >
@@ -1031,9 +1031,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    echo RESUME=none > /etc/initramfs-tools/conf.d/resume
    ```
 
-   `RESUME=none` 用于禁用休眠恢复。由于 zvol 在启动时尚未导入（池未导入），恢复脚本无法找到 swap，如果不禁用，启动过程会停滞约 30 秒等待 swap zvol 出现。
+   `RESUME=none` 用于禁用休眠恢复。由于 zvol 在启动时尚未导入（存储池未导入），恢复脚本无法找到 swap，如果不禁用，启动过程会停滞约 30 秒等待 swap zvol 出现。
 
-5. 启用 swap 设备：
+3. 启用 swap 设备：
 
    ```sh
    swapon -av
@@ -1067,7 +1067,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    systemctl restart sshd
    ```
 
-6. 可选：重新启用图形启动过程：
+5. 可选：重新启用图形启动过程：
 
    如果你希望使用图形启动，并且使用了 LUKS，这可以让提示界面更美观。
 
@@ -1084,14 +1084,14 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    >
    >如果出现 `osprober` 错误，可忽略。
 
-8. 可选：仅针对 LUKS 安装，备份 LUKS 头：
+6. 可选：仅针对 LUKS 安装，备份 LUKS 头：
 
    ```sh
    sudo cryptsetup luksHeaderBackup /dev/disk/by-id/scsi-SATA_disk1-part4 \
        --header-backup-file luks1-header.dat
    ```
 
-   将备份妥善保存（如云端存储）。该备份受 LUKS 密码保护，但你也可选择额外加密。
+   将备份妥善保存（如云端存储）。该备份受 LUKS 口令保护，但你也可选择额外加密。
   
    >**提示**：
    >
@@ -1165,7 +1165,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 本教程中大多数问题报告都与 `mpt2sas` 硬件相关，这类硬件会延迟异步初始化驱动器，例如某些 IBM M1015 或已刷回参考 LSI 固件的 OEM 卡。
 
-基本问题是，这些控制器上的磁盘在 Linux 内核启动时不可见，而 ZoL 不支持热插拔池成员。详见：[https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
+基本问题是，在常规系统启动完成之前，Linux 内核看不到这些控制器上的磁盘，而 ZoL 不支持热插拔存储池成员。详见：[https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
 
 大多数 LSI 卡完全兼容 ZoL。如果你的 LSI 卡存在此问题，可在 `/etc/default/zfs` 中设置：
 
@@ -1173,7 +1173,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 ZFS_INITRD_PRE_MOUNTROOT_SLEEP=X
 ```
 
-系统将在导入池之前等待 X 秒，确保所有磁盘都已出现。
+系统将在导入存储池之前等待 X 秒，确保所有磁盘都已出现。
 
 
 ### QEMU/KVM/XEN
