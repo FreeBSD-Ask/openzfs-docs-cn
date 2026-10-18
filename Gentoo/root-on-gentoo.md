@@ -4,9 +4,9 @@
 
 本文重点介绍在 Gentoo 上将 ZFS 用作根文件系统，并设计为配合手册使用。随着时间推移，将会加入更多高级配置，请查看 TODO 部分，以了解是否有可添加的内容来改进本文。
 
-#### 分区
+## 分区
 
-##### 布局
+### 布局
 
 请参考 Handbook 中的[准备磁盘](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks)部分，回到创建文件系统的章节。
 
@@ -18,7 +18,7 @@
 /dev/sda3   | 剩余磁盘空间  | ZFS 分区              | /, /boot, /home, ...
 ```
 
-##### 引导
+### 引导
 
 创建 1GB 的 FAT32 文件系统：
 
@@ -26,7 +26,7 @@
 mkfs.vfat -F 32 /dev/sda1
 ```
 
-##### 交换分区
+### 交换分区
 
 在 ZFS 分区上 swap 性能较差，并且不支持使用 swapfile，因此建议使用单独的分区。
 
@@ -39,9 +39,9 @@ swapon /dev/sda2
 >
 >或者，在内存充足的系统上可以使用 zram，但请注意 ZFS 会将数据缓存到内存来提升速度。
 
-#### ZFS 设置
+## ZFS 设置
 
-##### 生成主机 ID
+### 生成主机 ID
 
 随机生成主机 ID 到 `/etc/hostid`，可覆盖输出。
 
@@ -55,7 +55,7 @@ zgenhostid -f
 zgenhostid -f 0x00bab10c
 ```
 
-##### 创建 ZFS 池
+### 创建 ZFS 池
 
 加载 ZFS 内核模块，在 `/dev/sda3` 上创建 ZFS 池 `tank`。
 
@@ -80,7 +80,7 @@ zpool create -f \
 >
 >对于物理扇区大小为 512 字节的磁盘，请使用 `-o ashift=9`；对于物理扇区大小为 4096 字节的磁盘，请使用 `-o ashift=12`。详见 [OpenZFS: ashift 属性定义](https://openzfs.github.io/openzfs-docs/man/v2.4/7/zpoolprops.7.html#ashift)。
 
-##### 可选方案：使用原生加密创建 ZFS 池
+### 可选方案：使用原生加密创建 ZFS 池
 
 >**警告**
 >
@@ -106,7 +106,7 @@ zpool create -f -o ashift=12 \
 >
 >也可以将属性 `keylocation` 设置为指向某个文件，这在使用 ZFSBootMenu 作为引导加载器时非常有用，或者在启动时希望减少输入密码次数时也可用。[参见 ZFSBootMenu 文档](https://docs.zfsbootmenu.org/en/v2.3.x/general/native-encryption.html) 了解其对加密文件系统的处理方式。
 
-##### 创建 ZFS 文件系统
+### 创建 ZFS 文件系统
 
 本指南只为 root 和 home 创建了文件系统，但用户可根据需要创建更多文件系统。
 
@@ -126,7 +126,7 @@ zfs create -o mountpoint=/home tank/home
 zpool set bootfs=tank/os/gentoo tank
 ```
 
-##### 导出并重新导入池，挂载文件系统
+### 导出并重新导入池，挂载文件系统
 
 要导出并重新导入池，同时指定挂载点并且不自动挂载文件系统，请运行以下命令：
 
@@ -179,7 +179,7 @@ udevadm trigger
 
 返回 Handbook - [EFI_system_partition_filesystem](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Disks#EFI_system_partition_filesystem)，直到执行 `chroot` 命令前的位置。
 
-##### 复制 host ID 文件
+### 复制 host ID 文件
 
 ```sh
 cp /etc/hostid /mnt/gentoo/etc
@@ -187,13 +187,13 @@ cp /etc/hostid /mnt/gentoo/etc
 
 返回 Handbook - [Installing Gentoo base system](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Base#Entering_the_new_environment)，继续进行内核配置和编译。
 
-#### 内核
+## 内核
 
 用户可以在手动配置的内核或发行版内核之间进行选择。
 
-##### 发行版内核
+### 发行版内核
 
-###### 启用 USE 标志
+#### 启用 USE 标志
 
 如果使用发行版内核，则需要启用 USE 标志 `dist-kernel`：
 
@@ -203,7 +203,7 @@ cp /etc/hostid /mnt/gentoo/etc
 USE="dist-kernel"
 ```
 
-###### 安装发行版内核
+#### 安装发行版内核
 
 ```sh
 emerge -av sys-kernel/gentoo-kernel
@@ -215,7 +215,7 @@ emerge -av sys-kernel/gentoo-kernel
 emerge -av sys-kernel/gentoo-kernel-bin
 ```
 
-##### 手动内核配置
+### 手动内核配置
 
 按需配置内核，保存并构建（暂时不要安装）
 
@@ -237,7 +237,7 @@ make -j$(nproc) && make modules_install && make install
 
 每次更新 gentoo-sources 或内核配置发生更改时都必须重复此操作，否则系统将无法启动。
 
-#### ZFS 用户空间工具和内核模块
+## ZFS 用户空间工具和内核模块
 
 包 sys-fs/zfs 是必须的，它能让系统与 ZFS 池交互和管理。确保已设置模块标志：
 
@@ -245,9 +245,9 @@ make -j$(nproc) && make modules_install && make install
 emerge -av sys-fs/zfs
 ```
 
-#### Initramfs
+## Initramfs
 
-##### 配置 Dracut
+### 配置 Dracut
 
 如果不存在，为 Dracut 配置文件创建目录：
 
@@ -268,7 +268,7 @@ nofsck="yes"
 add_dracutmodules+="zfs"
 ```
 
-##### 为发行版内核构建 initramfs
+### 为发行版内核构建 initramfs
 
 ```sh
 emerge --config sys-kernel/gentoo-kernel
@@ -282,11 +282,11 @@ emerge --config sys-kernel/gentoo-kernel-bin
 
 你可以返回手册 - [配置系统](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/System)，然后在这里继续 [配置引导加载器](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Bootloader)。
 
-#### 引导加载器
+## 引导加载器
 
-##### ZFSBootMenu
+### ZFSBootMenu
 
-###### 设置内核命令行
+#### 设置内核命令行
 
 ```sh
 zfs set org.zfsbootmenu:commandline="quiet loglevel=4" tank/os
@@ -296,7 +296,7 @@ zfs set org.zfsbootmenu:commandline="quiet loglevel=4" tank/os
 >
 >ZFS 属性会继承，因此 `tank/os` 的所有子数据集将继承该命令行参数。如有必要，可以在特定子数据集中覆盖该属性。
 
-###### 挂载 EFI 系统分区
+#### 挂载 EFI 系统分区
 
 
 >**注意**
@@ -310,7 +310,7 @@ mkdir -p /efi
 mount /dev/sda1 /efi
 ```
 
-###### 从源码安装 ZFSBootMenu
+#### 从源码安装 ZFSBootMenu
 
 可在 [GURU](https://wiki.gentoo.org/wiki/Project:GURU) 仓库中获得 ZFSBootMenu ebuild，若未添加需先添加：
 
@@ -349,7 +349,7 @@ EFI:
 generate-zbm
 ```
 
-###### 安装 ZFSBootMenu（预构建）
+#### 安装 ZFSBootMenu（预构建）
 
 为引导加载器创建目录并下载 EFI 二进制文件：
 
@@ -358,7 +358,7 @@ mkdir -p /efi/EFI/BOOT
 curl -L https://get.zfsbootmenu.org/efi -o /efi/EFI/BOOT/BOOTX64.EFI
 ```
 
-###### 创建 EFI 启动项
+#### 创建 EFI 启动项
 
 安装包 sys-boot/efibootmgr：
 
@@ -378,21 +378,21 @@ efibootmgr -c -d /dev/sda -p 1 -L "ZFSBootMenu" -l \\EFI\\ZBM\\VMLINUZ.EFI
 efibootmgr -c -d /dev/sda -p 1 -L "ZFSBootMenu" -l \\EFI\\BOOT\\BOOTX64.EFI
 ```
 
-###### 可选：原生加密
+#### 可选：原生加密
 
 如果在创建 zpool 时选择了原生加密，如 [Alternative: Create a ZFS pool with native encryption](https://wiki.gentoo.org/wiki/ZFS/rootfs#zpool_Native_Encryption) 所述，可以设置 ZFSBootMenu 仅提示一次密码，并让 dracut 在启动时访问加密密钥，或者通过设置 `org.zfsbootmenu:keysource` 属性并将密钥存储在单独的数据集中实现。
 
 [参见 ZFSBootMenu 文档](https://docs.zfsbootmenu.org/en/v2.3.x/general/native-encryption.html) 了解正确设置方法。
 
-##### Limine
+### Limine
 
 Limine 是现代、先进、可移植、多协议的引导加载器和引导管理器，同时提供 Limine 引导协议的参考实现。
 
 参照 [Limine](https://wiki.gentoo.org/wiki/Limine) 文章，并确保遵循 [Limine#Using_Limine_With_ZFS_Root](https://wiki.gentoo.org/wiki/Limine#Using_Limine_With_ZFS_Root) 部分。
 
-##### 通用引导加载器（GRUB）
+### 通用引导加载器（GRUB）
 
-###### 为 GRUB 启用 ZFS 支持
+#### 为 GRUB 启用 ZFS 支持
 
 在 sys-boot/grub 包上设置 libzfs 标志以启用 ZFS 支持（需要构建 sys-fs/zfs 和 sys-fs/zfs-kmod）：
 
@@ -400,7 +400,7 @@ Limine 是现代、先进、可移植、多协议的引导加载器和引导管�
 echo "sys-boot/grub libzfs" >> /etc/portage/package.use/grub
 ```
 
-###### 构建带 ZFS 支持的 GRUB
+#### 构建带 ZFS 支持的 GRUB
 
 确保 GRUB_PLATFORMS 设置正确，以适用于带 EFI 分区的系统：
 
@@ -414,14 +414,14 @@ echo 'GRUB_PLATFORMS="efi-64"' >> /etc/portage/make.conf
 emerge --ask sys-boot/grub
 ```
 
-###### 将 GRUB 安装到已挂载的 EFI 分区
+#### 将 GRUB 安装到已挂载的 EFI 分区
 
 ```sh
 grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=gentoo
 grub-mkconfig -o /boot/grub/grub.cfg
 ```
 
-#### 仅为首次启动添加 CMDLINE
+## 仅为首次启动添加 CMDLINE
 
 ```sh
 nano /etc/default/grub
@@ -433,17 +433,17 @@ GRUB_CMDLINE_LINUX="refresh"
 
 执行 `grub-mkconfig -o /boot/grub/grub.cfg`，启动进入 gentoo 后删除该项并重新配置 grub。
 
-#### 完成设置
+## 完成设置
 
 将 zfs-import 和 zfs-mount 添加到启动服务，否则系统将无法启动。
 
-##### OpenRC
+### OpenRC
 
 ```sh
 rc-update add zfs-import sysinit && rc-update add zfs-mount sysinit
 ```
 
-#### 重启系统
+## 重启系统
 
 退出 chroot 环境并卸载所有挂载的分区，不要忘记导出池。之后即可重启系统。
 
@@ -456,11 +456,11 @@ zpool export tank
 reboot
 ```
 
-#### Gentoo 重启后无法启动
+## Gentoo 重启后无法启动
 
 在 grub 条目中按 e 并在 cmdline 添加 `refresh`。
 
-#### 待办事项
+## 待办事项
 
 需要添加的部分以完善指南：
 
