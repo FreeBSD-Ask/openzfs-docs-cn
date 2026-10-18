@@ -4,7 +4,7 @@
 
 ## 概述
 
-本节将深入探讨 ZFS 用户的高级主题，包括广泛的高级功能和优化技术。用户将学习自动化脚本以简化日常任务和系统维护，以及全面的 ZFS 调优策略，以在不同工作负载场景中最大化性能。内容包括高级数据集管理、用于监控和维护的自定义脚本、通过 ARC 和 ZIL 调优实现性能优化、复杂的备份与恢复流程，以及企业级高可用性配置。此外，本节还探讨高级加密方法、RAID-Z 扩展技术、特殊 VDEV 优化和容器集成策略。无论是管理家庭服务器还是企业存储基础设施，这些高级主题都将帮助用户通过适当的系统集成、自动化维护和性能监控充分发挥 ZFS 的潜力。特别关注实际场景和实践应用，确保用户能够将这些高级概念有效应用于其特定用例。
+本节将深入探讨 ZFS 用户的高级主题，包括广泛的高级功能和优化技术。用户将学习自动化脚本以简化日常任务和系统维护，以及全面的 ZFS 调优策略，以在不同工作负载场景中最大化性能。内容包括高级数据集管理、用于监控和维护的自定义脚本、通过 ARC 和 ZIL 调优实现性能优化、复杂的备份与恢复流程，以及企业级高可用性配置。此外，本节还探讨高级加密方法、RAID-Z 扩展技术、特殊 vdev 优化和容器集成策略。无论是管理家庭服务器还是企业存储基础设施，这些高级主题都将帮助用户通过适当的系统集成、自动化维护和性能监控充分发挥 ZFS 的潜力。本节特别关注实际场景和实践应用，确保用户能够将这些高级概念有效应用于其特定用例。
 
 ## 自动化脚本
 
@@ -25,7 +25,7 @@
 
 ### 使用 eix post sync
 
-下面的脚本将由脚本 `system_update.sh` 触发。在每次更新系统时用户都应执行它。如果根据提供的参数没有新更新，脚本将退出。这是为了确保脚本在 post-sync 后检查任何新内核版本。在 `postsync.d` 下创建你的 hook 脚本：
+下面的脚本将由脚本 `system_update.sh` 触发。每次更新系统时，用户都应执行它。如果根据提供的参数没有新更新，脚本将退出。这是为了确保脚本在 post-sync 后检查任何新内核版本。在 `postsync.d` 下创建你的 hook 脚本：
 
 ```sh
 sudo nano -w /etc/portage/postsync.d/zfs-check
@@ -56,11 +56,11 @@ chmod +x /etc/portage/postsync.d/zfs-check
 
 >**注意**
 >
->可能存在一些未知的极端情况。如果 DOM 树结构发生变化，脚本可能会失效。解决方法之一是在 `parse_linux_compatibility` 中前置另一个 if 语句，但需要检查 [这里](https://github.com/openzfs/zfs/releases) 以找到正确的表达式。目前：`Linux: compatible with ... kernels` 和 `Linux kernels ...` 将兼容从 zfs-3.0 到 zfs-2.2.5。如果这太复杂且你认为有问题，可以在启用 DEBUG 后运行 `debug_releases()` 并创建 pull request [这里](https://github.com/alphastigma101/BashScripts)，或提交 bug 报告。
+>可能存在一些未知的极端情况。如果 DOM 树结构发生变化，脚本可能会失效。解决方法之一是在 `parse_linux_compatibility` 中前置另一个 if 语句，但需要检查 [这里](https://github.com/openzfs/zfs/releases) 以找到正确的表达式。目前：`Linux: compatible with ... kernels` 和 `Linux kernels ...` 适用于 zfs-3.0 到 zfs-2.2.5。如果这太复杂且你认为有问题，可以在启用 DEBUG 后运行 `debug_releases()` 并创建 pull request [这里](https://github.com/alphastigma101/BashScripts)，或提交 bug 报告。
 
 >**警告**
 >
->截至 25 年 2 月 12 日，上述脚本仍在测试中。大部分已在 Gentoo 机器上测试过并可运行。它将根据 CLI 中传入的参数（如 stable、testing、unknown）安装新内核版本。仍存在一些需要解决的 bug，例如安装新的 ZFS 模块以及删除旧的内核目录。此外，该脚本仅用 stable 参数测试过。如果使用 testing 或 unknown，也应能正常工作。如脚本崩溃，你会知道如何处理。
+>截至 2025 年 2 月 12 日，上述脚本仍在测试中。大部分已在 Gentoo 机器上测试过并可运行。它将根据 CLI 中传入的参数（如 stable、testing、unknown）安装新内核版本。仍存在一些需要解决的 bug，例如安装新的 ZFS 模块以及删除旧的内核目录。此外，该脚本仅用 stable 参数测试过。如果使用 testing 或 unknown，也应能正常工作。如脚本崩溃，你会知道如何处理。
 
 该脚本将从 Portage 树中安装最新可用内核版本，并删除那些过期的内核。如果在内核安装、编译或安装新的 ZFS 模块过程中出现错误，脚本会捕获错误再退出。脚本功能依赖于提供的参数。
 
@@ -533,7 +533,7 @@ populate_releases() {
     )
     for url in "${RELEASES_PAGE[@]}"; do
         release_name=$(echo $url | grep -oP 'zfs-.*$')
-        # 试图解压 Linux 内核兼容性文件
+        # 试图解析 Linux 内核兼容性文件
         parse_linux_compatibility "https://github.com$url" "$release_name"
     done
 }
@@ -611,7 +611,7 @@ declare -a BUILD_KERNELS
 declare -a CURRENT_ZFS
 
 debug_zfs_releases() {
-    # Print out the compatible releases
+    # 打印兼容的 releases
     echo "Compatible ZFS Releases:"
     for release in "${!COMPATIBLE_RELEASES[@]}"; do
         echo "$release: Linux kernel ${COMPATIBLE_RELEASES[$release]}"
@@ -669,7 +669,7 @@ version_less_than_equal() {
 
 ### 错误处理脚本
 
-如果在运行时发生问题，该脚本会记录发生异常行为的函数名的字符串字面量，以及简短的说明发生了什么。请注意，由于缺少文件夹或文件，有些错误可能是误报。这不是问题，仅意味着需要添加额外的 if 语句。
+如果在运行时发生问题，该脚本会记录发生异常行为的函数名的字符串字面量，以及简短说明发生了什么。请注意，由于缺少文件夹或文件，有些错误可能是误报。这不是问题，仅意味着需要添加额外的 if 语句。
 
 错误处理脚本 `/etc/portage/postsync.d/error_handling.sh`：
 

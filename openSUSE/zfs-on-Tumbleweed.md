@@ -199,15 +199,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
    * 存储池名称可自定义。若更改，新名称必须保持一致使用。`bpool` 命名约定来源于本教程。
 
-   **功能说明：**
+   **特性说明：**
 
-   * `allocation_classes` 功能安全可用。但除非使用它（如 `special` vdev），否则启用它无意义。几乎不会有人在启动池使用该功能。如果关注启动池速度，将整个池放在更快的磁盘上比使用 `special` vdev 更合理。
-   * `project_quota` 功能经过测试，安全可用。对启动池而言几乎无实际意义。
-   * `resilver_defer` 功能安全，但启动池容量较小，通常无需使用。
-   * `spacemap_v2` 功能经过测试，安全可用。启动池容量较小，实际影响不大。
-   * 作为只读兼容功能，`userobj_accounting` 理论上兼容，但在实践中 GRUB 可能报错“invalid dnode type”。此功能对 `/boot` 无关紧要。
+   * `allocation_classes` 特性安全可用。但除非使用它（如 `special` vdev），否则启用它无意义。几乎不会有人在启动存储池上使用该特性。如果关注启动存储池速度，将整个存储池放在更快的磁盘上比使用 `special` vdev 更合理。
+   * `project_quota` 特性经过测试，安全可用。对启动存储池而言几乎无实际意义。
+   * `resilver_defer` 特性安全，但启动存储池容量较小，通常无需使用。
+   * `spacemap_v2` 特性经过测试，安全可用。启动存储池容量较小，实际影响不大。
+   * 作为只读兼容特性，`userobj_accounting` 理论上兼容，但在实践中 GRUB 可能报错“invalid dnode type”。此特性对 `/boot` 无关紧要。
 
-7. 创建根池：
+5. 创建根存储池：
    选择以下方案之一：
 
    * 未加密：
@@ -258,15 +258,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 * 设置 `normalization=formD` 可消除一些与 UTF-8 文件名规范化相关的极端情况。它还隐含 `utf8only=on`，意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请不要使用此选项。关于强制仅使用 UTF-8 文件名可能存在的问题，请参见 [The problems with enforced UTF-8 only filenames](http://utcc.utoronto.ca/~cks/space/blog/linux/ForcedUTF8Filenames)。
 * `recordsize` 未设置（保持默认 128 KiB）。如果想调整（例如 `-O recordsize=1M`），请参见[这些](https://jrs-s.net/2019/04/03/on-zfs-recordsize/) [博客](http://blog.programster.org/zfs-record-size) [文章](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSFileRecordsizeGrowth) [帖子](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSRecordsizeAndCompression)。
 * 设置 `relatime=on` 在经典 POSIX `atime` 行为（性能影响显著）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间提供折中。自 Linux 2.6.30 起，`relatime` 成为其他文件系统的默认设置。更多信息请参见 [RedHat 文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/power_management_guide/relatime)。
-* 设置 `xattr=sa` [大幅提高扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用使用，[一些桌面 GUI 应用会使用它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)；[Samba 可使用它们存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。注意 `xattr=sa` 是 [Linux 特定](https://openzfs.org/wiki/Platform_code_differences) 的。如果将 `xattr=sa` 池迁移到 ZFS-on-Linux 以外的 OpenZFS 实现，扩展属性将无法读取（数据仍可用）。如果扩展属性的可移植性对你重要，请省略上面的 `-O xattr=sa`。即便不希望整个池使用 `xattr=sa`，在 `/var/log` 上使用通常是安全的。
-* 确保包括驱动路径的 `-part4` 部分。如果忘记，将指定整个磁盘，ZFS 会重新分区，你将丢失启动器分区。
+* 设置 `xattr=sa` [大幅提高扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用使用，[一些桌面 GUI 应用会使用它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)；[Samba 可使用它们存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。注意 `xattr=sa` 是 [Linux 特定](https://openzfs.org/wiki/Platform_code_differences) 的。如果将 `xattr=sa` 存储池迁移到 ZFS-on-Linux 以外的 OpenZFS 实现，扩展属性将无法读取（数据仍可用）。如果扩展属性的可移植性对你重要，请省略上面的 `-O xattr=sa`。即便不希望整个存储池使用 `xattr=sa`，在 `/var/log` 上使用通常是安全的。
+* 确保包含磁盘路径中的 `-part4` 部分。如果忘记，将指定整个磁盘，ZFS 会重新分区，你将丢失引导加载器分区。
 * ZFS 原生加密 [现](https://github.com/openzfs/zfs/commit/31b160f0a6c673c8f926233af2ed6d5354808393) 默认使用 `aes-256-gcm`。
-* 对于 LUKS，选择的密钥大小为 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥被一分为二。因此 `-s 512` 即表示 AES-256。
+* 对于 LUKS，密钥大小选择为 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥被一分为二，`-s 512` 即表示 AES-256。
 * 你的口令很可能是最薄弱环节。请谨慎选择。参考 [cryptsetup FAQ 第 5 节](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions#5-security-aspects) 获取指导。
 
 **提示：**
 
-* 如果你创建镜像拓扑，请使用以下命令创建池：
+* 如果你创建镜像拓扑，请使用以下命令创建存储池：
 
   ```sh
   zpool create \
@@ -278,7 +278,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 * 对于 raidz 拓扑，将上面命令中的 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出其他磁盘的分区。
 * 使用 LUKS 配合镜像或 raidz 拓扑时，请使用 `/dev/mapper/luks1`、`/dev/mapper/luks2` 等，这些需要通过 `cryptsetup` 创建。
-* 可自定义存储池名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根池默认命名为 `rpool`。
+* 可自定义存储池名称。如果更改，新名称必须保持一致。在可以自动安装到 ZFS 的系统中，根存储池默认命名为 `rpool`。
 
 ## 第 3 步：安装系统
 
@@ -289,7 +289,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zfs create -o canmount=off -o mountpoint=none bpool/BOOT
    ```
 
-   在 Solaris 系统中，根文件系统会被克隆，并通过 `pkg image-update` 或 `beadm` 对后缀进行递增以应对重大系统更改。类似功能已在 Ubuntu 20.04 中通过 `zsys` 工具实现，尽管其数据集布局更复杂。即使没有此类工具，仍可手动创建 rpool/ROOT 和 bpool/BOOT 容器的克隆。不过，为简化操作，本教程假设 `/boot` 使用单一文件系统。
+   在 Solaris 系统中，根文件系统会被克隆，并通过 `pkg image-update` 或 `beadm` 递增后缀以应对重大系统更改。Ubuntu 20.04 已通过 `zsys` 工具实现了类似功能，尽管其数据集布局更复杂。即使没有此类工具，仍可手动创建 `rpool/ROOT` 和 `bpool/BOOT` 容器的克隆。不过，为简化操作，本教程假设 `/boot` 使用单一文件系统。
 
 2. 为根文件系统和启动文件系统创建数据集：
 
@@ -348,7 +348,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zfs create                                 rpool/var/games
    ```
 
-   如果系统将存储本地邮件在 `/var/mail`：
+   如果系统要在 `/var/mail` 中存储本地邮件：
 
    ```sh
    zfs create                                 rpool/var/spool/mail
@@ -409,7 +409,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    如果不做额外操作，`/tmp` 将作为根文件系统的一部分存储。或者，可以如上创建独立的 `/tmp` 数据集，将 `/tmp` 数据排除在根文件系统快照之外。同时，可对 `rpool/tmp` 设置配额以限制最大使用空间。否则，可在后续使用 tmpfs（内存文件系统）。
 
-5. 复制 `zpool.cache`：
+4. 复制 `zpool.cache`：
 
    ```sh
    mkdir /mnt/etc/zfs -p
@@ -665,7 +665,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 13. 启用 bpool 导入：
 
-    确保始终导入 `bpool`，无论是否存在 `/etc/zfs/zpool.cache`，是否启用 `zfs-import-scan.service`。
+    确保始终导入 `bpool`，无论是否存在 `/etc/zfs/zpool.cache`、其是否在 cachefile 中，以及是否启用 `zfs-import-scan.service`。
 
     ```sh
     vi /etc/systemd/system/zfs-import-bpool.service
@@ -695,9 +695,9 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
     systemctl enable zfs-import-bpool.service
     ```
 
-15. 可选（但推荐）：将 `/tmp` 挂载为 tmpfs
+14. 可选（但推荐）：将 `/tmp` 挂载为 tmpfs
 
-    如果之前创建了 `/tmp` 数据集，则跳过此步，否则可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上：
+    如果之前创建了 `/tmp` 数据集，则跳过此步（两者互斥），否则可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上：
 
     ```sh
     cp /usr/share/systemd/tmp.mount /etc/systemd/system/
@@ -726,7 +726,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    >**注意：**
    >
-   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED” 。
+   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED”。
    解决方法：检查 cryptsetup 的安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
 
    >**注意：**
@@ -764,7 +764,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    # 设置：GRUB_CMDLINE_LINUX="root=ZFS=rpool/ROOT/suse"
    ```
 
-5. 可选（但强烈建议）：便于调试 GRUB：
+   4. 可选（但强烈建议）：便于调试 GRUB：
 
    ```sh
    vi /etc/default/grub
@@ -776,7 +776,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    系统重启两次并确认一切正常后，可根据需要恢复这些更改。
 
-6. 更新启动配置：
+5. 更新启动配置：
 
    ```sh
    update-bootloader
@@ -798,7 +798,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    >grub2-mkconfig -o /boot/grub2/grub.cfg
    >```
 
-7. 安装启动加载器：
+6. 安装启动加载器：
 
    1. 对于 legacy（BIOS）启动，将 GRUB 安装到 MBR：
 
@@ -810,7 +810,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
       >
       >这里是将 GRUB 安装到整个磁盘，而非单个分区。
 
-      如果创建了 mirror 或 raidz 拓扑，需要对池中每块磁盘重复执行该命令。
+      如果创建了 mirror 或 raidz 拓扑，需要对存储池中每块磁盘重复执行该命令。
 
 8. 对于 UEFI 启动，将 GRUB 安装到 ESP 分区：
 
@@ -825,7 +825,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 >**警告：**
 >
->这将破坏你的 YaST2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 池而提供的替代方案。
+>这将破坏你的 YaST2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 存储池而提供的替代方案。
 
 1. 安装 systemd-boot：
 
@@ -882,14 +882,14 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zed -F &
    ```
 
-3. 验证 `zed` 是否更新了缓存，确保以下文件非空：
+2. 验证 `zed` 是否更新了缓存，确保以下文件非空：
 
    ```sh
    cat /etc/zfs/zfs-list.cache/bpool
    cat /etc/zfs/zfs-list.cache/rpool
    ```
 
-4. 如果文件为空，强制更新缓存并重新检查：
+3. 如果文件为空，强制更新缓存并重新检查：
 
    ```sh
    zfs set canmount=on     bpool/BOOT/suse
@@ -905,7 +905,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    然后重新启动 `zed` 并重试。
 
-5. 修正缓存路径，去掉前缀 `/mnt`：
+4. 修正缓存路径，去掉前缀 `/mnt`：
 
    ```sh
    sed -Ei "s|/mnt/?|/|" /etc/zfs/zfs-list.cache/*
@@ -981,7 +981,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
      grub-install $DISK
      ```
 
-     按回车直到出现设备选择界面，使用空格键选择池中的所有磁盘（不是分区）。
+     按回车直到出现设备选择界面，使用空格键选择存储池中的所有磁盘（不是分区）。
 
    * 对于 UEFI 启动：
 
