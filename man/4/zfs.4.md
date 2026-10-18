@@ -227,6 +227,14 @@ L2ARC 缓冲首次缓存到 L2ARC 时的 ARC 状态，可通过 **l2arc_mru_asiz
 在默认设置 **16 MiB** 下，即使对于高度碎片化且 **ashift**=9 的池，通常也只会出现少于 *500* 次迭代。可能的最大迭代次数为 **metaslab_df_max_search / 2^(ashift+1)**。以默认 **16 MiB** 设置计算，**ashift**=9 时为 *16 × 1024*，**ashift**=12 时为 *2 × 1024*。
 
 
+### **metaslab_df_alloc_threshold = 131072** B (128 KiB) (u64)
+
+迫使动态分配器改变其分配策略的最小大小。一旦空间映射无法满足该大小的分配，它就会切换到更激进的策略（按大小而非偏移量搜索）。
+
+### **metaslab_df_free_pct = 4** % (uint)
+
+空间映射必须以首次适配（first-fit）方式继续分配所需的最小空闲空间百分比。一旦空闲空间低于此水平，分配就会切换到最佳适配（best-fit）策略。
+
 ### **metaslab_df_use_largest_segment = 0 | 1** (int)
 
 如果未向前搜索（由于 **metaslab_df_max_search**、**metaslab_df_free_pct** 或 **metaslab_df_alloc_threshold**），该可调参数控制使用哪个段。设置为 1 时使用最大空闲段；未设置时使用至少满足请求大小的段。
