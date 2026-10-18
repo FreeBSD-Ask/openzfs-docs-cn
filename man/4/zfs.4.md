@@ -196,6 +196,10 @@ L2ARC 缓冲首次缓存到 L2ARC 时的 ARC 状态，可通过 **l2arc_mru_asiz
 
 防止在池导出或销毁时销毁日志空间映射。
 
+### **zfs_log_sm_blksz = 131072** B (128 KiB) (int)
+
+此值用作日志空间映射（log space map）功能的块大小。由于这些空间映射预计会一次性写入大量数据，因此更大的块大小对其更有利。
+
 ### **zfs_metaslab_segment_weight_enabled = 1 | 0** (int)
 
 启用/禁用基于段的 metaslab 选择。
@@ -490,7 +494,7 @@ ARC 元缓冲区中可被 dnode 消耗的百分比。
 
 ### **zfs_arc_dnode_reduce_percent = 10** % (u64)
 
-当 dnode 消耗的字节数超过 **zfs_arc_dnode_limit** 时，尝试扫描的 ARC dnode 百分比，以响应对非元数据的需求。
+用于确定 dnode 裁剪请求大小的百分比。请求大小取以下两者中的较大值：将 **zfs_arc_dnode_reduce_percent** 应用于超过 **zfs_arc_dnode_limit** 的 dnode 数量，或将 **zfs_arc_dnode_reduce_percent** 应用于 dnode 总数（当不可淘汰的元数据超过元数据目标的 3/4 时）。
 
 
 ### **zfs_arc_average_blocksize = 8192** B (8 KiB) (uint)
@@ -854,7 +858,7 @@ ZFS 允许用于未刷写元数据变更的系统总内存比例，以百万分�
 
 ### **zfs_bclone_wait_dirty = 1 | 0** (int)
 
-设置为 1 时，FICLONE 和 FICLONERANGE ioctl 会等待所有脏数据写入磁盘后再继续，保证克隆操作可靠，即使文件在修改后立即被克隆。对小文件可能比直接复制慢。设置为 0 时，如遇脏块克隆操作会立即失败。默认启用等待。
+设置为 1 时，FICLONE 和 FICLONERANGE ioctl 会等待所有脏数据写入磁盘后再继续，保证克隆操作可靠，即使文件在修改后立即被克隆。对小文件可能比直接复制慢。设置为 0 时，如遇脏块克隆操作会立即失败。默认启用等待。FIDEDUPERANGE 请求总是会等待，因为它没有可吸收此类失败的复制回退机制。
 
 ### **zfs_blake3_impl = fastest**（字符串）
 
