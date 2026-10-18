@@ -1951,7 +1951,7 @@ zpool_test/testfsds1@snap3                            0B      -     4.19G  -
 ls -la /zpool_test/testfsds1
 ```
 
-**"是否可以回滚到更早的快照？"** 答案是：可以。
+**“是否可以回滚到更早的快照？”** 答案是：可以。
 
 回到 `zpool_test/testfsds1@snap1` 看似像前面演示的操作一样简单，但这次会有额外的提示：
 
@@ -2168,7 +2168,7 @@ zpool_test/testfsds1_clone@snap2                      0B      -     4.52G  -
 
 解释起来有些复杂，但可以这样理解：由于 `/zpool_test/testfsds1_clone/test.dd` 仍被 `zpool_test/testfsds1_clone@snap2` 引用，其数据块依然保留（因此该快照显示 4.52GB）。而在 `zpool_test/testfsds1_clone@snap1`（原 `zpool_test/testfsds1@snap1`）中，该文件不存在，因此显示 4.50GB。演示中将 `zpool_test/testfsds1` 的内容设置为 `zpool_test/testfsds1_clone` 的子集，因此 ZFS 只需少量元数据即可标识各实体的内容。
 
-另一个满分的问题：**"是否可以恢复到原始状态？"**（或换句话说：**"能提升 `zpool_test/testfsds1` 吗？"**）。首先回滚，销毁 `zpool_test/testfsds1_clone@snap2`：
+另一个满分的问题：**“是否可以恢复到原始状态？”**（或换句话说：**“能提升 `zpool_test/testfsds1` 吗？”**）。首先回滚，销毁 `zpool_test/testfsds1_clone@snap2`：
 
 ```sh
 zfs rollback zpool_test/testfsds1_clone@snap2
@@ -2196,7 +2196,7 @@ zpool_test/testfsds1_clone  type      filesystem                  -
 zpool_test/testfsds1_clone  origin    zpool_test/testfsds1@snap1  -
 ```
 
-在 Gentoo 环境中，快照的典型用法是实验性地测试 **"如果发生这种情况会怎样？"**：克隆生产环境的文件系统数据集，然后挂载所需内容（就像克隆的是未压缩的 Gentoo stage 3 tar 文件），再 `chroot` 进入其中，提供一个可随意操作的测试环境。克隆避免了来回复制数百 GB 数据占满本地磁盘空间（ZFS 若直接复制而非克隆，将复制所有数据块）。由于性能影响，ZFS 去重通常未被广泛使用。
+在 Gentoo 环境中，快照的典型用法是实验性地测试 **“如果发生这种情况会怎样？”**：克隆生产环境的文件系统数据集，然后挂载所需内容（就像克隆的是未压缩的 Gentoo stage 3 tar 文件），再 `chroot` 进入其中，提供一个可随意操作的测试环境。克隆避免了来回复制数百 GB 数据占满本地磁盘空间（ZFS 若直接复制而非克隆，将复制所有数据块）。由于性能影响，ZFS 去重通常未被广泛使用。
 
 作为文件系统数据集，可以使用已知命令销毁克隆：
 

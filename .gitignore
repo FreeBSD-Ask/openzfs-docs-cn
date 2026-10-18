@@ -223,3 +223,4 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,node,yarn,vue,vuejs
 !/script/校对工作单.md
 /script
+script/校对工作单.md
