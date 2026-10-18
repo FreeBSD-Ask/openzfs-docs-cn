@@ -509,6 +509,10 @@ scatter/gather 列表中单个块连续分配的最大内存页数。
 
 使用 scatter（基于页）ABD 的最小分配大小。较小分配将使用线性 ABD。
 
+### **zfs_active_allocator = dynamic** (charp)
+
+选择 SPA metaslab 分配器。有效值为 **dynamic** 和 **cursor**。
+
 ### **zfs_arc_dnode_limit = 0** B (u64)
 
 当 ARC 中 dnode 消耗的字节数超过此值时，会尝试在非元数据需求下取消固定其中一部分。该值作为 dnode 元数据的上限，默认为 **0**，表示根据 **zfs_arc_dnode_limit_percent** 的百分比，从 ARC 元缓冲区中划分可用于 dnode 的部分。
@@ -610,6 +614,14 @@ arc_prune 线程的数量。FreeBSD 不需要超过一个。Linux 理论上可�
 
 允许在只读模式下导入池时缺失的顶层 vdev 数量。
 
+### **zfs_max_missing_tvds_cachefile = 2** (u64)
+
+从 cachefile 导入池时，在从 MOS 读取受信任配置之前，可容忍缺失的顶层 vdev 数量。设备移除后若未重写 cachefile，cachefile 可能与磁盘上的配置不同步，因此默认值 2 仍能让导入过程访问到 MOS 的副本。
+
+### **zfs_max_missing_tvds_scan = 0** (u64)
+
+通过扫描设备路径导入池时，在从 MOS 读取受信任配置之前，可容忍缺失的顶层 vdev 数量。默认值为 0，因为扫描应当能发现每一个存在的设备。
+
 ### **zfs_max_nvlist_src_size = 0** B (u64)
 
 允许传递给 `/dev/zfs` 上 ioctl 的 **zc_nvlist_src_size** 的最大字节数。此设置可防止用户导致内核分配过多内存。当超过此限制时，ioctl 会返回 **EINVAL**，并在 zfs-dbgmsg 日志中记录错误描述。正常情况下无需修改此参数。如果为 **0**，在 FreeBSD 下相当于用户固定内存限制的四分之一，在 Linux 下相当于 **134217728**B（128 MiB）。
@@ -617,6 +629,10 @@ arc_prune 线程的数量。FreeBSD 不需要超过一个。Linux 理论上可�
 ### **zfs_multilist_num_sublists = 0** (uint)
 
 为了允许更细粒度的锁定，每个 ARC 状态包含用于数据和元数据对象的一系列列表。锁定在这些“子列表”级别进行。此参数控制每个 ARC 状态的子列表数量，同时也适用于 multilist 数据结构的其他用途。如果为 **0**，则相当于在线 CPU 数量与 **4** 中的较大值。
+
+### **zfs_arc_no_grow_shift = 5** (uint)
+
+如果可用空闲内存少于 **arc_c** >> **zfs_arc_no_grow_shift**，则不允许 ARC 增长。
 
 ### **zfs_arc_overflow_shift = 8** (int)
 
@@ -650,6 +666,14 @@ ARC 回收目标占页缓存的百分比。
 
 ARC 应保留作为系统空闲内存的目标字节数。如果为零，则相当于 **512 KiB** 与 **all_system_memory/64** 中的较大值。
 
+### **zfs_arc_free_target** (uint)
+
+低于此期望空闲页数时，ARC 会触发回收。启动时初始化为内核的 **vm.v_free_target** 值，并可在运行时调整。此参数是 FreeBSD 特有的，以页为单位，这与 Linux 特有的、以字节为单位的 **zfs_arc_sys_free** 不同。
+
+### **zfs_ccw_retry_interval = 300** s (int)
+
+配置缓存文件写入失败后的重试间隔（秒）。
+
 ### **zfs_checksum_events_per_second = 20**/s (uint)
 
 将校验和事件的速率限制为每秒指定次数。注意，这个值不应低于 ZED 阈值（当前为 10 次校验和/10 秒），否则守护进程可能不会触发任何操作。
@@ -657,6 +681,10 @@ ARC 应保留作为系统空闲内存的目标字节数。如果为零，则相�
 ### **zfs_commit_timeout_pct = 10** % (uint)
 
 此参数控制当 ZIL 块（lwb）未“满”且有线程等待将其提交到稳定存储时，该块保持“打开”的时间。超时时间根据最近一次 lwb 延迟的百分比进行调整，以避免显著影响每个事务记录（itx）的延迟。
+
+### **zfs_compressed_arc_enabled = 1 | 0** (int)
+
+启用将以磁盘上的压缩形式存储 ARC 缓冲区，从而减轻内存压力。禁用时，缓冲区在缓存之前会被解压。
 
 ### **zfs_condense_indirect_commit_entry_delay_ms = 0** ms (int)
 
@@ -1018,6 +1046,10 @@ ZFS 允许用于未刷写元数据变更的系统总内存比例，以百万分�
 
 BIO 可添加的最大段数（最小为 4）。如果超过设备队列或内核允许的最大值，将被限制。设置为 0 时使用内核理想值。仅适用于 Linux。
 
+### **zfs_vdev_disk_calling_thread_io = 0 | 1** (uint)
+
+控制调用线程 I/O；注意，只有当 zio 绕过了 vdev 队列时，我们才会等待其完成，此模块参数所做的只是启用该能力。如果后端 vdev 设备快速且延迟低，启用后可能带来性能提升。在 raidz 或 draid 存储池配置上启用时，可能影响某些工作负载的性能。此参数目前仅适用于 Linux。
+
 ### **zfs_expire_snapshot = 300** s (int)
 
 **.zfs/snapshot** 下快照过期前的等待时间（秒）。
@@ -1026,9 +1058,17 @@ BIO 可添加的最大段数（最小为 4）。如果超过设备队列或内�
 
 允许通过 **.zfs/snapshot** 目录创建、删除或重命名条目来触发快照的创建、销毁或重命名。启用后，此功能在本地和设置了 *no_root_squash* 的 NFS 导出上均可用。
 
+### **zfs_snapshot_history_enabled = 1 | 0** (int)
+
+是否在池的历史日志中记录快照的创建和销毁事件，可用 `zpool history` 查看。
+
 ### **zfs_snapshot_no_setuid = 0 | 1** (int)
 
 是否禁用快照挂载的 *setuid/setgid* 支持，通过在挂载时加上 *nosuid* 选项实现。
+
+### **zfs_sb_uuid = 1 | 0** (int)
+
+在挂载时，根据池 GUID 和数据集 GUID 设置文件系统、快照或克隆的文件系统 UUID，如 **zfsprops(7)** 中 **guid** 属性的描述。设置为 **0** 可将 UUID 保留为空，这与没有此参数的发行版行为一致，例如在升级后残留的 overlayfs 文件句柄阻止挂载时；参见 **zpool-reguid(8)** 的“Filesystem UUIDs and Overlayfs”一节。变更适用于变更之后挂载的文件系统。对于开机时挂载的文件系统，需在首次挂载前设置此参数：可在内核命令行上设置为 **zfs.zfs_sb_uuid=0**，或在 `modprobe.d` 文件中设置为 **options zfs zfs_sb_uuid=0**。当根文件系统位于 ZFS 上时，initramfs 必须包含该文件。此参数仅适用于 Linux。
 
 ### **zfs_flags = 0** (int)
 
@@ -1170,6 +1210,10 @@ spacemap 日志摘要允许的最大行数。
 ### **zfs_min_metaslabs_to_flush = 1** (u64)
 
 每个 dirty TXG 至少要刷新的 metaslab 数量。
+
+### **zfs_min_metaslabs_to_condense_pct = 5** (u64)
+
+压缩（condense）日志空间映射时，每个 TXG 要刷新的 metaslab 最小数量，以运行 `zpool condense` 命令时未刷新 metaslab 数量的百分比表示。
 
 ### **zfs_metaslab_fragmentation_threshold = 77** % (uint)
 
@@ -1336,6 +1380,10 @@ scrub 操作由同步线程处理。每个 TXG 刷新之间至少花费此时间
 ### **zfs_scrub_error_blocks_per_txg = 4096** (uint)
 
 每个 TXG 中待 scrub 的错误块数量。
+
+### **zfs_scan_blkstats = 0 | 1** (int)
+
+启用时，ZFS 在 scrub 期间按块类型和间接层级统计块数量。这些计数保存在内存中用于调试，不会暴露给用户空间。
 
 ### **zfs_scan_checkpoint_intval = 7200** 秒 (2 小时) (uint)
 
