@@ -411,7 +411,7 @@
 17. 设置 root 密码：
 
     ```bash
-    printf 'root:你的密码' | chpasswd
+    printf 'root:yourpassword' | chpasswd
     ```
 
 ### 引导加载程序

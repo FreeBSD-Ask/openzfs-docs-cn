@@ -1016,7 +1016,7 @@ mount /boot/efi
 mount -a
 ```
 
-在完成所需修复后，清理挂载：
+在完成所需修复后，执行清理：
 
 ```sh
 exit
@@ -1040,13 +1040,13 @@ update-initramfs -c -k all
 RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 ```
 
-请升级或降级 Areca 驱动。在出现此错误的设备上，ZoL 可能不稳定。
+请升级或降级 Areca 驱动。在出现此错误信息的系统上，ZoL 不稳定。
 
 ### MPT2SAS 控制器
 
 本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
-基本问题是，这类控制器上的磁盘在 Linux 内核启动后才可见，而 ZoL 不会热插入池成员。详细说明见 [https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
+基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/openzfs/zfs/issues/330>。
 
 大多数 LSI 卡可与 ZoL 完全兼容。如果你的 LSI 卡出现了上述问题，可在文件 `/etc/default/zfs` 中设置：
 
