@@ -44,4 +44,4 @@ ZFS 使用基于事件的消息接口，将重要事件传递给系统上运行�
 
 每个事件都有一个用于过滤事件类型的类标识符。常见事件通常与池管理相关，类为 `sysevent.fs.zfs.*`，包括导入、导出、配置更新以及 `zpool history` 的更新。
 
-与错误相关的事件报告为类 `ereport.*`，对于故障排查非常有价值。软件各层在处理同一故障时，可能会产生多个 ereport。例如，对于没有校验保护的简单池，读取损坏磁盘时可能产生一个 `ereport.io`，从而在池级别生成一个 `ereport.fs.zfs.checksum`。这些事件也会反映在 `zpool status` 中的错误计数器中。如果在 `zpool status` 中看到校验和或读写错误，则在 `zpool events` 输出中应该有一个或多个对应的 ereport。
+与错误相关的事件报告为类 `ereport.*`，对于故障排查非常有价值。软件各层在处理同一故障时，可能会产生多个 ereport。例如，对于没有校验保护的简单池，读取损坏磁盘时可能产生一个 `ereport.io`，从而在池级别生成一个 `ereport.fs.zfs.checksum`。这些事件也会反映在 `zpool status` 中的错误计数器中。如果在 `zpool status` 中看到校验和错误或读写错误，则在 `zpool events` 输出中应该有一个或多个对应的 ereport。

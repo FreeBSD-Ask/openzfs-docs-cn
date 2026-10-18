@@ -2,7 +2,7 @@
 
 **ZFSBootMenu**
 
-[ZFSBootMenu](https://zfsbootmenu.org/) 是一种不受此类限制的替代引导加载器，还支持启动环境。如果你计划使用 ZBM，请不要参照本文，因为与其布局不兼容。请参考其网站获取安装细节。
+[ZFSBootMenu](https://zfsbootmenu.org/) 是一种不受此类限制的替代引导加载器，还支持启动环境。如果你计划使用 ZBM，请勿参照本页面上的说明，因为两者的布局并不兼容。请参考其网站获取安装细节。
 
 **自定义**
 
@@ -10,7 +10,7 @@
 
 **仅使用经过充分测试的存储池特性**
 
-你应且只应使用经过充分测试的存储池特性。如果数据完整性至关重要，请避免使用新特性。例如，可参见 [此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
+你应当只使用经过充分测试的存储池特性。如果数据完整性至关重要，请避免使用新特性。例如，可参见 [此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
 
 **仅支持 UEFI**
 
@@ -20,7 +20,8 @@
 
 1. 禁用安全启动。如果启用了安全启动，将无法加载 ZFS 模块。
 2. 由于最新 Live CD 的内核可能与 ZFS 不兼容，我们将使用默认自带 ZFS 的 Alpine Linux Extended。
-   下载最新版扩展变体的 [Alpine Linux Live 镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，校验 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，再从该镜像启动。
+
+   下载最新的 extended 变体 [Alpine Linux Live 镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，校验 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，再从该镜像启动。
 
    ```sh
    gpg --auto-key-retrieve --keyserver hkps://keyserver.ubuntu.com --verify alpine-extended-*.asc
@@ -72,7 +73,7 @@
     setup-apkrepos
     ```
 
-11. 本指南中使用由 udev 生成的可预测磁盘名称。
+11. 本指南通篇使用由 udev 生成的可预测磁盘名称。
 
     ```sh
     apk update
@@ -81,14 +82,16 @@
     ```
 
 12. 目标磁盘
-    列出可用磁盘：
+
+    使用以下命令列出可用磁盘：
 
     ```sh
     find /dev/disk/by-id/
     ```
 
     如果使用 virtio 作为磁盘总线，请关闭虚拟机并为磁盘设置序列号。对于 QEMU，使用 `-drive format=raw,file=disk2.img,serial=AaBb`；对于 libvirt，请编辑域 XML。示例可参见 [此页面](https://bugzilla.redhat.com/show_bug.cgi?id=1245013)。
-    声明磁盘编号：
+
+    声明磁盘数组：
 
     ```sh
     DISK='/dev/disk/by-id/ata-FOO /dev/disk/by-id/nvme-BAR'
@@ -107,6 +110,7 @@
     ```
 
 14. 设置分区大小：
+
     设置 swap 大小（GB），若不希望 swap 占用过多空间，可设为 1。
 
     ```sh
@@ -137,6 +141,7 @@
    >**注意**
    >
    >必须清除目标磁盘上所有现有的分区表和数据结构。
+
    对于基于闪存的存储，可使用以下 blkdiscard 命令：
 
    ```sh
@@ -159,7 +164,7 @@
    done
    ```
 
-2. 仅为本次安装设置临时加密 swap，当可用内存较小时非常有用：
+2. 仅为本次安装设置临时加密 swap。当可用内存较小时，这很有用：
 
    ```sh
    for i in ${DISK}; do
@@ -213,7 +218,7 @@
    mount -o X-mount.mkdir -t zfs rpool/home "${MNT}"/home
    ```
 
-6. 格式化并挂载 ESP。仅使用其中一个作为 `/boot`，之后需设置镜像：
+6. 格式化并挂载 ESP。只有其中一个会用作 `/boot`，之后需要设置镜像：
 
    ```sh
    for i in ${DISK}; do
@@ -264,7 +269,7 @@
    > "${MNT}"/etc/fstab
    ```
 
-4. chroot：
+4. 切换根环境（chroot）：
 
    ```sh
    cp /etc/resolv.conf "${MNT}"/etc/resolv.conf
@@ -363,7 +368,7 @@
     zgenhostid -f -o /etc/hostid
     ```
 
-12. 进行本地化：
+12. 生成本地化设置：
 
     ```sh
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen

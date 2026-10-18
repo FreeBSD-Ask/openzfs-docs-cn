@@ -4,7 +4,7 @@
 
 >**注意**
 >
->如果你想将 ZFS 用作根文件系统，请改为参阅下文的 Root on ZFS 链接。
+>如果你想将 ZFS 用作根文件系统，请改为参阅下文的以 ZFS 为根文件系统相关页面。
 
 在 Ubuntu 上，ZFS 已包含在默认的 Linux 内核包中。要安装 ZFS 工具，请先确保在 `/etc/apt/sources.list` 中启用了 `universe`：
 

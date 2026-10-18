@@ -31,7 +31,12 @@
 | copies | 副本数 | 属性 `copies` 名保留英文 |
 | checkpoint | 检查点 | |
 | bookmark | 书签 | |
-| hold | 保留（建议） | `zfs hold` 语境，暂停改动确认后再统一 |
+| hold | 保留（建议） | `zfs hold` 语境；ARC/引用计数语境的 holds 译"持有数"，按上下文区分 |
+| enclosure | 机箱 | 磁盘机箱 |
+| channel | 通道 | |
+| switch | 交换机 | SAS 拓扑语境 |
+| slot | 插槽 | 磁盘插槽语境统一用"插槽"（不写"槽位"） |
+| spill block | spill 块（保留） | 与 `zfs.4` 现有译法一致，不译"溢出块" |
 | property | 属性 | dataset property 译“数据集属性”，user property 译“用户属性” |
 | quota | 配额 | |
 | refquota | 引用配额（建议） | |

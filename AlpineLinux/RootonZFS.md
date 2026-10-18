@@ -2,7 +2,7 @@
 
 **ZFSBootMenu**
 
-[ZFSBootMenu](https://zfsbootmenu.org/) 是一种不受此类限制的替代引导加载器，还支持启动环境。如果你计划使用 ZFSBootMenu，请勿参照本页面上的说明，因为与其布局并不兼容。请参考其网站获取安装细节。
+[ZFSBootMenu](https://zfsbootmenu.org/) 是一种不受此类限制的替代引导加载器，还支持启动环境。如果你计划使用 ZFSBootMenu，请勿参照本页面上的说明，因为两者的布局并不兼容。请参考其网站获取安装细节。
 
 **自定义**
 
@@ -10,7 +10,7 @@
 
 **仅使用经过充分测试的存储池特性**
 
-你应且只应使用经过充分测试的存储池特性。若数据完整性至关重要，请避免使用新特性。例如，可参见 [此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
+你应当只使用经过充分测试的存储池特性。若数据完整性至关重要，请避免使用新特性。例如，可参见 [此评论](https://github.com/openzfs/openzfs-docs/pull/464#issuecomment-1776918481)。
 
 **仅支持 UEFI**
 
@@ -19,7 +19,7 @@
 ## 准备
 
 1. 禁用安全启动。如果启用了安全启动，将无法加载 ZFS 模块。
-2. 下载最新 extended（衍生版本）的 [Alpine Linux Live 镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，校验 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，然后从该镜像启动。
+2. 下载最新的 extended 变体 [Alpine Linux Live 镜像](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso)，校验 [校验和](https://dl-cdn.alpinelinux.org/alpine/v3.19/releases/x86_64/alpine-extended-3.19.0-x86_64.iso.asc)，然后从该镜像启动。
 
    ```sh
    gpg --auto-key-retrieve --keyserver hkps://keyserver.ubuntu.com --verify alpine-extended-*.asc
@@ -41,7 +41,7 @@
    manual netconfig:  n
    ```
 
-5. 如果你使用的是无线网络但无线网卡未出现在列表中，请参阅 [Alpine Linux wiki](https://wiki.alpinelinux.org/wiki/Wi-Fi#wpa_supplicant) 获取更多细节。`wpa_supplicant` 可以在没有互联网连接的情况下通过命令 `apk add wpa_supplicant` 进行安装。
+5. 如果你使用的是无线网络但无线网卡未出现在列表中，请参阅 [Alpine Linux wiki](https://wiki.alpinelinux.org/wiki/Wi-Fi#wpa_supplicant) 获取更多细节。`wpa_supplicant` 无需互联网连接即可通过命令 `apk add wpa_supplicant` 安装。
 6. 配置 SSH 服务器
 
    ```sh
@@ -54,7 +54,8 @@
 
    此处设置的配置将被原样复制到已安装的系统中。
 7. 设置 root 密码或 `/root/.ssh/authorized_keys`。
-   请设置足够复杂的 root 密码，因为它将用于新安装的系统。不过，`authorized_keys` 文件本身不会被复制到新系统中。
+
+   请设置强健的 root 密码，因为它会复制到新安装的系统中。不过，`authorized_keys` 不会被复制。
 8. 通过另一台计算机进行连接
 
    ```sh
@@ -83,6 +84,7 @@
 
     重启后可通过命令 `setup-devd mdev && apk del eudev` 将其移除。
 12. 目标磁盘
+
     使用以下命令列出可用磁盘：
 
     ```sh
@@ -91,7 +93,7 @@
 
     如果使用 virtio 作为磁盘总线，请关闭虚拟机并为磁盘设置序列号。对于 QEMU，可使用 `-drive format=raw,file=disk2.img,serial=AaBb`。对于 libvirt，请编辑域 XML。示例可参见 [此页面](https://bugzilla.redhat.com/show_bug.cgi?id=1245013)。
 
-    声明磁盘编号：
+    声明磁盘数组：
 
     ```sh
     DISK='/dev/disk/by-id/ata-FOO /dev/disk/by-id/nvme-BAR'
@@ -110,6 +112,7 @@
     ```
 
 14. 设置分区大小：
+
     设置 swap 大小（单位为 GB），如果不希望 swap 占用过多空间，可设置为 1。
 
     ```ini
@@ -140,6 +143,7 @@
    >**注意**
    >
    >你必须清除目标磁盘上所有现有的分区表和数据结构。
+
    对于基于闪存的存储，可以使用下面的 blkdiscard 命令完成此操作：
 
    ```sh

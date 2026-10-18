@@ -2,6 +2,6 @@
 
 ## 概览
 
-由于许可不兼容，在 Arch Linux 官方仓库中未包含对 ZFS 的支持。
+由于许可不兼容，ZFS 并未包含在 Arch Linux 官方仓库中。
 
-ZFS 支持由第三方的 [archzfs 仓库](https://github.com/archzfs/archzfs) 提供。
+ZFS 支持由第三方 [archzfs 仓库](https://github.com/archzfs/archzfs) 提供。
