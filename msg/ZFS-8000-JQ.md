@@ -32,7 +32,7 @@ config:
 errors: 1 data errors, use '-v' for a list
 ```
 
-确认受影响的设备已连接后，运行 `zpool clear` 再重新允许对池的写入 I/O 操作：
+确认受影响的设备已连接后，运行 `zpool clear`，以重新允许对池的写入 I/O 操作：
 
 ```sh
 # zpool clear test

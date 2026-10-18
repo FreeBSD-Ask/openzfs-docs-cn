@@ -6,15 +6,15 @@
 
 ## 介绍
 
-[dRAID](https://docs.google.com/presentation/d/1uo0nBfY84HIhEqGWEx-Tbm8fPbJKtIP3ICo4toOPcJo/edit) 是 raidz 的一种变体，提供了集成的分布式热备盘，更快地重建（resilvering），同时保留 raidz 的优势。dRAID vdev 由多个内部 raidz 组构成，每组包含 D 个数据设备和 P 个校验设备。这些组分布在所有子设备上，以充分利用可用的磁盘性能。这被称为校验去聚类（parity declustering），一直是个活跃的研究领域。下图是简化示意，但有助于说明 dRAID 与 raidz 的关键区别。
+[dRAID](https://docs.google.com/presentation/d/1uo0nBfY84HIhEqGWEx-Tbm8fPbJKtIP3ICo4toOPcJo/edit) 是 raidz 的一种变体，提供了集成的分布式热备盘，可实现更快的重建（resilvering），同时保留 raidz 的优势。dRAID vdev 由多个内部 raidz 组构成，每组包含 D 个数据设备和 P 个校验设备。这些组分布在所有子设备上，以充分利用可用的磁盘性能。这被称为校验去聚类（parity declustering），一直是个活跃的研究领域。下图是简化示意，但有助于说明 dRAID 与 raidz 的关键区别。
 
 
 ![](../.gitbook/assets/raidz_draid.png)
 
 
-此外，dRAID vdev 必须以一种方式重新排列其子 vdev，无论哪块磁盘发生故障，重建 I/O（包括读写）都能在所有存活磁盘之间均匀分布。这通过使用精心选择的预计算排列映射来实现。这样既可以保持存储池创建速度快，又能确保映射不会被损坏或丢失。
+此外，dRAID vdev 必须以特定方式重新排列其子 vdev，使得无论哪块磁盘发生故障，重建 I/O（包括读写）都能在所有存活磁盘之间均匀分布。这通过使用精心选择的预计算排列映射来实现。这样既能让存储池创建保持快速，又能确保映射不会被损坏或丢失。
 
-dRAID 与 raidz 的另一区别在于它使用固定条带宽度（必要时用零填充）。这使得 dRAID vdev 可以顺序重建（resilver），但固定条带宽度会显著影响可用容量和 IOPS。例如，默认 D=8 且磁盘扇区为 4k 时，最小分配大小为 32k。如果使用压缩，这种相对较大的分配大小可能降低实际压缩比。在使用 ZFS 卷和 dRAID 时，默认 volblocksize 属性会根据分配大小进行增加。如果 dRAID 池将存储大量小块数据，建议增加一个镜像特殊 vdev 来存储这些小块。
+dRAID 与 raidz 的另一区别在于它使用固定条带宽度（必要时用零填充）。这使得 dRAID vdev 可以顺序重建（resilver），但固定条带宽度会显著影响可用容量和 IOPS。例如，默认 D=8 且磁盘扇区为 4k 时，最小分配大小为 32k。如果使用压缩，这种相对较大的分配大小可能降低实际压缩比。在使用 ZFS 卷和 dRAID 时，默认的 volblocksize 属性会相应增大，以适配该分配大小。如果 dRAID 池将存储大量小块数据，建议额外添加一个镜像的 special vdev 来存储这些小块。
 
 关于 IOPS，性能与 raidz 类似，因为任何读取操作都必须访问所有 D 个数据磁盘。可交付的随机 IOPS 可以合理地近似为 `floor((N-S)/(D+P)) * <单盘 IOPS>`。
 
@@ -74,12 +74,12 @@ config:
 
 ## 重建到分布式热备盘
 
-dRAID 的一个主要优势是它同时支持顺序和传统重建（resilver）。在向分布式热备盘进行顺序重建时，性能按磁盘数量除以条带宽度（D+P）进行扩展。这可以大幅缩短重建时间，在通常时间的一小部分内恢复完整冗余。例如，下图显示了一个由 90 块机械硬盘构成、填充至 90% 容量的 dRAID 的实际顺序重建时间（以小时计）。
+dRAID 的一个主要优势是它同时支持顺序重建和传统的修复重建（healing resilver）。在向分布式热备盘进行顺序重建时，性能按磁盘数量除以条带宽度（D+P）进行扩展。这可以大幅缩短重建时间，在通常时间的一小部分内恢复完整冗余。例如，下图显示了一个由 90 块机械硬盘构成、填充至 90% 容量的 dRAID 的实际顺序重建时间（以小时计）。
 
 
 ![](../.gitbook/assets/draid-resilver-hours.png)
 
-**dRAID 顺序重建器 —— 替换一块 16TB 磁盘所需小时数 90 块 HDD，单个分布式热备盘，池容量 100%**
+**dRAID 顺序重建 —— 替换一块 16TB 磁盘所需的小时数，90 块 HDD，单个分布式热备盘，池容量 100%**
 
 
 在使用 dRAID 和分布式热备盘时，处理故障磁盘的过程几乎与带有传统热备盘的 raidz 相同。当检测到磁盘故障时，如果有可用的热备盘，ZFS 事件守护进程（ZED）会启动重建。唯一的区别是，对于 dRAID 会启动顺序重建（sequential resilver），而 raidz 必须使用修复重建（healing resilver）。
@@ -122,13 +122,13 @@ config:
 虽然两种类型的 resilvering 达到相同的目标，但值得花一点时间总结它们的主要区别。
 
 * 传统的 healing resilver 会扫描整个块树。这意味着在修复过程中每个块的校验和都是可用的，并且可以立即验证。缺点是这会产生随机读取工作负载，这对性能不利。
-* 顺序 resilver 则扫描空间映射，以确定哪些空间已分配、哪些必须修复。此重建过程不受块边界限制，可以顺序读取磁盘并使用较大的 I/O 进行修复。为了换取这种性能提升，块校验和在 resilvering 过程中无法验证。因此，在顺序 resilver 完成后会启动一次 scrub 来验证校验和。
+* 顺序 resilver 则扫描空间映射，以确定哪些空间已分配、哪些必须修复。此重建过程不受块边界限制，可以顺序读取磁盘并使用较大的 I/O 进行修复。获得这种性能提升所付出的代价是，在 resilvering 过程中无法验证块校验和。因此，在顺序 resilver 完成后会启动一次 scrub 来验证校验和。
 
 关于顺序与 healing resilvering 之间差异的更深入解释，请查看在 OpenZFS Developer Summit 上展示的这些[顺序 resilver](https://docs.google.com/presentation/d/1vLsgQ1MaHlifw40C9R2sPsSiHiQpxglxMbK2SMthu0Q/edit#slide=id.g995720a6cf_1_39)幻灯片。
 
 ## 重新平衡
 
-通过简单地用新驱动器替换任何故障驱动器，可以再次提供分布式备用空间。此过程称为重新平衡，本质上就是一次 resilver。在执行重新平衡时，推荐使用 healing resilver，因为此时池不再处于降级状态。这可确保在重建到新磁盘时验证所有校验和，并消除了随后对池进行 scrub 的必要。
+只需用新驱动器替换任何故障驱动器，即可重新提供分布式热备空间。此过程称为重新平衡，本质上就是一次 resilver。在执行重新平衡时，推荐使用 healing resilver，因为此时池不再处于降级状态。这可确保在重建到新磁盘时验证所有校验和，从而无需随后对池执行 scrub。
 
 
 ```sh
@@ -167,4 +167,4 @@ config:
        draid1-0-0          INUSE     currently in use
 ```
 
-在 resilvering 完成后，分布式热备用再次可用，存储池已恢复到正常健康状态。
+在 resilvering 完成后，分布式热备盘可以再次使用，存储池也恢复到正常的健康状态。
