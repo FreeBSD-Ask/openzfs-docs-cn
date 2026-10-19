@@ -1,5 +1,7 @@
 # 编辑日志
 
+* 2026.10.20
+  * 启动 man 页全量翻译（源：openzfs/zfs master 7c3d85aa，2026-10-18），新增 37 页：man(1) dbufstat、zarcsummary；man(5) vdev_id.conf；man(7) dracut.zfs、vdevprops、zfsconcepts、zpool-features、zpoolconcepts、zpoolprops；man(8) mount.zfs、zfs-diff、zfs-hold、zfs-load-key、zfs-mount-generator、zfs-promote、zfs-receive、zfs-rollback、zfs-send、zfs-upgrade、zfs-zone、zfs_ids_to_path、zpool-add、zpool-checkpoint、zpool-clear、zpool-ddtprune、zpool-destroy、zpool-detach、zpool-events、zpool-export、zpool-history、zpool-import、zpool-labelclear、zpool-prefetch、zpool-reopen、zpool-resilver、zpool-sync、zpool-trim
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置
