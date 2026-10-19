@@ -12,7 +12,7 @@ mount.zfs [-sfnvh] [-o options] dataset mountpoint
 
 ## 说明
 
-`mount.zfs` 辅助程序被 mount(8) 用于挂载文件系统快照和 `mountpoint=legacy` 的 ZFS 文件系统；在未设置 `ZFS_MOUNT_HELPER` 环境变量时，也被 zfs(8) 使用。在大多数情况下，你应当调用 mount(8) 或 zfs(8)，而不是直接调用它。
+`mount.zfs` 辅助程序被 mount(8) 用于挂载文件系统快照和 `mountpoint=legacy` 的 ZFS 文件系统；在未设置 `ZFS_MOUNT_HELPER` 环境变量时，也被 zfs(8) 使用。在大多数情况下，你应当调用 mount(8) 或 zfs(8)。
 
 `options` 依据 zfsprops(7) 的“临时挂载点属性”一节处理，下文所述的选项除外。
 

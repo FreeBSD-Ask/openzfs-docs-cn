@@ -138,7 +138,7 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `allocation_classes`
 
-* **GUID**：`org.zfsonlinear:allocation_classes`
+* **GUID**：`org.zfsonlinux:allocation_classes`
 * **只读兼容**：是
 
 此特性启用独立分配类别的支持。使用 `zpool create` 或 `zpool add` 命令创建专用分配类别 vdev（dedup 或 special）时，此特性变为 `active`。借助设备移除功能，若所有专用分配类别 vdev 都被移除，它可以回到 `enabled` 状态。
@@ -364,7 +364,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `large_dnode`
 
-* **GUID**：`org.zfsonlinear:large_dnode`
+* **GUID**：`org.zfsonlinux:large_dnode`
 * **依赖**：`extensible_dataset`
 * **只读兼容**：否
 
@@ -402,7 +402,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `longname`
 
-* **GUID**：`org.zfsonlinear:longname`
+* **GUID**：`org.zfsonlinux:longname`
 * **依赖**：`extensible_dataset`
 * **只读兼容**：否
 
