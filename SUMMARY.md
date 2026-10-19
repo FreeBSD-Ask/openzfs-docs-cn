@@ -109,6 +109,11 @@
   * [dracut.zfs(7)](man/7/dracut.zfs.7.md)
   * [vdevprops(7)](man/7/vdevprops.7.md)
   * [zpoolconcepts(7)](man/7/zpoolconcepts.7.md)
+* 系统管理命令（System Administration (8)）
+  * [zpool-destroy(8)](man/8/zpool-destroy.8.md)
+  * [zpool-export(8)](man/8/zpool-export.8.md)
+  * [zpool-history(8)](man/8/zpool-history.8.md)
+  * [zpool-sync(8)](man/8/zpool-sync.8.md)
 
 ## ZFS 消息
 
