@@ -111,12 +111,16 @@
   * [zpoolconcepts(7)](man/7/zpoolconcepts.7.md)
 * 系统管理命令（System Administration (8)）
   * [zfs_ids_to_path(8)](man/8/zfs_ids_to_path.8.md)
+  * [zpool-clear(8)](man/8/zpool-clear.8.md)
   * [zpool-ddtprune(8)](man/8/zpool-ddtprune.8.md)
   * [zpool-destroy(8)](man/8/zpool-destroy.8.md)
+  * [zpool-detach(8)](man/8/zpool-detach.8.md)
   * [zpool-export(8)](man/8/zpool-export.8.md)
   * [zpool-history(8)](man/8/zpool-history.8.md)
+  * [zpool-labelclear(8)](man/8/zpool-labelclear.8.md)
   * [zpool-prefetch(8)](man/8/zpool-prefetch.8.md)
   * [zpool-reopen(8)](man/8/zpool-reopen.8.md)
+  * [zpool-resilver(8)](man/8/zpool-resilver.8.md)
   * [zpool-sync(8)](man/8/zpool-sync.8.md)
 
 ## ZFS 消息
