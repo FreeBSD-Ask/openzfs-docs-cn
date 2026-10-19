@@ -225,10 +225,10 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 **特性说明：**
 
-* `allocation_classes` 特性应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在引导池上使用此特性。如果关心加速引导池，更合理的方法是将整个池放在更快的磁盘上，而不是作为特殊 vdev 使用。
+* `allocation_classes` 特性应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在引导池上使用此特性。如果想让引导池更快，更合理的做法是将整个池放在更快的磁盘上，而不是将其用作特殊 vdev。
 * `device_rebuild` 特性应该可以安全使用（raidz 上除外，因为它不兼容），但引导池本身很小，因此在实际中影响不大。
-* `log_spacemap` 和 `spacemap_v2` 特性已经经过测试，可安全使用。引导池较小，所以在实际中影响不大。
-* `project_quota` 特性已测试，可安全使用。对于引导池，这个特性几乎不会有实际意义。
+* `log_spacemap` 和 `spacemap_v2` 特性经过测试，可安全使用。引导池较小，所以在实际中影响不大。
+* `project_quota` 特性经过测试，可安全使用。对于引导池，这个特性几乎不会有实际意义。
 * `resilver_defer` 特性应该安全，但由于引导池足够小，通常不需要启用。
 * 作为只读兼容特性，`userobj_accounting` 特性理论上应兼容，但在实际中，GRUB 可能会出现报错“invalid dnode type”。无论如何，这个特性对 `/boot` 并不重要。
 
@@ -380,7 +380,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    zfs create rpool/var/lib/NetworkManager
    ```
 
-   如果该系统将使用 Docker（其会管理自身的数据集和快照）：
+   如果该系统将使用 Docker（它会管理自己的数据集和快照）：
 
    ```sh
    zfs create -o com.sun:auto-snapshot=false rpool/var/lib/docker
@@ -584,7 +584,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
       **注意：**
 
-      * 仅在磁盘提供 4 KiB 逻辑扇区（“4Kn”磁盘）时才需要 `mkdosfs` 中的 `-s 1` ，用于满足 FAT32 的最小簇大小要求（在分区大小为 512 MiB 的情况下）。在提供 512 B 扇区的磁盘上同样可以正常工作。
+      * 仅在磁盘提供 4 KiB 逻辑扇区（“4Kn”磁盘）时才需要 `mkdosfs` 中的 `-s 1`，用于满足 FAT32 的最小簇大小要求（在分区大小为 512 MiB 的情况下）。在提供 512 B 扇区的磁盘上同样可以正常工作。
       * 对于 mirror 或 raidz 拓扑，此步骤只会在第一块磁盘上安装 GRUB，其他磁盘将在后续步骤中处理。
 11. 可选：卸载 os-prober：
 
@@ -600,6 +600,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     ```
 
 13. 启用导入 bpool
+
     这样可确保 `bpool` 始终被导入，无论 `/etc/zfs/zpool.cache` 是否存在、是否位于 cachefile 中，或 `zfs-import-scan.service` 是否启用。
 
     ```sh
@@ -685,9 +686,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     * 转换服务器密钥可以让 Dropbear 使用与 OpenSSH 相同的密钥，从而避免主机密钥不匹配警告。目前，[dropbearconvert 无法识别新的 OpenSSH 私钥格式](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=955384)，因此需要先使用 `ssh-keygen` 将密钥转换为旧的 PEM 格式。为 OpenSSH 和 Dropbear 使用相同密钥的缺点是，OpenSSH 的密钥会以未加密的形式存放在 initramfs 的磁盘上。
     * 之后使用该功能时，在系统启动过程中提示输入口令时，以 root 身份通过 SSH 连接到系统。对于 ZFS 原生加密，运行 `zfsunlock`；对于 LUKS，运行 `cryptroot-unlock`。
     * 你也可以在 `authorized_keys` 行前添加 `command="/usr/bin/zfsunlock"` 或 `command="/bin/cryptroot-unlock"` 来强制执行解锁命令。这样解锁命令会自动运行，且只能运行该命令。
-17. 可选（但我们非常推荐）：安装 popcon
+17. 可选（但诚恳请求）：安装 popcon
 
-    `popularity-contest` 软件包会报告系统中已安装的软件包列表。表明 ZFS 的受欢迎程度，可能有助于它在发行版中获得长期关注。
+    `popularity-contest` 软件包会报告系统中已安装的软件包列表。表明 ZFS 受欢迎，可能有助于它在发行版中获得长期关注。
 
     ```sh
     apt install --yes popularity-contest
@@ -886,7 +887,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    你可以根据需要调整大小（即 `4G` 部分）。
 
-   压缩算法选择 `zle`，因为它是开销最低的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），常见的 4 KiB 页面大小情况下，没有压缩算法能减少 I/O。唯一例外是全零页面，ZFS 会自动丢弃；但必须启用某种压缩才能达到这一效果。
+   压缩算法选择 `zle`，因为它是开销最低的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），在常见的 4 KiB 页面大小情况下，没有压缩算法能减少 I/O。唯一例外是全零页面，ZFS 会自动丢弃；但必须启用某种压缩才能达到这一效果。
 
 2. 配置 swap 设备：
 
@@ -969,7 +970,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
 5. 可选：重新启用图形化启动过程：
-   如果你喜欢图形化启动界面，可以在现在重新启用。在使用 LUKS 时，界面看起来会更美观。
+   如果你喜欢图形化启动界面，现在就可以重新启用。在使用 LUKS 时，界面看起来会更美观。
 
    ```sh
    sudo vi /etc/default/grub
@@ -1023,7 +1024,7 @@ zfs mount rpool/ROOT/debian
 zfs mount -a
 ```
 
-如有需要，可 `chroot` 进入新安装系统环境：
+如有需要，可 `chroot` 进入新安装的系统环境：
 
 ```sh
 mount --make-private --rbind /dev  /mnt/dev
@@ -1064,7 +1065,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 
 ### MPT2SAS 控制器
 
-本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
+本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步磁盘初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
 基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/zfsonlinux/zfs/issues/330>。
 
@@ -1074,7 +1075,7 @@ RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 ZFS_INITRD_PRE_MOUNTROOT_SLEEP=X
 ```
 
-系统将在导入 ZFS 池之前等待 `X` 秒，以确保所有磁盘都能被识别。
+系统将在导入存储池之前等待 `X` 秒，以确保所有磁盘都能被识别。
 
 ### QEMU/KVM/XEN
 

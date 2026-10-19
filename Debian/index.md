@@ -37,7 +37,7 @@ apt install zfs-dkms zfsutils-linux
 
 >**注意**：
 >
->如果你处于配置不良的环境中（例如某些虚拟机或容器控制台），当 apt 在首次安装时尝试弹出提示信息，它可能未能察觉真正的控制台并不可用，于是表现为无限期停滞。为避免这种情况发生，你可以在命令 `apt install` 前加上 `DEBIAN_FRONTEND=noninteractive`，形如：
+>如果你处于配置不良的环境中（例如某些虚拟机或容器控制台），当 apt 在首次安装时尝试弹出提示信息，它可能未能察觉实际上并没有真正可用的控制台，于是表现为无限期停滞。为避免这种情况发生，你可以在 `apt install` 命令前加上 `DEBIAN_FRONTEND=noninteractive`，形如：
 >
 >```sh
 >DEBIAN_FRONTEND=noninteractive apt install zfs-dkms zfsutils-linux

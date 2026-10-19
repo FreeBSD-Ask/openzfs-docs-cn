@@ -4,7 +4,7 @@
 
 ### 有更新版本
 
-* 新安装请参阅《[根文件系统使用 ZFS 的 Debian 10 Buster](Debian-Buster-10.md)》。
+* 新安装请参阅[构建以 ZFS 为根文件系统的 Debian 10 (Buster)](Debian-Buster-10.md)。
 
 ### 注意事项
 
@@ -15,10 +15,10 @@
 ### 系统要求
 
 * [64 位 Debian GNU/Linux Stretch Live CD](https://cdimage.debian.org/mirror/cdimage/release/current-live/amd64/iso-hybrid/)
-* 强烈建议使用 [64-bit 内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
-* 在逻辑扇区为 4 KiB（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[GRUB 在 legacy（BIOS）启动模式下无法也不会支持 4K 扇区。](http://savannah.gnu.org/bugs/?46700)
+* 强烈建议使用 [64 位内核](https://github.com/zfsonlinux/zfs/wiki/FAQ#32-bit-vs-64-bit-systems)。
+* 在逻辑扇区为 4 KiB（“4Kn”磁盘）的磁盘上安装，仅在 UEFI 启动模式下可行。这并非 ZFS 特有。[在传统（BIOS）启动模式下，GRUB 无法也不会在 4Kn 磁盘上工作。](http://savannah.gnu.org/bugs/?46700)
 
-内存小于 2 GiB 的计算机运行 ZFS 时会非常缓慢。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication），则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
+内存小于 2 GiB 的计算机运行 ZFS 会很慢。在基础工作负载下，建议至少 4 GiB 内存，才能获得正常性能。如果你希望使用去重（deduplication），则需要[大量内存](http://wiki.freebsd.org/ZFSTuningGuide#Deduplication)。启用去重是不可逆的永久性更改，无法轻易恢复。
 
 ### 加密
 
@@ -51,7 +51,7 @@ $ sudo systemctl restart ssh
 $ sudo -i
 ```
 
-1.4 设置，更新软件源：
+1.4 设置并更新软件源：
 
 ```sh
 # echo deb http://deb.debian.org/debian stretch contrib >> /etc/apt/sources.list
@@ -67,11 +67,11 @@ $ sudo -i
 # modprobe zfs
 ```
 
-* dkms 依赖项是手动安装的，以确保来自 stretch 而不是 stretch-backports。这并非关键步骤。
+* 手动安装 dkms 依赖只是为了让它来自 stretch 而非 stretch-backports，这并非关键步骤。
 
 ## 第二步：磁盘格式化
 
-2.1 如果重复使用磁盘，根据需要清理：
+2.1 如果复用磁盘，请根据需要进行清理：
 
 ```sh
 如果磁盘之前用于 MD 阵列，请清除超级块：
@@ -88,10 +88,10 @@ $ sudo -i
 如果需要传统（BIOS）启动，运行：
 # sgdisk -a1 -n1:24K:+1000K -t1:EF02 /dev/disk/by-id/scsi-SATA_disk1
 
-如果使用 UEFI 启动（现在或未来使用），运行：
+如果使用 UEFI 启动（现在或将来使用），运行：
 # sgdisk     -n2:1M:+512M   -t2:EF00 /dev/disk/by-id/scsi-SATA_disk1
 
-为引导 pool 分区，运行：
+为引导存储池分区，运行：
 # sgdisk     -n3:0:+1G      -t3:BF01 /dev/disk/by-id/scsi-SATA_disk1
 ```
 
@@ -115,7 +115,7 @@ $ sudo -i
 
 * 使用命令 `ls -la /dev/disk/by-id` 可以列出别名。
 * 你是在虚拟机中操作吗？如果虚拟磁盘在 `/dev/disk/by-id` 中缺失，使用 KVM + virtio 时可用 `/dev/vda`；否则请参考[故障排查](https://openzfs.github.io/openzfs-docs/Getting%20Started/Debian/Debian%20Stretch%20Root%20on%20ZFS.html#troubleshooting)部分。
-* 如果你要创建镜像或 raidz 拓扑，请对 pool 中的所有磁盘重复分区命令。
+* 如果你要创建镜像或 raidz 拓扑，请对存储池中的所有磁盘重复分区命令。
 
 2.3 创建引导存储池：
 
@@ -141,7 +141,7 @@ $ sudo -i
 
 通常无需为引导存储池自定义任何选项。
 
-GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。此步骤为 `/boot` 创建一个单独的引导存储池，仅启用 GRUB 支持的特性，从而让根存储池用任意特性。注意 GRUB 以只读方式打开存储池，因此所有兼容只读的特性都被 GRUB 支持。
+GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。此步骤为 `/boot` 创建一个单独的引导存储池，仅启用 GRUB 支持的特性，从而让根存储池可以使用任意特性。注意 GRUB 以只读方式打开存储池，因此所有只读兼容的特性都被 GRUB 视为受支持。
 
 **提示：**
 
@@ -176,12 +176,12 @@ GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](ht
       rpool /dev/mapper/luks1
 ```
 
-* 建议在此使用 `ashift=12`，因为如今许多硬盘的物理扇区为 4KiB（或更大），即使它们呈现为 512B 的逻辑扇区。未来更换的硬盘可能具有 4KiB 物理扇区（此时 `ashift=12` 是可选的）或 4KiB 逻辑扇区（此时 `ashift=12` 是必需的）。
-* 设置 `-O acltype=posixacl` 可全局启用 POSIX ACL。如果不需要，可移除此选项，但之后在创建 `/var/log` 的 `zfs create` 时需添加 `-o acltype=posixacl`（注意小写“o”），因为 [journald 需要 ACL](https://askubuntu.com/questions/970886/journalctl-says-failed-to-search-journal-acl-operation-not-supported)。
+* 建议在此使用 `ashift=12`，因为如今许多硬盘的物理扇区为 4 KiB（或更大），即使它们呈现为 512 B 的逻辑扇区。未来更换的硬盘可能具有 4 KiB 物理扇区（此时 `ashift=12` 是理想选择）或 4 KiB 逻辑扇区（此时 `ashift=12` 是必需的）。
+* 设置 `-O acltype=posixacl` 可全局启用 POSIX ACL。如果不需要，可移除此选项，但之后在创建 `/var/log` 的 `zfs create` 时需添加 `-o acltype=posixacl`（注意：小写的“o”），因为 [journald 需要 ACL](https://askubuntu.com/questions/970886/journalctl-says-failed-to-search-journal-acl-operation-not-supported)。
 * 设置 `normalization=formD` 可消除一些与 UTF-8 文件名规范化相关的极端情况，同时隐含 `utf8only=on`，意味着只允许 UTF-8 文件名。如果希望支持非 UTF-8 文件名，请勿使用此选项。关于强制 UTF-8 文件名可能带来的问题，请参见 [The problems with enforced UTF-8 only filenames](http://utcc.utoronto.ca/~cks/space/blog/linux/ForcedUTF8Filenames)。
 * 设置 `relatime=on` 是经典 POSIX `atime` 行为（性能影响较大）和 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间的折中。自 Linux 2.6.30 起，其他文件系统默认启用 `relatime`。详情请参见 [RedHat 文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/power_management_guide/relatime)。
-* 设置 `xattr=sa` 可显著提升扩展属性性能 [performance of extended attributes](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL，也可被用户空间应用使用。[部分桌面 GUI 应用使用扩展属性](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)。[Samba 可利用扩展属性存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器也需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。请注意，`xattr=sa` 是 Linux 特有的。如果将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的 OpenZFS 实现，扩展属性将不可读（数据本身仍可读）。若扩展属性的可移植性对你很重要，请省略上述 `-O xattr=sa`。即便不为整个存储池使用 `xattr=sa`，在 `/var/log` 使用通常没有问题。
-* 确保包含驱动路径的 `-part4` 部分。如果忘记，将指定整个磁盘，ZFS 会重新分区，从而丢失引导加载器分区。
+* 设置 `xattr=sa` [可显著提升扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL，也可被用户空间应用使用。[部分桌面 GUI 应用使用扩展属性](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)。[Samba 可利用扩展属性存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器也需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。请注意，`xattr=sa` 是 Linux 特有的。如果将启用了 `xattr=sa` 的存储池移动到除 ZFS-on-Linux 之外的 OpenZFS 实现，扩展属性将不可读（数据本身仍可读）。若扩展属性的可移植性对你很重要，请省略上述 `-O xattr=sa`。即便不为整个存储池使用 `xattr=sa`，在 `/var/log` 使用通常没有问题。
+* 请务必包含驱动器路径中的 `-part4` 部分。如果忘记这一点，就会指定整个磁盘，ZFS 将重新对其分区，从而导致你丢失引导加载器分区。
 * 对于 LUKS，选择的密钥大小为 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥会被拆分为两半，`-s 512` 即表示 AES-256。
 * 密码可能是安全链中最薄弱的环节，请谨慎选择。参考 [cryptsetup FAQ 第 5 节](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions#5-security-aspects) 获取指导。
 
@@ -224,9 +224,9 @@ GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](ht
 # zfs create                                 rpool/var/spool
 ```
 
-以下数据集可选，取决于你的偏好，软件选择：
+以下数据集是可选的，取决于你的偏好和软件选择：
 
-如果希望排除在快照之外：
+如果你希望将这些排除在快照之外：
 
 ```sh
 # zfs create -o com.sun:auto-snapshot=false  rpool/var/cache
@@ -302,9 +302,9 @@ GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](ht
 # chmod 1777 /mnt/tmp
 ```
 
-此数据集布局的主要目标是将操作系统与用户数据分离。这样可以在回滚根文件系统时，不影响用户数据，如 `/var/log` 中的日志。这在将来集成 `beadm` 或类似工具时尤为重要。`com.sun:auto-snapshot` 设置被一些 ZFS 快照工具用来排除临时数据。
+此数据集布局的主要目标是将操作系统与用户数据分离。这样可以在回滚根文件系统时不回滚用户数据（如 `/var/log` 中的日志）。这在将来集成 `beadm` 或类似工具时尤为重要。`com.sun:auto-snapshot` 设置被一些 ZFS 快照工具用来排除临时数据。
 
-如果不做额外操作，`/tmp` 将作为根文件系统的一部分存储。或者，你可以像上文示例那样为 `/tmp` 创建单独的数据集，这样 `/tmp` 数据不会包含在根文件系统的快照中。还可以对 `rpool/tmp` 设置配额，以限制最大使用空间。后续还可以使用 tmpfs（RAM 文件系统）。
+如果不做额外操作，`/tmp` 将作为根文件系统的一部分存储。或者，你可以像上文示例那样为 `/tmp` 创建单独的数据集，这样 `/tmp` 数据不会包含在根文件系统的快照中。还可以对 `rpool/tmp` 设置配额，以限制最大使用空间。后续还可以使用 tmpfs（内存文件系统）。
 
 3.4 安装最小系统：
 
@@ -313,7 +313,7 @@ GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](ht
 # zfs set devices=off rpool
 ```
 
-`debootstrap` 命令会将新系统保持在未配置状态。替代方法是将既有可用系统的全部内容复制到新的 ZFS 根中。
+`debootstrap` 命令会使新系统处于未配置状态。替代方法是将既有可用系统的全部内容复制到新的 ZFS 根中。
 
 ## 第四步：系统配置
 
@@ -374,9 +374,9 @@ Pin-Priority: 990
 # chroot /mnt /bin/bash --login
 ```
 
->**注意：** 使
+>**注意：**
 >
->用的是 `--rbind`，而不是 `--bind`。
+>使用的是 `--rbind`，而不是 `--bind`。
 
 4.5 配置基本系统环境：
 
@@ -401,7 +401,7 @@ Pin-Priority: 990
 # apt install --yes zfs-initramfs
 ```
 
-4.7 仅针对 LUKS 安装，配置 crypttab：
+4.7 仅针对 LUKS 安装，配置 `/etc/crypttab`：
 
 ```sh
 # apt install --yes cryptsetup
@@ -415,7 +415,7 @@ Pin-Priority: 990
 
 >**提示：**
 >
->如果创建镜像或 raidz 拓扑，请为 `luks2` 等磁盘重复 `/etc/crypttab` 条目。
+>如果你创建的是镜像或 raidz 拓扑，请为 `luks2` 等重复添加 `/etc/crypttab` 条目，并根据每块磁盘进行相应调整。
 
 4.8 安装 GRUB
 
@@ -442,11 +442,11 @@ Pin-Priority: 990
 # apt install --yes grub-efi-amd64 shim
 ```
 
-* `mkdosfs` 中的 `-s 1` 仅对呈现 4 KiB 逻辑扇区（“4Kn”硬盘）的驱动器必要，以满足 FAT32 的最小簇大小（针对 512 MiB 分区），对呈现 512 B 扇区的驱动器也适用。
+* `mkdosfs` 中的 `-s 1` 仅在驱动器呈现 4 KiB 逻辑扇区（“4Kn”硬盘）时才需要，用于满足 FAT32 的最小簇大小要求（针对 512 MiB 分区）；在呈现 512 B 扇区的驱动器上也可以正常工作。
 
 >**注意：**
 >
->如果创建镜像或 raidz 拓扑，此步骤仅在第一块磁盘上安装 GRUB，其他磁盘稍后处理。
+>如果你创建的是镜像或 raidz 拓扑，此步骤仅在第一块磁盘上安装 GRUB，其他磁盘将在后续步骤中处理。
 
 4.9 设置 root 密码
 
@@ -456,7 +456,7 @@ Pin-Priority: 990
 
 4.10 启用 bpool 导入
 
-这可确保 `bpool` 始终被导入，无论在 `/etc/zfs/zpool.cache` 中是否存在、是否在缓存文件中，是否启用 `zfs-import-scan.service`。
+这可确保 `bpool` 始终被导入，无论 `/etc/zfs/zpool.cache` 是否存在、是否位于缓存文件中，或 `zfs-import-scan.service` 是否启用。
 
 ```ini
 # vi /etc/systemd/system/zfs-import-bpool.service
@@ -476,18 +476,18 @@ WantedBy=zfs-import.target
 # systemctl enable zfs-import-bpool.service
 ```
 
-4.11 可选（但推荐）：将 tmpfs 挂载到 /tmp
+4.11 可选（但推荐）：将 tmpfs 挂载到 `/tmp`
 
-如果之前创建了数据集 `/tmp`，则请跳过此步骤，因为两者冲突。否则，可以通过启用 `tmp.mount` 单元，将 `/tmp` 放在 tmpfs（RAM 文件系统）上。
+如果你在前面选择创建了 `/tmp` 数据集，请跳过此步骤，因为二者只能择其一。否则，可以通过启用 `tmp.mount` 单元，将 `/tmp` 放在 tmpfs（内存文件系统）上。
 
 ```sh
 # cp /usr/share/systemd/tmp.mount /etc/systemd/system/
 # systemctl enable tmp.mount
 ```
 
-4.12 可选（但推荐）：安装 popcon
+4.12 可选（但诚恳请求）：安装 popcon
 
-软件包 `popularity-contest` 会报告系统上安装的软件列表。显示 ZFS 的受欢迎程度有助于让 ZFS 获得发行版长期关注。
+软件包 `popularity-contest` 会报告系统上安装的软件列表。表明 ZFS 受欢迎，可能有助于它在发行版中获得长期关注。
 
 ```sh
 # apt install --yes popularity-contest
@@ -545,7 +545,7 @@ done
 
 >**注意：**
 >
->如果出现报错 `osprober`，则可忽略。
+>如果存在来自 `osprober` 的报错，请忽略。
 
 5.6 安装引导加载器
 
@@ -559,7 +559,7 @@ Installation finished. No error reported.
 
 在得到完全相同的结果信息前，请勿重启计算机。注意，此操作是将 GRUB 安装到整个磁盘，而非分区。
 
-如果创建镜像或 raidz 拓扑，请对 pool 中的每块磁盘重复执行 `grub-install` 命令。
+如果创建镜像或 raidz 拓扑，请对存储池中的每块磁盘重复执行 `grub-install` 命令。
 
 5.6b 对于 UEFI 启动，安装 GRUB：
 
@@ -598,11 +598,11 @@ Installation finished. No error reported.
 # zfs set mountpoint=legacy rpool/var/spool
 # echo rpool/var/spool /var/spool zfs nodev,relatime 0 0 >> /etc/fstab
 
-如果创建了 /var/tmp dataset：
+如果创建了 /var/tmp 数据集：
 # zfs set mountpoint=legacy rpool/var/tmp
 # echo rpool/var/tmp /var/tmp zfs nodev,relatime 0 0 >> /etc/fstab
 
-如果创建了 /tmp dataset：
+如果创建了 /tmp 数据集：
 # zfs set mountpoint=legacy rpool/tmp
 # echo rpool/tmp /tmp zfs nodev,relatime 0 0 >> /etc/fstab
 ```
@@ -663,7 +663,7 @@ Installation finished. No error reported.
 ```sh
 # dpkg-reconfigure grub-pc
 按回车直到设备选择界面。
-使用空格选择 pool 中的所有磁盘（非分区）。
+使用空格选择存储池中的所有磁盘（非分区）。
 ```
 
 6.8b UEFI
@@ -684,7 +684,7 @@ Installation finished. No error reported.
 
 >**注意**：
 >
->在内存压力极高的系统上，使用 zvol 作为交换设备可能导致系统锁死，无论交换空间还有多少可用。目前该问题正在调查中：[https://github.com/zfsonlinux/zfs/issues/7734](https://github.com/zfsonlinux/zfs/issues/7734)
+>在内存压力极高的系统上，无论还剩多少 swap 空间可用，使用 zvol 作为交换设备都可能导致系统锁死。目前该问题正在调查中：[https://github.com/zfsonlinux/zfs/issues/7734](https://github.com/zfsonlinux/zfs/issues/7734)
 
 7.1 创建用于交换的卷数据集（zvol）：
 
@@ -711,7 +711,7 @@ Installation finished. No error reported.
 # echo RESUME=none > /etc/initramfs-tools/conf.d/resume
 ```
 
-`RESUME=none` 用于禁用从休眠恢复。因为在恢复脚本运行时 zvol 尚未导入（未导入存储池），所以如果不禁用，启动过程会等待交换 zvol 出现而停滞 30 秒。
+`RESUME=none` 用于禁用从休眠恢复。这之所以必要，是因为恢复脚本运行之时 zvol 尚不存在（此时存储池尚未导入）。若不将其禁用，启动过程会因等待交换 zvol 出现而停滞约 30 秒。
 
 7.3 启用交换设备：
 
@@ -787,7 +787,7 @@ $ sudo update-grub
 
 >**注意**：
 >
->如果出现 osprober 错误，可忽略。
+>如果存在来自 `osprober` 的报错，请忽略。
 
 9.5 可选：仅针对 LUKS 安装，备份 LUKS 头：
 
@@ -847,15 +847,15 @@ $ sudo cryptsetup luksHeaderBackup /dev/disk/by-id/scsi-SATA_disk1-part4 \
 
 本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步磁盘初始化，例如一些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
-基本问题是，这些控制器上的磁盘在 Linux 内核启动常规系统之前不可见，而 ZoL 不支持热插拔存储池成员。详见 [https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
+基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 [https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
 
-大多数 LSI 卡与 ZoL 完全兼容。如果你的卡存在此问题，尝试在 `/etc/default/zfs` 中设置 `ZFS_INITRD_PRE_MOUNTROOT_SLEEP=X`。系统将在导入存储池前等待 X 秒以确保所有磁盘被识别。
+大多数 LSI 卡与 ZoL 完全兼容。如果你的卡存在此问题，尝试在 `/etc/default/zfs` 中设置 `ZFS_INITRD_PRE_MOUNTROOT_SLEEP=X`。系统将在导入存储池前等待 `X` 秒，以确保所有磁盘都能被识别。
 
 ### Areca
 
 需要 `arcsas` 驱动的系统，应将 `arcsas` 添加到文件 `/etc/initramfs-tools/modules` 中，并运行 `update-initramfs -u -k all`。
 
-如果内核日志中出现类似 `RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20` 的信息，请升级或降级 Areca 驱动。在出现此错误信息的设备上使用 ZoL 并不稳定。
+如果内核日志中出现类似 `RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20` 的信息，请升级或降级 Areca 驱动。在出现此错误信息的系统上，ZoL 不稳定。
 
 ### VMware
 

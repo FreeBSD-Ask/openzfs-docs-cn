@@ -217,9 +217,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 **特性说明：**
 
-* `allocation_classes` 特性应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在引导池上使用此特性。如果关心加速引导池，更合理的方法是将整个池放在更快的磁盘上，而不是作为特殊 vdev 使用。
-* `log_spacemap` 和 `spacemap_v2` 特性已经经过测试，可安全使用。引导池较小，所以在实际中影响不大。
-* `project_quota` 特性已测试，可安全使用。对于引导池，这个特性几乎不会有实际意义。
+* `allocation_classes` 特性应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在引导池上使用此特性。如果想让引导池更快，更合理的做法是将整个池放在更快的磁盘上，而不是将其用作特殊 vdev。
+* `spacemap_v2` 特性经过测试，可安全使用。引导池较小，所以在实际中影响不大。
+* `project_quota` 特性经过测试，可安全使用。对于引导池，这个特性几乎不会有实际意义。
 * `resilver_defer` 特性应该安全，但由于引导池足够小，通常不需要启用。
 * 作为只读兼容特性，`userobj_accounting` 特性理论上应兼容，但在实际中，GRUB 可能会出现报错“invalid dnode type”。无论如何，这个特性对 `/boot` 并不重要。
 
@@ -304,7 +304,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    zfs create -o canmount=off -o mountpoint=none bpool/BOOT
    ```
 
-   在 Solaris 系统中，root 文件系统会被克隆，并在通过 `pkg image-update` 或 `beadm` 进行重大系统变更时递增后缀。Ubuntu 中通过 `zsys` 工具实现了类似功能，不过其数据集布局更为复杂，而且 `zsys` 已处于几乎失去维护的状态。即便没有此类工具，仍可手动创建 rpool/ROOT 和 bpool/BOOT 容器的克隆。尽管如此，为了简化起见，本教程假定 `/boot` 仅使用单一文件系统。
+   在 Solaris 系统中，root 文件系统会被克隆，并在通过 `pkg image-update` 或 `beadm` 进行重大系统变更时递增后缀。Ubuntu 中通过 `zsys` 工具实现了类似功能，不过其数据集布局更为复杂，而且 `zsys` [已基本停止维护](https://bugs.launchpad.net/ubuntu/+source/ubiquity/+bug/1968150)。即便没有此类工具，仍可手动创建 `rpool/ROOT` 和 `bpool/BOOT` 容器的克隆。尽管如此，为了简化起见，本教程假定 `/boot` 仅使用单一文件系统。
 2. 为 root 和 boot 文件系统创建文件系统数据集：
 
    ```sh
@@ -591,7 +591,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     apt purge --yes os-prober
     ```
 
-    这样可以避免 update-grub 输出错误信息。仅在双启动配置中才需要 os-prober。
+    这样可以避免 `update-grub` 输出错误信息。仅在双系统配置中才需要 `os-prober`。
 11. 设置 root 密码：
 
     ```sh
@@ -599,6 +599,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     ```
 
 12. 启用导入 bpool
+
     这可以确保无论是否存在 `/etc/zfs/zpool.cache`、是否在 cachefile 中、或者是否启用 `zfs-import-scan.service`，都会导入 `bpool`。
 
     ```sh
@@ -629,7 +630,8 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
   
 14. 可选（但建议）：将 tmpfs 挂载到 `/tmp`
-    如果你在前面选择创建了 `/tmp` 数据集，请跳过此步骤，因为两者是冲突的。或者，可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上。
+
+    如果你在前面选择创建了 `/tmp` 数据集，请跳过此步骤，因为二者只能择其一。或者，可以通过启用 `tmp.mount` 单元将 `/tmp` 放在 tmpfs（内存文件系统）上。
 
     ```sh
     cp /usr/share/systemd/tmp.mount /etc/systemd/system/
@@ -645,8 +647,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     # 设置：PermitRootLogin yes
     ```
 
-16. 可选（但我们非常推荐）：安装 popcon
-    `popularity-contest` 软件包会报告系统中已安装的软件包列表。显示 ZFS 的使用率可能有助于其在发行版中获得长期关注。
+16. 可选（但诚恳请求）：安装 popcon
+
+    `popularity-contest` 软件包会报告系统中已安装的软件包列表。表明 ZFS 受欢迎，可能有助于它在发行版中获得长期关注。
 
     ```sh
     apt install --yes popularity-contest
@@ -710,10 +713,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
      ```sh
      grub-install --target=x86_64-efi --efi-directory=/boot/efi \
           --bootloader-id=debian --recheck --no-floppy
-
-     不需要在这里指定磁盘。如果你正在创建 mirror
-     或 raidz 拓扑，额外的磁盘将在后续步骤中处理。
      ```
+
+     这里不必指定磁盘。如果你正在创建 mirror 或 raidz 拓扑，额外的磁盘将在后续步骤中处理。
 
 7. 修复文件系统挂载顺序：
    我们需要启用 `zfs-mount-generator`。这能让 systemd 识别到各个独立的挂载点，这对于诸如 `/var/log` 和 `/var/tmp` 之类的路径非常重要。相应地，`rsyslog.service` 通过 `local-fs.target` 依赖于 `var-log.mount`，而使用 systemd 的 `PrivateTmp` 特性的服务会自动使用 `After=var-tmp.mount`。
@@ -830,7 +832,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 >**注意**：
 >
->在内存压力极高的系统上，无论 swap 空间多寡，使用 zvol 作为 swap 都可能导致系统死锁。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
+>在内存压力极高的系统上，无论还剩多少 swap 空间可用，使用 zvol 作为 swap 都可能导致系统死锁。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
 1. 创建用于 swap 的 zvol：
 
@@ -842,11 +844,11 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
    你可以根据需要调整大小（即 `4G` 部分）。
-   压缩算法选择 `zle`，因为它是开销最低的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），常见的 4 KiB 页面大小情况下，没有压缩算法能减少 I/O。唯一例外是全零页面，ZFS 会自动丢弃；但必须启用某种压缩才能达到这一效果。
+   压缩算法选择 `zle`，因为它是开销最低的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），在常见的 4 KiB 页面大小情况下，没有压缩算法能减少 I/O。唯一例外是全零页面，ZFS 会自动丢弃；但必须启用某种压缩才能达到这一效果。
 2. 配置 swap 设备：
    >**注意**：
    >
-   >在配置文件中应始终使用长别名 `/dev/zvol`，绝不可使用短别名 `/dev/zdX`。
+   >在配置文件中应始终使用完整的 `/dev/zvol` 别名，绝不可使用简短的 `/dev/zdX` 设备名。
 
    ```sh
    mkswap -f /dev/zvol/rpool/swap
@@ -922,7 +924,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
 5. 可选：重新启用图形化启动过程：
-   如果你喜欢图形化启动界面，可以在现在重新启用。在使用 LUKS 时，界面看起来会更美观。
+   如果你喜欢图形化启动界面，现在就可以重新启用。在使用 LUKS 时，界面看起来会更美观。
 
    ```sh
    sudo vi /etc/default/grub
@@ -935,7 +937,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    >**注意**：
    >
-   >如果出现报错 `osprober`，可忽略。
+   >如果存在来自 `osprober` 的报错，请忽略。
 6. 可选：仅针对 LUKS 安装，备份 LUKS 头：
 
    ```sh
@@ -943,7 +945,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
        --header-backup-file luks1-header.dat
    ```
 
-   将备份妥善保存（例如存储在云端）。它受你的 LUKS 密码保护，但你可能想使用额外的加密。
+   将备份妥善保存（例如存储在云端）。它受你的 LUKS 口令短语保护，但你可能想使用额外的加密。
    >**提示**：
    >
    >如果你创建了镜像或 raidz 拓扑，请对每个 LUKS 卷（如 `luks2` 等）重复此操作。
@@ -952,7 +954,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 ### 使用 Live CD 进行救援
 
-按照 [步骤 1：准备安装环境](https://openzfs.github.io/openzfs-docs/Getting%20Started/Debian/Debian%20Bullseye%20Root%20on%20ZFS.html#step-1-prepare-the-install-environment) 操作。
+按照 [步骤 1：准备安装环境](https://openzfs.github.io/openzfs-docs/Getting%20Started/Debian/Debian%20Buster%20Root%20on%20ZFS.html#step-1-prepare-the-install-environment) 操作。
 
 对于 LUKS，首先解锁磁盘：
 
@@ -974,7 +976,7 @@ zfs mount rpool/ROOT/debian
 zfs mount -a
 ```
 
-如有需要，可 `chroot` 进入新安装系统环境：
+如有需要，可 `chroot` 进入新安装的系统环境：
 
 ```sh
 mount --rbind /dev  /mnt/dev
@@ -987,7 +989,7 @@ mount /boot/efi
 mount -a
 ```
 
-在完成所需修复后，清理挂载：
+在完成所需修复后，执行清理：
 
 ```sh
 exit
@@ -1011,13 +1013,13 @@ update-initramfs -c -k all
 RIP: 0010:[<ffffffff8101b316>]  [<ffffffff8101b316>] native_read_tsc+0x6/0x20
 ```
 
-请升级或降级 Areca 驱动。在出现此错误的设备上，ZoL 可能不稳定。
+请升级或降级 Areca 驱动。在出现此错误信息的系统上，ZoL 不稳定。
 
 ### MPT2SAS 控制器
 
-本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步驱动初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
+本教程的大多数问题报告都与硬件 `mpt2sas` 相关，这类硬件会进行缓慢的异步磁盘初始化，例如某些 IBM M1015 或刷成参考 LSI 固件的 OEM 卡。
 
-基本问题是，这类控制器上的磁盘在 Linux 内核启动后才可见，而 ZoL 不会热插入池成员。详细说明见 [https://github.com/zfsonlinux/zfs/issues/330](https://github.com/zfsonlinux/zfs/issues/330)。
+基本问题是，这些控制器上的磁盘要等到常规系统启动完成之后才对 Linux 内核可见，而 ZoL 不会热插拔存储池成员。详见 <https://github.com/zfsonlinux/zfs/issues/330>。
 
 大多数 LSI 卡可与 ZoL 完全兼容。如果你的 LSI 卡出现了上述问题，可在文件 `/etc/default/zfs` 中设置：
 
