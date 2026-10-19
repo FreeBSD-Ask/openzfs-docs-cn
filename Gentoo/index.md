@@ -2301,7 +2301,7 @@ sda                  0x50014ee2b3b4d492
 >
 >WWN 仅适用于 SATA/SAS 硬盘，NVMe 设备使用不同的命名，形如 `eui.6479a776500000b8`。
 
-`/dev/sda3` 的完整名称为 `/dev/disks/by-id/wwn-0x50014ee2b3b4d492-part3`。创建 ZFS 存储池 rpool：
+`/dev/sda3` 的完整名称为 `/dev/disk/by-id/wwn-0x50014ee2b3b4d492-part3`。创建 ZFS 存储池 rpool：
 
 ```sh
 zpool create -o cachefile=/etc/zfs/zpool.cache \
@@ -2314,7 +2314,7 @@ zpool create -o cachefile=/etc/zfs/zpool.cache \
              -O normalization=formD \
              -O relatime=on \
              -O canmount=off \
-             -R /mnt/gentoo rpool /dev/disks/by-id/wwn-0x50014ee2b3b4d492-part3
+             -R /mnt/gentoo rpool /dev/disk/by-id/wwn-0x50014ee2b3b4d492-part3
 ```
 
 >**注意**
