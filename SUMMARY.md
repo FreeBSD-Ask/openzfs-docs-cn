@@ -108,6 +108,7 @@
   * [zfsconcepts(7)](man/7/zfsconcepts.7.md)
   * [dracut.zfs(7)](man/7/dracut.zfs.7.md)
   * [vdevprops(7)](man/7/vdevprops.7.md)
+  * [zpoolconcepts(7)](man/7/zpoolconcepts.7.md)
 
 ## ZFS 消息
 
