@@ -81,12 +81,15 @@
 
 ## 基础概念
 
-* [ZFS 的校验和及其用途](Basic-Concepts/Checksums.md)
-* [特性标志](Basic-Concepts/Feature-Flags.md)
-* [RAIDZ (ZFS RAID)](Basic-Concepts/RAIDZ.md)
-* [故障排除](Basic-Concepts/Troubleshooting.md)
-* [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
-* [分布式 RAID (dRAID)](Basic-Concepts/dRAID.md)
+* 存储池结构（Pool Structure）
+  * [特性标志](Basic-Concepts/Pool-Structure/Feature-Flags.md)
+  * [RAIDZ (ZFS RAID)](Basic-Concepts/Pool-Structure/RAIDZ.md)
+  * [虚拟设备（VDEV）](Basic-Concepts/Pool-Structure/VDEV.md)
+  * [分布式 RAID (dRAID)](Basic-Concepts/Pool-Structure/dRAID-Howto.md)
+* 数据存储（Data Storage）
+  * [ZFS 的校验和及其用途](Basic-Concepts/Data-Storage/Checksums.md)
+* 操作（Operations）
+  * [故障排除](Basic-Concepts/Operations/Troubleshooting.md)
 
 ## 手册页
 
