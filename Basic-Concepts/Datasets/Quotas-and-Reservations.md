@@ -1,6 +1,6 @@
 # 配额与预留
 
-各数据集共享存储池的空闲空间，因此默认情况下任何一个都可能把池填满。配额限制数据集可消耗的上限；预留保证它总能主张的空间。两者都是属性，都按位置而非按值继承，且都分两种：含后代与快照（`quota`、`reservation`）或不含（`refquota`、`refreservation`）。
+各数据集共享存储池的空闲空间，因此默认情况下任何一个都可能把池填满。配额限制一个数据集最多可以消耗多少空间；预留则保证它始终能主张多少空间。两者都是属性，都按位置而非按值继承，且都分两种：含后代与快照（`quota`、`reservation`）或不含（`refquota`、`refreservation`）。
 
 ## 配额
 
@@ -18,7 +18,7 @@ zfs set refquota=80G pool/home/alice
 zfs get quota,refquota,used,referenced,available pool/home/alice
 ```
 
-在后代上设置的配额不会覆盖祖先的——它只是增加一条限制，最紧的那条生效。配额不能设在卷上：`volsize` 本身已充当隐式配额。
+在后代上设置的配额不会覆盖祖先的——它只是增加一条限制，最紧的那条生效。配额不能设在卷上：`volsize` 本身就充当隐式配额。
 
 实际区别很重要。在普通 `quota` 下，快照会吃掉用户的额度，因此自动快照计划可能让写入失败，即便用户删除了文件。而在 `refquota` 下，用户看到的是稳定上限，快照增长改由父级承担。常见模式是：用 `refquota` 设用户可见的上限，再用父级数据集上的 `quota` 框定总量。
 
@@ -41,7 +41,7 @@ zfs set refreservation=none pool/vm/disk0
 
 设置了 `refreservation` 时，只有在预留之外有足够空闲空间容纳数据集当前 `referenced` 字节数，才能创建快照。
 
-`refreservation=auto` 仅适用于卷：它为 zvol 做厚置，为整个 `volsize` 加上元数据预留足够空间。设为 `none` 则让卷变成稀疏——创建更快、占用更少，但存储池填满时写入可能以 `ENOSPC` 失败。
+`refreservation=auto` 仅适用于卷：它会为 zvol 厚置备，预留足够空间容纳整个 `volsize` 并计入元数据。设为 `none` 则让卷变成稀疏——创建更快、占用更少，但存储池填满时写入可能以 `ENOSPC` 失败。
 
 ## 用户、组与项目配额
 
@@ -56,9 +56,9 @@ zfs userspace pool/home
 zfs groupspace pool/home
 ```
 
-`defaultuserquota`、`defaultgroupquota` 与 `defaultprojectquota` 设置针对所有未单独配额者的兜底值（`0` 表示禁用）。`*objquota@` 系列限制*对象数量*而非字节数。
+`defaultuserquota`、`defaultgroupquota` 与 `defaultprojectquota` 为所有未单独设置配额者设定兜底值（`0` 表示禁用）。`*objquota@` 系列限制*对象数量*而非字节数。
 
-强制是异步的：用户可能略微超出配额，之后写入才开始以 `EDQUOT` 失败。
+强制执行是异步的：用户可以略微超出配额，随后写入才开始以 `EDQUOT` 失败。
 
 ## 限制数量而非空间
 
@@ -81,7 +81,7 @@ zfs get filesystem_count,snapshot_count pool/home
 
 在极小的存储池上，该预留会提高到至少 128 MiB；在极大的存储池上，它被限制为不超过 128 GiB，但它从不超过存储池的一半。
 
-在大池上可以调高 `spa_slop_shift` 来回收其中一部分空间——6 得 1.6%，7 得 0.8%——代价是恢复余量更薄。参见[模块参数](../../Performance-Tuning/ModuleParameters.md)与[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)，后者建议为分配性能保持 10% 以上的空闲空间——这与余量预留是两个问题，而前者通常先找上门。
+在大池上可以调高 `spa_slop_shift` 来回收其中一部分空间——设为 6 得 1.6%，设为 7 得 0.8%——代价是恢复余量更薄。参见[模块参数](../../Performance-Tuning/ModuleParameters.md)与[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)，后者建议为分配性能保持 10% 以上的空闲空间——这与余量预留是两个问题，而通常先遇到的是前者。
 
 ## 延伸阅读
 

@@ -20,21 +20,29 @@
 
 当前翻译 git 版本：259438bd5f12278765eed197237be9d6ab9d5d27（CHANGELOG 2026.3.14 条目）。
 
+**文档正文板块版本**：全仓正文仍以 `259438bd` 为判定基准，但「基础概念」板块已于 2026-10-20 整体同步至上游 master `0c1de93ff4a07394e78cfe24d9f5b67f11147f0f`（2026-10-06）：该板块按 master 重组为写时复制加四个子板块，共 30 页，旧版平铺页面对应的译文已按 master 原文重译或校订。其余板块的同步基点仍为 `259438bd`。
+
 **man 页版本基线**：`man/` 译自 openzfs/zfs 仓库，版本独立于 openzfs-docs 单独记录。既有 10 页 man 译文基于 openzfs/zfs@b481a8bbbf32c26b014518d7c72979c557205918（2026-03-13，与译文提交日 2026-03-14 对齐）；此后上游 master 对 man/ 有较大改动（截至 2026-10-18 共 92 个文件，+2527/-1589 行）。校对既有 man 译文时，以其提交时基线（b481a8bb）的 troff 原文为翻译错误判定基准，同时向当前 master 同步版本差异；新增 man 页一律以 master 为源。man 源版本变化时在 CHANGELOG.md 记录对应 zfs commit。
 
 同步上游或新增翻译后，需同步更新 CHANGELOG.md（记录日期、新增内容与上游 commit）及本文件中的“当前翻译 git 版本”。
 
-### 与上游的已知结构差异（截至 2026-10，待同步）
+### 与上游的已知结构差异（截至 2026-10-20）
 
-上游自同步基点以来结构有较大调整，以下内容尚未同步到本仓库：
+上游自同步基点以来结构有较大调整。已同步与仍待同步的项目如下：
 
-* 基础概念（Basic Concepts）已重组为五个子板块：写时复制（Copy-on-write）、池结构（Pool Structure：Caching、Changing Pool Layout、Feature Flags、RAIDZ、Special vdev、VDEVs、dRAID Howto）、数据集（Datasets：ACLs、Datasets and Properties、Quotas and Reservations、Snapshots and Clones、ZVOLs）、数据存储（Data Storage：Block Cloning、Checksums、Compression、Deduplication、Encryption）、操作（Operations：Boot Process、Delegated Administration、Scrub and Resilver、Send and Receive、Sharing、TRIM、Troubleshooting）。本地旧版平铺页面（RAIDZ、VDEV、dRAID、Feature-Flags、Checksums、Troubleshooting）对应其中部分新页，需对照重组。
-* Debian 新增页面：Debian GNU Linux initrd documentation。
-* 项目与社区（Project and Community）新增 FAQ hole birth 页面与板块概述页（index）。
-* 开发资源（Developer Resources）新增板块概述页（index）。
+**已同步**
+
+* 基础概念（Basic Concepts）按上游 master 重组为「写时复制 + 四个子板块」，共 30 页：写时复制（Copy-on-write）；存储池结构（Pool Structure：VDEVs、RAIDZ、dRAID Howto、Caching、Special vdev、Changing Pool Layout、Feature Flags）；数据集（Datasets：Datasets and Properties、ZVOLs、Snapshots and Clones、Quotas and Reservations、ACLs）；数据存储（Data Storage：Checksums、Compression、Deduplication、Block Cloning、Encryption）；操作（Operations：Send and Receive、Scrub and Resilver、TRIM、Sharing、Delegated Administration、Boot Process、Troubleshooting）。五个板块各设 index 概述页，目录见 `SUMMARY.md`「基础概念」分组。
+* Debian 新增页面「Debian GNU Linux initrd documentation」（`Debian/Debian-GNU-Linux-initrd-documentation.md`）。
+* 项目与社区（Project and Community）新增 FAQ hole birth 页面（`Project-and-Community/FAQ-hole-birth.md`）；板块概述页对应本地 `Project-and-Community.md`（SUMMARY 条目标题「概述」）。
+* 开发资源（Developer Resources）板块概述页上游仅含 toctree 与一条外链，已由 `SUMMARY.md`「开发资源」分组与 `Project-and-Community/Developer_resources.md` 覆盖，不另建页面。
+* man 页：openzfs/zfs master 的 man1/man4/man5/man7/man8 共 93 页已全部译出并登记，含 `zfs(8)`、`zpool(8)`、`zfsprops(7)`、`zfsconcepts(7)` 等大部头页面。
+
+**仍待定夺**
+
 * 上游已移除 System Administration 与 Developer resources 独立页面（本地仍保留译文，待定夺去留）。
 * Gentoo 相关内容上游已改为外链 Gentoo Wiki（<https://wiki.gentoo.org/wiki/ZFS>），不再维护文档页；本地三页为早期版本译文。
-* openzfs/zfs 仓库的 `zfs(8)`、`zpool(8)`、`zfsprops(7)`、`zfsconcepts(7)` 等 man 页尚未翻译（本地仅覆盖 man1、man4 两个节）。
+* 上游「项目与社区」的 toctree 含 Issue Tracker、Releases、Roadmap 三条外链，本地未在 `SUMMARY.md` 中列出（GitBook 侧边栏是否收录外链待定夺）。
 
 ## 内容架构
 
@@ -124,7 +132,7 @@
 
 **自动提交节奏**：批量校对、批量翻译期间，每完成一个批次并复核后立即提交一次（高频小步提交），提交信息格式：`校对：<批次名> <简述>`、`man：<批次名> <简述>`、`同步：<内容> <简述>`。
 
-**代理派发纪律**：AI 后台子代理一律**串行执行**（同时最多一个），禁止并发派发；上一批完成并复核后才能派发下一批。
+**代理派发纪律**：允许并发派发后台子代理，单轮同时运行的数量不超过 10 个（2026-10-20 用户批准）。每个子代理只写自己的目标文件与自己的日志，**禁止修改 `SUMMARY.md`（由主会话统一登记）、禁止修改他人文件、禁止执行任何 git 操作**；主会话在各路完成并逐路复核后统一提交。中断的批次优先以新指令恢复原代理，无法恢复时再新开。
 
 ### 原文获取
 

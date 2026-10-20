@@ -4,7 +4,7 @@
 
 ## 快照
 
-快照是文件系统或卷在某一时刻的只读副本。创建几乎瞬间完成，且初始不占用额外空间；当活动数据集发生偏离，只有快照引用的块无法再被释放时，它才开始计入空间。
+快照是文件系统或卷在某一时刻的只读副本。创建几乎瞬间完成，且初始不占用额外空间；随着活动数据集发生变化、仅由快照引用的块无法再被释放，它才开始占用空间。
 
 快照是原子的——它包含该时间点之前完成的所有系统调用。使用 `-r` 递归创建的快照全部在同一瞬间生成，这使得递归快照可以作为跨越多个数据集的一致镜像使用。
 
@@ -15,7 +15,7 @@ zfs snapshot pool/home/user@monday
 # 原子地为数据集及其所有后代创建快照
 zfs snapshot -r pool/home@monday
 
-# 列出快照（默认情况下它们不会出现在普通的 "zfs list" 中）
+# 列出快照（默认情况下它们不会出现在普通的“zfs list”中）
 zfs list -t snapshot -r pool/home
 ```
 
@@ -31,7 +31,7 @@ cp /home/user/.zfs/snapshot/monday/notes.txt /home/user/notes.txt
 
 `snapdir` 属性控制 `.zfs` 目录是 `disabled`、`hidden`（默认——目录存在，但不会出现在 `ls` 中）还是 `visible`。
 
-卷没有可浏览的目录。当卷的 `snapdev` 属性设为 `visible` 时，快照设备节点会出现在 `/dev/zvol/<池>` 下；默认值为 `hidden`。
+卷没有可浏览的目录。当卷的 `snapdev` 属性设为 `visible` 时，快照设备节点会出现在 `/dev/zvol/<pool>` 下；默认值为 `hidden`。
 
 ### 回滚
 
@@ -61,7 +61,7 @@ zfs list -t snapshot -o name,used,referenced,written -r pool/home/user
 
 `referenced` 是快照（或数据集）能看到多少数据，`written` 是自上一个快照以来改变了多少数据——后者对估算增量复制很有用。
 
-一个陈旧的快照可能钉住任意数量的空间：如果某个大文件在快照创建之后被删除，其空间会一直保持分配状态，直到该快照消失。
+一个旧快照可能钉住任意数量的空间：如果某个大文件在快照创建之后被删除，其空间会一直保持分配状态，直到该快照消失。
 
 ### 保留与延迟销毁
 
@@ -92,9 +92,9 @@ zfs diff pool/home/user@monday
 
 ### 按计划创建
 
-ZFS 负责创建快照，但不负责调度或过期清理。必须有东西决定何时创建、何时销毁，否则存储池会悄然堆满多年的每小时快照。
+ZFS 负责创建快照，但不负责调度或过期清理。必须由某个机制决定何时创建、何时销毁，否则存储池会悄然堆满多年的每小时快照。
 
-对于简单场景，一个调用 `zfs snapshot -r` 的定时器加上另一个销毁超过 *N* 个快照之外内容的定时器就足够了。更复杂的场景由第三方工具处理保留策略，而它们通常也处理复制——`sanoid`/`syncoid`、`zrepl` 与 `zfstools` 都是成熟的选择。它们都不属于 OpenZFS，因此应像对待任何支撑你备份的依赖一样对待它们。
+对于简单场景，用一个定时器调用 `zfs snapshot -r`，再用一个定时器销毁存在时间超过 *N* 的快照，就足够了。更复杂的场景由第三方工具处理保留策略，而它们通常也处理复制——`sanoid`/`syncoid`、`zrepl` 与 `zfstools` 都是成熟的选择。它们都不属于 OpenZFS，因此应像对待任何支撑你备份的依赖一样对待它们。
 
 有些工具会根据 `com.sun:auto-snapshot` 用户属性决定纳入哪些数据集，这正是它出现在示例中的原因，例如 [ZVOL](ZVOLs.md) 中的交换 zvol。
 
@@ -125,7 +125,7 @@ zfs destroy -r pool/vm/base       # 现在可以了
 
 ## 书签
 
-书签是标记快照创建时间点的只读标记。它比快照更廉价——完全不占用额外空间——但它也不保留任何数据：无法浏览、挂载、克隆，也无法回滚到它。
+书签是一个只读标记，指向快照创建的时间点。它比快照更廉价——完全不占用额外空间——但它也不保留任何数据：无法浏览、挂载、克隆，也无法回滚到它。
 
 ```sh
 zfs bookmark pool/home/user@monday pool/home/user#monday
@@ -138,7 +138,7 @@ zfs list -t bookmark -r pool/home/user
 zfs send -i pool/home/user#monday pool/home/user@tuesday | ...
 ```
 
-书签最初与某个快照绑定，但它能在该快照销毁后继续存在。关于它们如何融入复制工作流，参见 [Send 与 receive](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Operations/Send%20and%20Receive.html)。
+书签最初与某个快照绑定，但它能在该快照销毁后继续存在。关于它们如何融入复制工作流，参见[发送与接收](../Operations/Send-and-Receive.md)。
 
 ## 延伸阅读
 

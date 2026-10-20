@@ -29,7 +29,7 @@ zpool list -v pool                  # 按 vdev 的使用情况，含 special 类
 
 1. **去重表**：若存储池有 `dedup` vdev 则放入其中，否则放入特殊 vdev。把 `zfs_ddt_data_is_special` 模块参数设为 0，可将它们排除在特殊类之外。
 2. **元数据**——ZFS 标记为元数据的所有对象类型——进入特殊类。
-3. **用户数据的间接块**（0 级以上的所有块）也会进入，由 `zfs_user_indirect_is_special` 控制（默认开启）。这些就是块指针，正因如此，树遍历才会快得多。
+3. **用户数据的间接块**（0 级以上的所有块）也会进入，由 `zfs_user_indirect_is_special` 控制（默认开启）。这些块本身就是块指针，树遍历之所以快，很大程度上靠的正是它们。
 4. **小的用户数据块**只有在数据集通过 `special_small_blocks` 选择加入时才会进入——而且仅当该类低于其元数据预留时，详见下文。
 5. 其余一切进入普通类。
 
@@ -59,7 +59,7 @@ zfs set special_small_blocks=32K pool/data
 zpool list -v pool
 ```
 
-容量规划取决于工作负载，很难从原理上预测。诚实的做法是测量你实际拥有的存储池——`zdb -bbb pool` 会按块类型报告空间使用情况，可从中读出元数据总量——然后留出充裕的余量，因为估算偏小的代价是一个无法缩小的 vdev。
+容量规划取决于工作负载，很难从原理上预测。务实的做法是测量你实际拥有的存储池——`zdb -bbb pool` 会按块类型报告空间使用情况，可从中读出元数据总量——然后留出充裕的余量，因为估算偏小的代价是一个无法缩小的 vdev。
 
 ## 移除
 
@@ -69,13 +69,13 @@ zpool remove pool special-1
 
 这只能在与其他顶层 vdev 移除相同的约束下进行：存储池**不得**包含任何 raidz 或 draid 顶层 vdev；所有顶层 vdev 必须具有相同的 `ashift`；加密数据集的密钥必须已加载；并且必须启用 `device_removal` 特性。
 
-实际结论很直接：**在 raidz 存储池上，特殊 vdev 永远无法移除。** 添加它是一项永久决定。参见[更改存储池布局](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Pool%20Structure/Changing%20Pool%20Layout.html)。
+实际结论很直接：**在 raidz 存储池上，特殊 vdev 永远无法移除。** 添加它是一项永久决定。参见[更改存储池布局](Changing-Pool-Layout.md)。
 
 ## 相关的 vdev 类型
 
 ### `dedup`
 
-同样的思路，但仅限去重表。当启用了去重、又希望其表与元数据隔离时使用。同样的冗余要求，同样的移除限制。参见[去重](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Data%20Storage/Deduplication.html)。
+同样的思路，但仅限去重表。当启用了去重、又希望其表与元数据隔离时使用。同样的冗余要求，同样的移除限制。参见[去重](../Data-Storage/Deduplication.md)。
 
 ### `log`（SLOG）
 

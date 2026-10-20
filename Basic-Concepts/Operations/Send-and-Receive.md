@@ -23,7 +23,7 @@ zfs send pool/data@2026-07-21 | ssh backup zfs receive tank/data
 zfs send pool/data@2026-07-21 | zstd -3 > /mnt/usb/data-full.zfs.zst
 ```
 
-把流存入文件适合传输，但作为归档格式很差：单个字节损坏就可能使整个流无法接收，而接收后的数据集有校验、可 scrub、可修复。凡是你打算长期保存的内容，都应接收进真实存储池。
+把流存入文件适合传输，但作为归档格式很差：单个字节损坏就可能使整个流无法接收，而接收后的数据集带有校验和、可 scrub、可修复。凡是你打算长期保存的内容，都应接收进真实存储池。
 
 ## 增量流
 
@@ -95,7 +95,7 @@ zfs send -R -I pool/home@sunday pool/home@monday \
 
 ### `-h`（`--holds`）
 
-在所发送的快照中包含用户 hold。
+在所发送的快照中包含用户保留（hold）。
 
 ### `-n -v` / `-P`
 
@@ -149,7 +149,7 @@ zfs send -t <token> | ssh backup zfs receive -s tank/data
 
 **特性选项必须匹配。** 用 `-L`、`-c`、`-e` 或 `-w` 生成的流，需要接收端存储池具备相应特性。
 
-手工处理快照、保留、hold 与续传令牌这些记账工作会变得繁琐。建立在 `zfs send`/`receive` 之上的第三方工具会处理这些——参见[按计划创建](../Datasets/Snapshots-and-Clones.md#按计划创建)，因为同一批工具通常两者都做。
+手工处理快照、保留策略、hold 与续传令牌这些记账工作会变得繁琐。建立在 `zfs send`/`receive` 之上的第三方工具会处理这些——参见[按计划创建](../Datasets/Snapshots-and-Clones.md#按计划创建)，因为同一批工具通常两者都做。
 
 关于 `hole_birth` 等流相关的注意事项，参见 [FAQ](../../Project-and-Community/FAQ.md)。
 

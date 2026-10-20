@@ -32,7 +32,7 @@ zfs set sharenfs=off pool/export
 
 `sharenfs=on` 以默认选项 `sec=sys,rw,crossmnt,no_subtree_check` 共享。任何其他取值都是一个选项列表，先按上面的许可名单校验，再被翻译成一条 `/etc/exports` 风格的条目。
 
-注意语法：选项**以逗号分隔**，这与 [exports(5)](https://man7.org/linux/man-pages/man5/exports.5.html) 不同。这样做避免了引号，也便于由脚本生成该属性。在 FreeBSD 上可以给出多组选项，彼此以分号分隔，每组应用于不同的主机或网络。
+注意语法：选项**以逗号分隔**，这与 [exports(5)](https://man7.org/linux/man-pages/man5/exports.5.html) 不同。这样就不必处理引号问题，也便于由脚本生成该属性。在 FreeBSD 上可以给出多组选项，彼此以分号分隔，每组应用于不同的主机或网络。
 
 当 `sharenfs=off` 时，数据集完全不由 ZFS 管理——请通过 `/etc/exports` 与 `exportfs` 以传统方式导出。
 
@@ -44,11 +44,11 @@ zfs set sharenfs=off pool/export
 zfs set sharesmb=on pool/export
 ```
 
-在 Linux 上这使用 **Samba 用户共享**：ZFS 调用 `net(8)` 来创建一个用户共享（USERSHARE）。在此之前，必须先把 Samba 配置为允许用户共享。
+在 Linux 上这使用 **Samba 用户共享**：ZFS 调用 `net(8)` 来创建一个 USERSHARE（用户共享）。必须先配置 Samba 允许用户共享，这项功能才能生效。
 
 需要了解：
 
-* 共享名取自数据集名称，名称中在资源名里非法的字符会被替换为下划线。
+* 共享名取自数据集名称，其中在资源名里非法的字符会被替换为下划线。
 * 共享以 ACL `Everyone:F` 创建，且不开放访客访问——Samba 必须能认证一个真实用户。一切更细粒度的访问控制都必须在文件系统本身上完成。
 * Linux 不支持 Solaris 上可用的那些额外 `sharesmb` 选项。
 
@@ -80,7 +80,7 @@ ls -l /dev/zvol/pool/iscsi/lun0
 
 **`full`（别名 `geom`）**：完整的块设备，分区也包括在内。
 
-**`dev`**：不带分区的块设备——通常是 LUN 或虚拟机磁盘所需的形式，因为主机没有理由去扫描客户机的分区表。
+**`dev`**：分区被隐藏的块设备——通常是 LUN 或虚拟机磁盘所需的形式，因为主机不应去扫描客户机的分区表。
 
 **`none`**：完全不向 ZFS 之外暴露。仍然可以快照、克隆与复制——适合作为备份目标。
 

@@ -112,7 +112,7 @@ zpool status pool                    # 跟踪迁移进度
 
 > **警告**
 >
-> **raidz 存储池无法缩小。** 如果存储池含有任何 raidz 或 draid 顶级 vdev，则任何顶级 vdev 都永远无法移除——包括后来添加的 `special` 或 `dedup` vdev，也包括误加的一块普通磁盘。唯一的补救办法是重建存储池并恢复数据。务必先用 `zpool add -n`。
+> **raidz 存储池无法缩小。** 如果存储池含有任何 raidz 或 draid 顶级 vdev，则任何顶级 vdev 都永远无法移除——包括后来添加的 `special` 或 `dedup` vdev，也包括误加的一块普通磁盘。唯一的补救办法是重建存储池并恢复数据。务必先用 `zpool add -n` 试运行。
 
 ## 导入与导出
 

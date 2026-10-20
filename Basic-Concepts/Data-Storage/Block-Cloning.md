@@ -39,7 +39,7 @@ ZFS 确实会尝试跨数据集克隆（包括加密数据集），但操作系�
 | 可以一直开着 | 可以 | 只有在仔细规划容量后才行 |
 | 发现重复块 | 否——只克隆被告知克隆的内容 | 是，存储池内任意位置 |
 
-由于 BRT 的开销极小，块克隆完全可以一直保持启用——这对[去重](../Data-Storage/Deduplication.md)并不成立。
+由于 BRT 的开销极小，块克隆完全可以一直保持启用——这对[去重](Deduplication.md)并不成立。
 
 ## 核算收益
 
@@ -57,4 +57,4 @@ zdb -T pool          # BRT 统计
 * [zfsconcepts(7)](../../man/7/zfsconcepts.7.md)——`Block cloning`
 * [zpool-features(7)](../../man/7/zpool-features.7.md)——`block_cloning`、`block_cloning_endian`
 * [zpoolprops(7)](../../man/7/zpoolprops.7.md)——`bcloneused`、`bclonesaved`、`bcloneratio`
-* [去重](../Data-Storage/Deduplication.md)、[快照、克隆与书签](../Datasets/Snapshots-and-Clones.md)
+* [去重](Deduplication.md)、[快照、克隆与书签](../Datasets/Snapshots-and-Clones.md)

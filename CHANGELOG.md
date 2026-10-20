@@ -9,6 +9,9 @@
   * man(8) 同步补齐 16 个历史别名说明：zfs-change-key、zfs-get、zfs-groupspace、zfs-inherit、zfs-projectspace、zfs-recv、zfs-redact、zfs-release、zfs-unallow、zfs-unjail、zfs-unload-key、zfs-unmount、zfs-unzone、zpool-online、zpool-set、zstreamdump
   * 完成全书正文逐段校对（C1–C10）：msg 15 页、基础概念 6 页、Debian 6 页、Ubuntu 6 页、Alpine/Arch/Fedora/FreeBSD 7 页、NixOS/openSUSE/RHEL/Slackware 9 页、Gentoo/开发资源/License 6 页、项目与社区 10 页、性能调优 6 页、man(1) 8 页、man(4) 2 页
   * 补译 Debian、Ubuntu、NixOS、openSUSE 各页缺失的“支持”“贡献”两节；修正 Ubuntu 22.04 树莓派页版本错配的下载链接、openSUSE Tumbleweed 页包名与路径错误、RHEL 页代码块内被误译的示例对话
+  * 基础概念（Basic Concepts）按上游 master `0c1de93ff4a07394e78cfe24d9f5b67f11147f0f`（2026-10-06）重组为「写时复制 + 存储池结构 / 数据集 / 数据存储 / 操作」五板块共 30 页，新增译 10 页：原生加密、数据集与属性、发送与接收、更改存储池布局、启动时的存储池，以及五个板块的概述页；`SUMMARY.md`「基础概念」分组登记 30 页，与 `Basic-Concepts/` 下实体文件一一对应
+  * 修复基础概念重组后未同步的站内相对链接缺陷 12 处（含 `Copy-on-write.md` 上跳层级错误、`Pool-Structure` 两页图片路径、`ArchLinux/index.md` 邮件列表链接、`man/8/zfs-create.8.md` FAQ 链接），并把 `Snapshots-and-Clones.md` 两处指向英文原站的链接改为站内中文页
+  * 新增站内相对链接校验脚本 `script/link-audit.py`（本地工具，按 `.gitignore` 不入库），纳入批次复核流程
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置

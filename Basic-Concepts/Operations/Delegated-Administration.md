@@ -17,12 +17,12 @@ zfs allow pool/home/alice              # 显示已委托的内容
 zfs unallow alice snapshot pool/home/alice
 ```
 
-对象：
+授予对象：
 
-* 裸名称依次按 `everyone`、用户、组解释——用 `-u` 或 `-g` 可显式指定；
+* 不带前缀的名称依次按 `everyone`、用户、组解释——用 `-u` 或 `-g` 可显式指定；
 * `-e`（或字面的 `everyone`）授予所有用户。
 
-范围：
+作用范围：
 
 * `-l`——仅本数据集（locally）；
 * `-d`——仅其后代；
@@ -40,10 +40,10 @@ zfs unallow alice snapshot pool/home/alice
 * `destroy`、`rollback` 与 `snapshot` 还需要 `mount`；
 * `clone` 需要源文件系统中的 `create` 加 `mount`；
 * `rename` 需要新父级中的 `mount` 与 `create`；
-* `receive` 需要 `mount` 与 `create`，它也是允许 `zfs receive -F` 的前提——若要一个不能强制回滚的接收权限，请用 `receive:append`；
+* `receive` 需要 `mount` 与 `create`，也正是它让 `zfs receive -F` 成为可能——若需要一种无法强制回滚的接收权限，请用 `receive:append`；
 * `allow` 让用户可以继续向下委托，但只能委托他们自己持有的权限。
 
-针对加密数据还有更严格的发送变体：`send:raw` 只允许原始流，`send:encrypted` 只允许加密数据集的原始流——两者都防止加密数据集以解密形式被发送。参见[原生加密](../Data-Storage/Encryption.md)。
+针对加密数据还存在范围更窄的发送变体：`send:raw` 只允许原始流，`send:encrypted` 只允许加密数据集的原始流——两者都防止加密数据集以解密形式被发送。参见[原生加密](../Data-Storage/Encryption.md)。
 
 >**注意**
 >
