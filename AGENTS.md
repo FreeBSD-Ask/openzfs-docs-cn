@@ -43,7 +43,8 @@
 
 **仍待定夺**
 
-* Gentoo 相关内容上游已改为外链 Gentoo Wiki（<https://wiki.gentoo.org/wiki/ZFS>），不再维护文档页；本地三页为早期版本译文。
+* Gentoo：**已处理**（2026-10-20 裁决「必须与上游一致」）——本地三页已移除，`SUMMARY.md`「安装指引」按上游 toctree 改为 Gentoo Wiki 外链。
+* 上游根级 `Getting Started/Fedora.rst` 与 `RHEL and CentOS.rst` 为 `:orphan:` 旧地址跳转页（无导航价值），本地不设对应页；上游两个板块 index（性能调优、开发资源）仅含 toctree 无正文，由 `SUMMARY.md` 分组承担，不另建空页。
 
 ## 内容架构
 
@@ -56,7 +57,7 @@
 
 ### 目录结构
 
-* 各发行版目录沿用上游英文目录名（空格改连字符或直接移除）：`AlpineLinux/`、`ArchLinux/`、`Debian/`、`Fedora/`、`Gentoo/`、`NixOS/`、`openSUSE/`、`RHEL/`、`Slackware/`、`Ubuntu/`
+* 各发行版目录沿用上游英文目录名（空格改连字符或直接移除）：`AlpineLinux/`、`ArchLinux/`、`Debian/`、`Fedora/`、`NixOS/`、`openSUSE/`、`RHEL/`、`Slackware/`、`Ubuntu/`；Gentoo 不再有本地页面，`SUMMARY.md` 中为指向 Gentoo Wiki 的外链条目
 * 内容板块目录：`Basic-Concepts/`、`Performance-Tuning/`、`Project-and-Community/`、`DeveloperResources/`（历史命名未带连字符，保持不变）
 * `man/<节号>/<命令名>.<节号>.md` — 手册页，如 `man/1/cstyle.1.md`（译自 zfs 仓库 `man/man1/cstyle.1`）
 * `msg/<消息 ID>.md` — ZFS 消息页，如 `msg/ZFS-8000-14.md`（译自上游 `docs/msg/ZFS-8000-14/index.rst`）

@@ -27,10 +27,7 @@
   * [构建以 ZFS 为根文件系统的 Fedora](Fedora/fedora-Root-on-ZFS.md)
 * FreeBSD
   * [FreeBSD 中的 ZFS 支持](FreeBSD.md)
-* Gentoo
-  * [在 Gentoo 中启用 ZFS 支持](Gentoo/index.md)
-  * [构建以 ZFS 为根文件系统的 Gentoo](Gentoo/root-on-gentoo.md)
-  * [Gentoo ZFS 高级教程](Gentoo/Advanced.md)
+* [Gentoo](https://wiki.gentoo.org/wiki/ZFS)
 * NixOS
   * [在 NixOS 中启用 ZFS 支持](NixOS/index.md)
   * [构建以 ZFS 为根文件系统的 NixOS](NixOS/NixOS-Root-on-ZFS.md)
@@ -69,7 +66,7 @@
 * [自定义软件包](DeveloperResources/CustomPackages.md)
 * [构建 ZFS](DeveloperResources/BuildingZFS.md)
 * [开发资源](Project-and-Community/Developer_resources.md)
-* [Git 和 GitHub 入门指南（ZoL 版）](Project-and-Community/Git-and-GitHub.md)
+* [Git 和 GitHub 入门指南（ZoL 版）](DeveloperResources/Git-and-GitHub.md)
 
 ## 性能调优
 
@@ -77,7 +74,6 @@
 * [工作负载调优](Performance-Tuning/WorkloadTuning.md)
 * [OpenZFS 事务延迟](Performance-Tuning/Transaction-Delay.md)
 * [ZFS I/O (ZIO) 调度器](Performance-Tuning/ZIO-Scheduler.md)
-* [Async Write I/O 调度](Performance-Tuning/Async-Write.md)
 
 ## 基础概念
 
