@@ -7,7 +7,7 @@
 ## 概述
 
 ```sh
-zpool list [-HgLpPv] [-j [--json-int, --json-pool-key-guid]] [-o 属性[,属性]…] [-T d|u] [池名]… [间隔 [次数]]
+zpool list [-HgLpPv] [-j [--json-int, --json-pool-key-guid]] [-o 属性[,属性]…] [-T u|d] [池名]… [间隔 [次数]]
 ```
 
 ## 说明
@@ -42,9 +42,9 @@ zpool list [-HgLpPv] [-j [--json-int, --json-pool-key-guid]] [-o 属性[,属性]
 
 显示 vdev 的完整路径，而不是只有路径的最后一个组成部分。可以与 `-L` 标志配合使用。
 
-### `-T d|u`
+### `-T u|d`
 
-显示时间戳。指定 `d` 使用标准日期格式，参见 date(1)。指定 `u` 使用时间内部表示的可打印形式，参见 time(1)。
+显示时间戳。指定 `u` 使用时间内部表示的可打印形式，参见 time(1)。指定 `d` 使用标准日期格式，参见 date(1)。
 
 ### `-v`
 
