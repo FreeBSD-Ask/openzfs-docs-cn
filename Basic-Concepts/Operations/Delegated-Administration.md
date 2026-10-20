@@ -45,7 +45,7 @@ zfs unallow alice snapshot pool/home/alice
 
 针对加密数据还存在范围更窄的发送变体：`send:raw` 只允许原始流，`send:encrypted` 只允许加密数据集的原始流——两者都防止加密数据集以解密形式被发送。参见[原生加密](../Data-Storage/Encryption.md)。
 
->**注意**
+> **注意**
 >
 > 在 Linux 上，`mount`、`unmount`、`mountpoint`、`canmount`、`rename` 与 `share` 权限无法委托，因为 `mount(8)` 只允许 root 修改全局命名空间。由于 `create`、`destroy`、`snapshot` 等都需要 `mount`，在 Linux 上搭建完全自助的环境仍然需要 root 或 setuid 辅助程序的帮助。
 

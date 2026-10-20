@@ -27,6 +27,8 @@
 | initialize | 初始化 | zpool initialize 子命令语境 |
 | ARC、L2ARC、ZIL、SLOG、ZED、ZEDLET | 保留英文 | 大小写与现有译文一致 |
 | txg | 事务组（txg） | 首次出现加注英文，与 `Basic-Concepts/Copy-on-write.md` 一致 |
+| quiescing | 静止 | 事务组状态，`quiescing` 指停止接收新写入并等待落伍者 |
+| bit rot | 保留英文 | 介质上的比特衰减，正文可作“比特衰减（bit rot）” |
 | deadman | deadman 定时器 | 保留英文 deadman，不译“死人开关” |
 | sit out | 暂停参与 | 首次出现保留 `*sit out*` 并括注 |
 | inflight | 在途 | I/O 与事务语境 |

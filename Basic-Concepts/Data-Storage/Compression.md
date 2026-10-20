@@ -59,7 +59,7 @@ zfs list -o name,used,logicalused,compressratio -r pool
 
 ## 与其他特性的相互作用
 
-* 压缩发生在加密**之前**，因此加密数据集仍能保留压缩率。由此引出的 CRIME 式（压缩比率信息泄露）注意事项，参见[原生加密](Encryption.md)。
+* 压缩发生在加密**之前**，因此加密数据集仍能保留压缩率。由此引出的 CRIME 式注意事项，参见[原生加密](Encryption.md)。
 * `zfs send -c` 以压缩形式发送已压缩的块——流更小，两端 CPU 都更省。参见[发送与接收](../Operations/Send-and-Receive.md)。
 * 压缩与 `recordsize` 相互影响；参见[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)。
 
