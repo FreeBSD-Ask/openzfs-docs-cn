@@ -395,7 +395,7 @@ config:
 # zpool remove tank mirror-1
 ```
 
-`mirror-1` 的数据迁出后，池仍保持冗余，但总空间量减少了：
+`mirror-1` 腾空后，池仍保持冗余，但总空间量减少了：
 
 ```sh
   pool: tank

@@ -16,7 +16,7 @@ zpool attach [-fsw] [-o 属性=值] 池名 vdev 新设备
 
 如果现有 vdev 是镜像或普通设备（例如指定为 `sda` 或“mirror-7”），新设备将与现有 vdev 组成镜像，随后启动 resilver；resilver 完成后，新设备将贡献额外的冗余。如果 `vdev` 目前不属于镜像配置，`device` 会自动变成 `device` 与 `new_device` 组成的双向（two-way）镜像。如果 `vdev` 已是双向镜像，附加 `new_device` 将创建三向（three-way）镜像，依此类推。无论哪种情况，`new_device` 都会立即开始 resilver，任何正在进行的 scrub 都会被取消。
 
-如果现有 vdev 是 RAID-Z 设备（例如指定为“raidz2-0”），新设备将成为该 RAID-Z 组的一部分。系统会启动“RAID-Z 扩容”（raidz expansion），扩容完成后，新设备将为该 RAID-Z 组贡献额外的空间。扩容需要读取 RAID-Z 组中所有现有磁盘上已分配的空间，并将其重写到该 RAID-Z 组的新磁盘布局中（包括新加入的 `device`）。其进度可以用 `zpool status` 监控。
+如果现有 vdev 是 RAID-Z 设备（例如指定为“raidz2-0”），新设备将成为该 RAID-Z 组的一部分。系统会启动“RAID-Z 扩容”（raidz expansion），扩容完成后，新设备将为该 RAID-Z 组贡献额外的空间。扩容需要读取 RAID-Z 组中所有现有磁盘上已分配的空间，并将其重写到该 RAID-Z 组中的新磁盘上（包括新加入的 `device`）。其进度可以用 `zpool status` 监控。
 
 扩容期间与扩容之后，数据冗余都得以保持。如果扩容进行期间有磁盘发生故障，扩容将暂停，直到 RAID-Z vdev 的健康状况恢复（例如更换故障磁盘并等待重建完成）。扩容不会改变不发生数据丢失所能容忍的故障数量（例如 RAID-Z2 扩容后仍是 RAID-Z2）。一个 RAID-Z vdev 可以多次扩容。每次扩容都会使用 ZFS 在每块磁盘开头附近预留的 3.5 MiB 启动区作为暂存空间，该区域必须为扩容后的 vdev 中的每块磁盘存放一个扇区：例如，在 `ashift=16` 下，RAID-Z vdev 最多可扩容到 56 块磁盘。
 

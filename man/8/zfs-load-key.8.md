@@ -53,7 +53,7 @@ zfs change-key -i [-l] filesystem
 
 ### `zfs change-key [-l] [-o keylocation=value] [-o keyformat=value] [-o pbkdf2iters=value] [-o user:prop=value] filesystem`、`zfs change-key -i [-l] filesystem`
 
-更改用于访问数据集的用户密钥（例如口令短语）。此命令要求该数据集的现有密钥已加载。此命令还可用于按需更改 `keylocation`、`keyformat` 与 `pbkdf2iters` 属性，以及设置用户属性。如果该数据集此前不是加密根，它将变为加密根。或者，可以提供 `-i` 标志，使加密根改为继承父数据集的密钥。
+更改用于访问数据集的用户密钥（例如密码短语）。此命令要求该数据集的现有密钥已加载。此命令还可用于按需更改 `keylocation`、`keyformat` 与 `pbkdf2iters` 属性，以及设置用户属性。如果该数据集此前不是加密根，它将变为加密根。或者，可以提供 `-i` 标志，使加密根改为继承父数据集的密钥。
 
 如果用户密钥泄露，`zfs change-key` 未必能保护已有数据或新写入的数据免受攻击。新写入的数据将继续使用与现有数据相同的 master key 加密。如果攻击者获取了用户密钥以及对应的被包裹的 master key，则 master key 视为泄露。目前，`zfs change-key` 不会覆盖磁盘上之前的被包裹 master key，因此它在一段不确定的时间内仍可通过取证分析访问。
 
@@ -61,7 +61,7 @@ zfs change-key -i [-l] filesystem
 
 #### `-l`
 
-确保在尝试更改密钥之前先加载密钥。这实际上等同于运行 `zfs load-key filesystem`；`zfs change-key filesystem`
+确保在尝试更改密钥之前先加载密钥。这实际上等同于运行 `zfs load-key filesystem`；`zfs change-key filesystem`。
 
 #### `-o property=value`
 
@@ -75,7 +75,7 @@ zfs change-key -i [-l] filesystem
 
 启用 `encryption` 特性即可创建加密的文件系统与卷。ZFS 将加密文件与卷数据、文件属性、ACL、权限位、目录列表、FUID 映射以及 `userused`/`groupused` 数据。ZFS 不会加密与池结构相关的元数据，包括数据集与快照名称、数据集层级、属性、文件大小、文件空洞以及去重表（尽管去重后的数据本身是加密的）。
 
-密钥轮换由 ZFS 管理。更改用户密钥（例如口令短语）不需要重新加密整个数据集。在加密密钥未加载的情况下，数据集仍可执行 scrub、resilver、重命名与删除操作（有关密钥加载的更多信息，参见 `load-key` 子命令）。
+密钥轮换由 ZFS 管理。更改用户密钥（例如密码短语）不需要重新加密整个数据集。在加密密钥未加载的情况下，数据集仍可执行 scrub、resilver、重命名与删除操作（有关密钥加载的更多信息，参见 `load-key` 子命令）。
 
 创建加密数据集时，需要在创建时指定 `encryption` 与 `keyformat` 属性，并可选择指定 `keylocation` 与 `pbkdf2iters`。输入加密密钥后，所创建的数据集将成为加密根。所有后代数据集默认从加密根继承其加密密钥，这意味着对加密根加载、卸载或更改密钥，会隐式地对所有继承的数据集做同样的操作。如果不需要这种继承，只需在创建子数据集时提供一个 `keyformat`，或使用 `zfs change-key` 断开现有关系、在子数据集上创建一个新的加密根。注意，子数据集的 `keyformat` 可以与父数据集相同，但仍然会创建新的加密根；而且仅更改 `encryption` 属性不会创建新的加密根，那只会使用不同的密码套件，但仍沿用其加密根的相同密钥。唯一例外是克隆始终使用其源数据集的加密密钥。由于该例外，某些加密相关属性（即 `keystatus`、`keyformat`、`keylocation` 与 `pbkdf2iters`）不像其他 ZFS 属性那样继承，而是使用由其加密根决定的值。加密根的继承关系可以通过只读的 `encryptionroot` 属性进行跟踪。
 

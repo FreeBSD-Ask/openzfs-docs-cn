@@ -13,11 +13,11 @@
 
 ## 概述
 
-### `zhack feature stat 存储池`
+### `zhack feature stat pool`
 
 列出功能标志。
 
-### `zhack feature enable [-d 描述] [-r] 存储池 guid`
+### `zhack feature enable [-d description] [-r] pool guid`
 
 向池中添加一个由 guid 唯一标识的新功能，guid 的格式与 zfs(8) 用户属性相同。
 
@@ -25,7 +25,7 @@
 
 `-r` 标志表示，即使系统不支持该 guid 功能，也可以用只读模式安全打开池。
 
-### `zhack feature ref [-d|-m] 存储池 guid`
+### `zhack feature ref [-d|-m] pool guid`
 
 增加池中 guid 功能的引用计数。
 
@@ -33,7 +33,7 @@
 
 `-m` 标志表示该 guid 功能现在是读取池元对象集（Metaobject Set, MOS）所必需的。
 
-### `zhack label repair [-cu] 设备`
+### `zhack label repair [-cu] device`
 
 根据选项修复指定设备的标签。
 
@@ -50,7 +50,7 @@ zhack label repair -cu device
 
 将修复校验和并重新附加设备。
 
-### `zhack mmp reclaim 存储池`
+### `zhack mmp reclaim pool`
 
 导入一个存储池：其 uberblock 声明（claim）无法到达配置仍期望存在的每一个镜像 leg；随后将不可达的 leaf 标记为离线，使常规导入得以成功，最后再次导出该存储池。
 
@@ -62,21 +62,21 @@ zhack label repair -cu device
 
 存储池会保持导出状态，此后可在这些 leaf 离线的情况下降级导入。硬件恢复后，可用 zpool-online(8) 将每个 leaf 重新上线。持有某些数据唯一副本的 leaf 无法置于离线：系统会报告该 leaf 并使其保持在线，来自其他主机的导入仍会被拒绝。对于未设置 **multihost** 的存储池，不会将任何 leaf 标记为离线，因为此类存储池不运行声明，常规导入本就能成功。log、cache 和 spare vdev 的 leaf 不会被改动，因为声明不会向它们写入。
 
-### `zhack metaslab leak [-f] 存储池`
+### `zhack metaslab leak [-f] pool`
 
 将由 zdb 生成的碎片化配置应用到指定的存储池。
 
 `-f` 标志将强制应用该配置，即使存储池中的 vdev 与碎片化配置的 metaslab 数量不一致。
 
-### `zhack mos scan 存储池`
+### `zhack mos scan pool`
 
 扫描存储池 MOS 中泄漏的对象，并报告可回收的候选对象。仅当对象既未被引用又为空时，才算是候选对象：即条目数为零、且没有任何 DSL 目录引用的 DSL 目录克隆 ZAP（DSL dir clones ZAP），或没有任何分配、且不被 DTL、metaslab、obsolete、checkpoint 或日志空间映射消费者引用的空间映射对象。未被引用但非空的对象会被报告并跳过。本子命令为只读操作，适用于已导入的存储池。
 
-### `zhack mos reclaim [-w] 存储池`
+### `zhack mos reclaim [-w] pool`
 
 回收 `mos scan` 识别为候选对象的泄漏 MOS 对象。不带 `-w` 时为干运行，不会做任何更改。带上 `-w` 时，候选对象会在同步上下文中被释放，且该操作会记录到存储池历史中。存储池必须处于导出状态。
 
-### `zhack mos leak [-w] [-c 数量] [-s 数量] 存储池`
+### `zhack mos leak [-w] [-c count] [-s count] pool`
 
 在可丢弃的存储池上创建合成的泄漏 MOS 对象，用于测试 `mos scan` 和 `mos reclaim`。`-c` 和 `-s` 标志分别设置要注入的泄漏 DSL 克隆映射与泄漏空间映射的数量，默认各注入一个。不带 `-w` 时为干运行，不会做任何更改。存储池必须处于导出状态。
 
@@ -84,15 +84,15 @@ zhack label repair -cu device
 
 以下选项可在任何 `zhack` 子命令之前传入：
 
-### `-c 缓存文件`
+### `-c cachefile`
 
 从“缓存文件”读取存储池的配置，默认为 `/etc/zfs/zpool.cache`。
 
-### `-d 目录`
+### `-d dir`
 
 在“目录”中搜索存储池成员。可指定多次。
 
-### `-o 可调参数=值`
+### `-o var=value`
 
 将给定的可调参数设置为指定值。
 

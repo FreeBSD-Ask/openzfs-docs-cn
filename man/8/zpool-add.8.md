@@ -12,7 +12,7 @@ zpool add [-fgLnP] [--allow-in-use --allow-replication-mismatch --allow-ashift-m
 
 ## 说明
 
-将指定的虚拟设备添加到给定的池中。`vdev` 规格说明参见 zpoolconcepts(7) 的“虚拟设备（vdevs）”一节。`-f` 选项的行为以及执行的设备检查，参见 zpool create 子命令。
+将指定的虚拟设备添加到给定的池中。`vdev` 规格说明参见 zpoolconcepts(7) 的“虚拟设备（vdevs）”一节。`-f` 选项的行为以及执行的设备检查，参见 `zpool create` 子命令。
 
 ### `-f`
 
