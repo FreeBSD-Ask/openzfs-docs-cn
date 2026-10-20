@@ -20,7 +20,7 @@
 
 当前翻译 git 版本：259438bd5f12278765eed197237be9d6ab9d5d27（CHANGELOG 2026.3.14 条目）。
 
-**文档正文板块版本**：全仓正文仍以 `259438bd` 为判定基准，但「基础概念」板块已于 2026-10-20 整体同步至上游 master `0c1de93ff4a07394e78cfe24d9f5b67f11147f0f`（2026-10-06）：该板块按 master 重组为写时复制加四个子板块，共 30 页，旧版平铺页面对应的译文已按 master 原文重译或校订。其余板块的同步基点仍为 `259438bd`。
+**文档正文板块版本**：全仓正文仍以 `259438bd` 为判定基准，但“基础概念”板块已于 2026-10-20 整体同步至上游 master `0c1de93ff4a07394e78cfe24d9f5b67f11147f0f`（2026-10-06）：该板块按 master 重组为写时复制加四个子板块，共 30 页，旧版平铺页面对应的译文已按 master 原文重译或校订。其余板块的同步基点仍为 `259438bd`。
 
 **man 页版本基线**：`man/` 译自 openzfs/zfs 仓库，版本独立于 openzfs-docs 单独记录。既有 10 页 man 译文基于 openzfs/zfs@b481a8bbbf32c26b014518d7c72979c557205918（2026-03-13，与译文提交日 2026-03-14 对齐）；此后上游 master 对 man/ 有较大改动（截至 2026-10-18 共 92 个文件，+2527/-1589 行）。校对既有 man 译文时，以其提交时基线（b481a8bb）的 troff 原文为翻译错误判定基准，同时向当前 master 同步版本差异；新增 man 页一律以 master 为源。man 源版本变化时在 CHANGELOG.md 记录对应 zfs commit。
 
@@ -32,18 +32,18 @@
 
 **已同步**
 
-* 基础概念（Basic Concepts）按上游 master 重组为「写时复制 + 四个子板块」，共 30 页：写时复制（Copy-on-write）；存储池结构（Pool Structure：VDEVs、RAIDZ、dRAID Howto、Caching、Special vdev、Changing Pool Layout、Feature Flags）；数据集（Datasets：Datasets and Properties、ZVOLs、Snapshots and Clones、Quotas and Reservations、ACLs）；数据存储（Data Storage：Checksums、Compression、Deduplication、Block Cloning、Encryption）；操作（Operations：Send and Receive、Scrub and Resilver、TRIM、Sharing、Delegated Administration、Boot Process、Troubleshooting）。五个板块各设 index 概述页，目录见 `SUMMARY.md`「基础概念」分组。
-* Debian 新增页面「Debian GNU Linux initrd documentation」（`Debian/Debian-GNU-Linux-initrd-documentation.md`）。
-* 项目与社区（Project and Community）新增 FAQ hole birth 页面（`Project-and-Community/FAQ-hole-birth.md`）；板块概述页对应本地 `Project-and-Community.md`（SUMMARY 条目标题「概述」）。
-* 开发资源（Developer Resources）板块概述页上游仅含 toctree 与一条外链，已由 `SUMMARY.md`「开发资源」分组与 `Project-and-Community/Developer_resources.md` 覆盖，不另建页面。
+* 基础概念（Basic Concepts）按上游 master 重组为“写时复制 + 四个子板块”，共 30 页：写时复制（Copy-on-write）；存储池结构（Pool Structure：VDEVs、RAIDZ、dRAID Howto、Caching、Special vdev、Changing Pool Layout、Feature Flags）；数据集（Datasets：Datasets and Properties、ZVOLs、Snapshots and Clones、Quotas and Reservations、ACLs）；数据存储（Data Storage：Checksums、Compression、Deduplication、Block Cloning、Encryption）；操作（Operations：Send and Receive、Scrub and Resilver、TRIM、Sharing、Delegated Administration、Boot Process、Troubleshooting）。五个板块各设 index 概述页，目录见 `SUMMARY.md`“基础概念”分组。
+* Debian 新增页面“Debian GNU Linux initrd documentation”（`Debian/Debian-GNU-Linux-initrd-documentation.md`）。
+* 项目与社区（Project and Community）新增 FAQ hole birth 页面（`Project-and-Community/FAQ-hole-birth.md`）；板块概述页对应本地 `Project-and-Community.md`（SUMMARY 条目标题“概述”）。
+* 开发资源（Developer Resources）板块概述页上游仅含 toctree 与一条外链，已由 `SUMMARY.md`“开发资源”分组与 `Project-and-Community/Developer_resources.md` 覆盖，不另建页面。
 * man 页：openzfs/zfs master 的 man1/man4/man5/man7/man8 共 93 页已全部译出并登记，含 `zfs(8)`、`zpool(8)`、`zfsprops(7)`、`zfsconcepts(7)` 等大部头页面。
 
-* 「项目与社区」的 `SUMMARY.md` 分组收录上游 toctree 的三条外链：问题跟踪器、发布版本、路线图（`github.com/openzfs/zfs`）。
-* 上游已移除的三个历史页面已复核后移除（2026-10-20）：`Admin Documentation`（本地「管理文档」）、`System Administration`（本地 wiki 快照译文，核心内容已被基础概念新页覆盖）、`Module Parameters`（本地占位页，模块参数已并入 man 页；相关 3 处正文链接改指 `zfs(4)`）。本地 `Project-and-Community/Developer_resources.md` 对应上游「开发资源」板块的外链资源，保留。
+* “项目与社区”的 `SUMMARY.md` 分组收录上游 toctree 的三条外链：问题跟踪器、发布版本、路线图（`github.com/openzfs/zfs`）。
+* 上游已移除的三个历史页面已复核后移除（2026-10-20）：`Admin Documentation`（本地“管理文档”）、`System Administration`（本地 wiki 快照译文，核心内容已被基础概念新页覆盖）、`Module Parameters`（本地占位页，模块参数已并入 man 页；相关 3 处正文链接改指 `zfs(4)`）。本地 `Project-and-Community/Developer_resources.md` 对应上游“开发资源”板块的外链资源，保留。
 
 **仍待定夺**
 
-* Gentoo：**已处理**（2026-10-20 裁决「必须与上游一致」）——本地三页已移除，`SUMMARY.md`「安装指引」按上游 toctree 改为 Gentoo Wiki 外链。
+* Gentoo：**已处理**（2026-10-20 裁决“必须与上游一致”）——本地三页已移除，`SUMMARY.md`“安装指引”按上游 toctree 改为 Gentoo Wiki 外链。
 * 上游根级 `Getting Started/Fedora.rst` 与 `RHEL and CentOS.rst` 为 `:orphan:` 旧地址跳转页（无导航价值），本地不设对应页；上游两个板块 index（性能调优、开发资源）仅含 toctree 无正文，由 `SUMMARY.md` 分组承担，不另建空页。
 
 ## 内容架构
@@ -107,7 +107,7 @@
 * **占位符：** 路径、URI 与命令示例中的占位符（如 `<pool>`、`<name>`、`<vdevs...>`、`file:///absolute/path`）保持上游英文原样，不中文化；仅正文中不构成路径或命令的叙述性说明才可译作中文。
 * **避免页面交叉引用：** 正文不写“参见上一节”这类模糊指代；跨页链接优先使用相对链接指向站内中文页面，对应中文页面尚未翻译时可链接英文原站对应页面（如 <https://openzfs.github.io/openzfs-docs/Basic%20Concepts/RAIDZ.html>），与现有译文惯例一致。
 * **代码块注释翻译：** 代码块（` ``` ` 围栏）内的英文注释必须翻译为中文（如 shell 注释 `# This is a comment` → `# 这是一个注释`）。只翻译注释部分，不修改实际命令或代码，保持代码结构和格式不变。
-* **引号规范：** 正文引号使用“”（中文双引号）或‘’（单引号），必须成对且方向正确（开引号在左、闭引号在右）；禁止直引号（`"`、`'`）出现在正文（代码块、行内代码、markdown 链接标题语法、英文单词内的缩字符如 won’t 除外）；禁止「」引号。逐个手动修改，禁止机械替换。
+* **引号规范：** 正文引号使用“”（中文双引号）或‘’（单引号），必须成对且方向正确（开引号在左、闭引号在右）；禁止直引号（`"`、`'`）出现在正文（代码块、行内代码、markdown 链接标题语法、英文单词内的缩字符如 won’t 除外）；**禁止使用日式半角引号（直角引号「」），一律改用“”或‘’**（2026-10-20 用户新增规则，元文档与日志一并适用）。逐个手动修改，禁止机械替换。
 * **禁止 rst 残留语法：** 上游为 rst 格式，转写时不得残留 rst 语法：行内交叉引用（`:doc:`、`:ref:`）、行尾 `__` 链接后缀、指令标记（`.. note::`）等必须转为等价 Markdown。必须使用标准 markdown 链接 `[文本](路径)` 指向真实位置。
 * **禁止软换行：** 所有段落必须在同一行内完成，不得跨行拼接。
 * **fstab 与配置文件内容：** 代码块内的文件内容（含 fstab 表头 `# Device Mountpoint FStype Options Dump Pass#`）保持英文原样，不翻译。
