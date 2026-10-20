@@ -21,6 +21,7 @@
   * 按用户裁决处理三项结构遗留：`Pool-Structure/RAIDZ.md` 移除六个校验开销小节与六张静态图，跟随上游改为指向在线校验开销表的链接；复核后移除三个历史页面（`Performance-Tuning/ModuleParameters.md` 占位页、`Project-and-Community/index.md`「管理文档」与 `System_Administration.md` wiki 快照译文，上游已分别删除或从未收录，核心内容已被基础概念新页覆盖），相关 3 处正文链接改指 `zfs(4)`；`SUMMARY.md`「项目与社区」分组收录上游 toctree 的三条外链（问题跟踪器、发布版本、路线图）
   * 按用户裁决「必须与上游一致」完成结构终核：移除 Gentoo 三页并在 `SUMMARY.md` 按上游 toctree 改为 Gentoo Wiki 外链；移除本地特有的 `Performance-Tuning/Async-Write.md`（内容已由 `man/4/zfs.4.md` 的相关参数条目与「ZFS I/O 调度器」页覆盖）；`Git 和 GitHub 入门指南` 由 `Project-and-Community/` 迁至 `DeveloperResources/` 对齐上游目录；`GettingStarted.md` 按上游修正——删除残留的 Aaron Toponce 推荐句，补译「首次使用者应从基础概念的写时复制与 VDEV 读起」一段
   * 经上游树映射比对确认不再存在的差异：上游根级 `Fedora.rst`/`RHEL and CentOS.rst` 为 `:orphan:` 跳转页、两个板块 index 无正文，本地均不设对应页（`SUMMARY.md` 分组即 toctree）；msg 15 页与上游一致
+  * 表格管道符按 CJK 显示宽度全量对齐（6 张表：校验和两表、块克隆、共享数据集、缓存、特性矩阵），分隔行统一左对齐；新增本地工具 `script/align-table.py`，特性矩阵生成脚本输出已同步为对齐格式
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置

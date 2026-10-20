@@ -17,18 +17,18 @@
 zfs set checksum=sha256 pool_name/dataset_name
 ```
 
-| 校验和       | 是否适用于去重和 nopwrite？ | 是否兼容其他 ZFS 实现？             | 备注                                                                           |
-| :---------: | :------------------ | :-------------------------- | :---------------------------------------------------------------------------- |
-| on        | 见备注                | 是                          | `on` 对非去重数据集为 `fletcher4` 的简写，对去重数据集为 `sha256` 的简写                           |
-| off       | 否                  | 是                          | 不要使用 `off`                                                                   |
-| fletcher2 | 否                  | 是                          | Fletcher 校验和的已弃用实现，请使用 `fletcher4`                                           |
-| fletcher4 | 否                  | 是                          | Fletcher 算法，也用于 `zfs send` 流                                                 |
-| sha256    | 是                  | 是                          | 去重数据集的默认值                                                                    |
-| noparity  | 否                  | 是                          | 不要使用 `noparity`                                                              |
-| sha512    | 是                  | 需要池特性 `org.illumos:sha512` | 带盐的 `sha512` 目前不支持用于启动池上的任何文件系统                                              |
-| skein     | 是                  | 需要池特性 `org.illumos:skein`  | 带盐的 `skein` 目前不支持用于启动池上的任何文件系统                                               |
-| edonr     | 见备注                | 需要池特性 `org.illumos:edonr`  | 带盐的 `edonr` 目前不支持用于启动池上的任何文件系统。为了谨慎起见，Edon-R 在与去重一起使用时需要验证，因此会自动使用 `verify`。 |
-| blake3    | 是                  | 需要池特性 `org.openzfs:blake3` | 带盐的 `blake3` 目前不支持用于启动池上的任何文件系统                                              |
+| 校验和    | 是否适用于去重和 nopwrite？ | 是否兼容其他 ZFS 实现？         | 备注                                                                                                                            |
+| :-------- | :-------------------------- | :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------ |
+| on        | 见备注                      | 是                              | `on` 对非去重数据集为 `fletcher4` 的简写，对去重数据集为 `sha256` 的简写                                                        |
+| off       | 否                          | 是                              | 不要使用 `off`                                                                                                                  |
+| fletcher2 | 否                          | 是                              | Fletcher 校验和的已弃用实现，请使用 `fletcher4`                                                                                 |
+| fletcher4 | 否                          | 是                              | Fletcher 算法，也用于 `zfs send` 流                                                                                             |
+| sha256    | 是                          | 是                              | 去重数据集的默认值                                                                                                              |
+| noparity  | 否                          | 是                              | 不要使用 `noparity`                                                                                                             |
+| sha512    | 是                          | 需要池特性 `org.illumos:sha512` | 带盐的 `sha512` 目前不支持用于启动池上的任何文件系统                                                                            |
+| skein     | 是                          | 需要池特性 `org.illumos:skein`  | 带盐的 `skein` 目前不支持用于启动池上的任何文件系统                                                                             |
+| edonr     | 见备注                      | 需要池特性 `org.illumos:edonr`  | 带盐的 `edonr` 目前不支持用于启动池上的任何文件系统。为了谨慎起见，Edon-R 在与去重一起使用时需要验证，因此会自动使用 `verify`。 |
+| blake3    | 是                          | 需要池特性 `org.openzfs:blake3` | 带盐的 `blake3` 目前不支持用于启动池上的任何文件系统                                                                            |
 
 ## 校验和加速器
 
@@ -38,10 +38,10 @@ ZFS 能够将校验和操作卸载到 Intel QuickAssist Technology (QAT) 适配�
 
 某些 ZFS 功能在加载 `zfs.ko` 内核模块时会使用微基准测试来确定校验和的最优算法。微基准测试的结果可以在 `/proc/spl/kstat/zfs` 目录中观察到。获胜算法会被报告为“最快”，并成为默认值。可以通过设置 ZFS 模块参数来覆盖默认值。
 
-| 校验和       | 结果文件名                                | `zfs` 模块参数                                        |
-| :--------- | :------------------------------------ | ------------------------------------------------- |
-| Fletcher4 | `/proc/spl/kstat/zfs/fletcher_4_bench` | `zfs_fletcher_4_impl`                               |
-| 其他全部      | `/proc/spl/kstat/zfs/chksum_bench`     | `zfs_blake3_impl`、`zfs_sha256_impl`、`zfs_sha512_impl` |
+| 校验和    | 结果文件名                             | `zfs` 模块参数                                          |
+| :-------- | :------------------------------------- | :------------------------------------------------------ |
+| Fletcher4 | `/proc/spl/kstat/zfs/fletcher_4_bench` | `zfs_fletcher_4_impl`                                   |
+| 其他全部  | `/proc/spl/kstat/zfs/chksum_bench`     | `zfs_blake3_impl`、`zfs_sha256_impl`、`zfs_sha512_impl` |
 
 ## 禁用校验和
 

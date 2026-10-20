@@ -6,11 +6,11 @@ ZFS 可以从数据集属性驱动 NFS 与 SMB 导出，因此共享跟随数据
 
 **ZFS 不实现 NFS 或 SMB。** `sharenfs` 与 `sharesmb` 属性为平台的标准服务器生成配置，然后通知它重新加载：
 
-| 平台 | ZFS 写入 | ZFS 随后运行 |
-| --- | --- | --- |
-| Linux（NFS） | `/etc/exports.d/zfs.exports` | `/usr/sbin/exportfs` |
-| FreeBSD（NFS） | `/etc/zfs/exports` | 向 `mountd` 发信号 |
-| Linux（SMB） | 一个 Samba 用户共享 | `net usershare add` / `delete` |
+| 平台           | ZFS 写入                     | ZFS 随后运行                   |
+| :------------- | :--------------------------- | :----------------------------- |
+| Linux（NFS）   | `/etc/exports.d/zfs.exports` | `/usr/sbin/exportfs`           |
+| FreeBSD（NFS） | `/etc/zfs/exports`           | 向 `mountd` 发信号             |
+| Linux（SMB）   | 一个 Samba 用户共享          | `net usershare add` / `delete` |
 
 其余的一切——认证、Kerberos、ACL 语义、性能、调优——都是服务器的工作，并以服务器的方式配置。便利性真实存在，后果同样真实：
 
