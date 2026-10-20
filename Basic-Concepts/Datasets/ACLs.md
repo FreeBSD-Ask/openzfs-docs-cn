@@ -51,7 +51,7 @@ zfs set acltype=nfsv4 pool/data        # FreeBSD
 
 #### `passthrough`
 
-原样继承一切。文件的模式随后由可继承的 ACE 决定；若没有 ACE 影响模式，则使用应用程序请求的模式。
+原样继承一切。文件随后以由可继承 ACE 决定的模式创建；若没有 ACE 影响模式，则使用应用程序请求的模式。
 
 #### `passthrough-x`
 

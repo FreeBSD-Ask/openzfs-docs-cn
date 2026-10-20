@@ -9,17 +9,98 @@ OpenZFS 特性标志——作为传统版本编号的替代——**可为磁盘�
 * 独立的格式更改
 * 相互依赖的格式更改
 
+## 特性状态
+
+每个特性都表现为名为 `feature@<short-name>` 的池属性，并处于以下三种状态之一：
+
+* `disabled`：磁盘格式尚未更改，且除非管理员启用，否则不会更改。
+* `enabled`：已标记为启用，但磁盘格式更改**尚未发生**。池仍可被不了解该特性的软件导入——直到某个操作触发该更改（随时可能发生），该特性随即转为 `active`。
+* `active`：格式更改已生效。软件必须支持该特性才能以读写方式导入该池。
+
+```sh
+zpool get all pool | grep feature@
+zpool get feature@large_blocks pool
+```
+
+**特性一旦启用便无法禁用。** 部分特性在使用它的对象被释放后可以从 `active` 返回 `enabled`（例如 `block_cloning` 在最后一个克隆块消失后），但这取决于具体特性。
+
+启用某个特性会自动启用它所依赖的所有特性。
+
+## 只读兼容
+
+有些格式更改不会妨碍其他软件*读取*池。如果池上所有不受支持的特性都是只读兼容的，该池仍能以只读方式导入：
+
+```sh
+zpool import -o readonly=on pool
+```
+
+对于已导入池上每个不受支持的特性，属性 `unsupported@<feature-name>` 会说明为何允许导入：`inactive`（该特性仅为 `enabled`，格式仍然兼容）或 `readonly`（该特性只读兼容，且池以只读方式导入）。
+
 ## 兼容性
 
-当池使用的所有 **特性** 都被多个 OpenZFS 实现支持时，磁盘格式即可在这些实现之间移植。
+当池使用的所有**特性**都被多个 OpenZFS 实现支持时，磁盘格式即可在这些实现之间移植。
 
 启用后具有独占性的特性应定期移植到所有发行版。
+
+## 兼容性特性集
+
+`compatibility` 池属性把池固定到某个具名的磁盘格式，使其在别处——较早的发行版、其他操作系统或引导加载程序——仍可导入。
+
+* `off`（默认）：不做限制，任何特性都可以启用。
+* `legacy`：完全不允许启用任何特性——无论通过 `zpool upgrade` 还是设置 `feature@…=enabled`，也不能把池升级到更新的磁盘版本。这是有意的安全限制。
+* `file[,file…]`：一个或多个特性集文件。只有**所有**列出的文件中都存在的特性才可启用。
+
+```sh
+zpool create -o compatibility=grub2-2.12 bpool ...
+zpool set compatibility=openzfs-2.1-linux tank
+zpool get compatibility tank
+```
+
+特性集名称会按 `/etc/zfs/compatibility.d`（本地，优先）或 `/usr/share/zfs/compatibility.d`（由发行版随附）解析，也可以直接给出绝对路径。随附的特性集覆盖各平台的 OpenZFS 版本（`openzfs-2.1-linux`、`openzfs-2.2`、`openzfs-2.3`、`openzfs-2.4`、`openzfs-2.0-freebsd` 等）、较早的 ZoL 与 FreeBSD 版本、GRUB（`grub2-2.06`、`grub2-2.12`），以及按年份命名的基线（`compat-2018` … `compat-2021`）。
+
+```sh
+ls /usr/share/zfs/compatibility.d/
+```
+
+实际用途主要有两种：一是把**引导池**限制在引导加载程序所能理解的范围内，二是让池在较旧的系统上仍可导入。设置 `compatibility` 还能让 `zpool status` 不再就所选集合之外的未启用特性反复提醒。
+
+## 升级存储池
+
+```sh
+zpool upgrade                   # 列出含有未启用特性的池
+zpool upgrade -v                # 本次构建支持哪些特性
+zpool upgrade pool              # 在某个池上启用这些特性
+zpool upgrade -a                # 在所有池上启用
+```
+
+`zpool upgrade` 会启用所有受支持的特性，但受 `compatibility` 约束：如果某个特性集正在生效，则只启用该集合内的特性；若为 `legacy`，则什么也不会发生。
+
+> **警告**
+>
+> **升级是单向的。** 特性之后无法禁用。一旦启用的特性变为 `active`，池便无法再被不支持这些特性的软件导入——包括你可能需要回退启动的旧内核、应急 U 盘，以及根池上的引导加载程序。
+>
+> 升级要有意识地进行，不要因为 `zpool status` 提示了就条件反射地升级。未升级的池照常工作，只是不提供较新的特性。
+
+注意，`zpool status` 报告 “some supported features are not enabled” 只是提示性信息。尤其在根池或引导池上，请先确认引导加载程序支持哪些特性——参见[以 ZFS 为根文件系统的指南](../../GettingStarted.md)。
+
+## `zfs upgrade` 是另一回事
+
+数据集带有自己的磁盘版本，与池的特性无关。
+
+```sh
+zfs upgrade                     # 列出未处于最新版本的文件系统
+zfs upgrade -v                  # 本次构建支持哪些版本
+zfs upgrade -r pool/data        # 升级某个子树
+zfs upgrade -a                  # 全部升级
+```
+
+同样的单向警告同样适用，并且多一层后果：升级之后，由这些文件系统的*新*快照生成的 `zfs send` 流也无法被较旧的 ZFS 版本接收。如果你要复制到较旧的系统，受影响的不只是本地挂载，复制本身也会中断。
 
 ## 参考资料
 
 [ZFS Feature Flags](http://web.archive.org/web/20160419064650/http://blog.delphix.com/csiden/files/2012/01/ZFS_Feature_Flags.pdf)（Christopher Siden，2012-01，Internet Archive Wayback Machine）特别指出：“… 对于池版本 1-28，遗留版本号仍然存在 …”。
 
-[zpool-features(7) 手册页](https://openzfs.github.io/openzfs-docs/man/7/zpool-features.7.html) - OpenZFS
+[zpool-features(7) 手册页](../../man/7/zpool-features.7.md) - OpenZFS
 
 [zpool-features](http://illumos.org/man/5/zpool-features) (5) – illumos
 
