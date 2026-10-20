@@ -1,7 +1,12 @@
 # 编辑日志
 
 * 2026.10.20
-  * 启动 man 页全量翻译（源：openzfs/zfs master 7c3d85aa，2026-10-18），新增 54 页：man(1) dbufstat、zarcsummary；man(5) vdev_id.conf；man(7) dracut.zfs、vdevprops、zfsconcepts、zfsprops、zpool-features、zpoolconcepts、zpoolprops；man(8) fsck.zfs、mount.zfs、vdev_id、zfs、zfs-bookmark、zfs-clone、zfs-destroy、zfs-diff、zfs-hold、zfs-load-key、zfs-mount-generator、zfs-program、zfs-promote、zfs-receive、zfs-rollback、zfs-send、zfs-upgrade、zfs-wait、zfs-zone、zfs_ids_to_path、zfs_prepare_disk、zgenhostid、zpool、zpool-add、zpool-checkpoint、zpool-clear、zpool-condense、zpool-ddtprune、zpool-destroy、zpool-detach、zpool-events、zpool-export、zpool-history、zpool-import、zpool-initialize、zpool-labelclear、zpool-prefetch、zpool-reguid、zpool-reopen、zpool-resilver、zpool-status、zpool-sync、zpool-trim、zpool_influxdb
+  * 完成 man 页全量翻译（源：openzfs/zfs master 7c3d85aa，2026-10-18），新增 83 页：
+    * man(1)：dbufstat、zarcsummary
+    * man(5)：vdev_id.conf
+    * man(7)：dracut.zfs、vdevprops、zfsconcepts、zfsprops、zpool-features、zpoolconcepts、zpoolprops
+    * man(8)：fsck.zfs、mount.zfs、pam_zfs_key、vdev_id、zdb、zed、zfs、zfs-allow、zfs-bookmark、zfs-clone、zfs-create、zfs-destroy、zfs-diff、zfs-hold、zfs-jail、zfs-list、zfs-load-key、zfs-mount、zfs-mount-generator、zfs-program、zfs-project、zfs-promote、zfs-receive、zfs-rename、zfs-rewrite、zfs-rollback、zfs-send、zfs-set、zfs-share、zfs-snapshot、zfs-upgrade、zfs-userspace、zfs-wait、zfs-zone、zfs_ids_to_path、zfs_prepare_disk、zgenhostid、zinject、zpool、zpool-add、zpool-attach、zpool-checkpoint、zpool-clear、zpool-condense、zpool-create、zpool-ddtprune、zpool-destroy、zpool-detach、zpool-events、zpool-export、zpool-get、zpool-history、zpool-import、zpool-initialize、zpool-iostat、zpool-labelclear、zpool-list、zpool-offline、zpool-prefetch、zpool-reguid、zpool-remove、zpool-reopen、zpool-replace、zpool-resilver、zpool-scrub、zpool-split、zpool-status、zpool-sync、zpool-trim、zpool-upgrade、zpool-wait、zpool_influxdb、zstream
+  * man(8) 同步补齐 16 个历史别名说明：zfs-change-key、zfs-get、zfs-groupspace、zfs-inherit、zfs-projectspace、zfs-recv、zfs-redact、zfs-release、zfs-unallow、zfs-unjail、zfs-unload-key、zfs-unmount、zfs-unzone、zpool-online、zpool-set、zstreamdump
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置
