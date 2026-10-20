@@ -35,17 +35,17 @@ uberblock 也不会被覆盖。每个设备标签都带有一个 **128 KiB 的 u
 
 实际结果是：异步写入一进入内存就会返回，最多几秒后到达磁盘。崩溃会丢失尚未完成同步的事务组，存储池会回到最后一个已提交的事务组。它是一致的，只是稍微旧了一些。
 
-对于调用了 `fsync()` 的应用程序来说，这是不可接受的，这正是 [ZFS 意图日志](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Pool%20Structure/Caching.html) 存在的意义：它立即记录同步写入，以便在系统于事务组提交前死亡时重放它们。除此之外，ZIL 从不被读取。
+对于调用了 `fsync()` 的应用程序来说，这是不可接受的，这正是 [ZFS 意图日志](Pool-Structure/Caching.md) 存在的意义：它立即记录同步写入，以便在系统于事务组提交前死亡时重放它们。除此之外，ZIL 从不被读取。
 
 ## 由此得出的结论
 
-**快照几乎是免费的。** 旧树已经完好完整——快照只是一个引用，阻止这些块被释放。没有任何东西被复制。参见[快照与克隆](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Datasets/Snapshots%20and%20Clones.html)。
+**快照几乎是免费的。** 旧树已经完好完整——快照只是一个引用，阻止这些块被释放。没有任何东西被复制。参见[快照、克隆与书签](Datasets/Snapshots-and-Clones.md)。
 
 **克隆与块克隆开销很低**，原因相同：对同一个块的多次引用是正常现象，因此共享的代价是一个引用，而不是一次复制。
 
-**增量复制是精确的。** 由于每个块都记录它诞生时所在的事务组，ZFS 无需扫描任何内容，就能精确找出两个快照之间发生变化的块。参见 [Send 与 receive](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Operations/Send%20and%20Receive.html)。
+**增量复制是精确的。** 由于每个块都记录它诞生时所在的事务组，ZFS 无需扫描任何内容，就能精确找出两个快照之间发生变化的块。参见[发送与接收](Operations/Send-and-Receive.md)。
 
-**损坏可检测，且通常可修复。** 校验和位于父节点中，因此读回错误的块会在读取时被发现；在有冗余的情况下，会使用完好的副本并重写损坏的那个。参见[校验和](../Data-Storage/Checksums.md)与 [Scrub 与 resilver](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Operations/Scrub%20and%20Resilver.html)。
+**损坏可检测，且通常可修复。** 校验和位于父节点中，因此读回错误的块会在读取时被发现；在有冗余的情况下，会使用完好的副本并重写损坏的那个。参见[校验和](Data-Storage/Checksums.md)与 [Scrub 与 resilver](Operations/Scrub-and-Resilver.md)。
 
 **没有 fsck。** `fsck.zfs` 的存在只是为了满足接口，基本不做事——它的手册页就是这么说的。挂载时无需检查一致性，因为存储池从不处于不一致状态。验证*内容*是另一项工作，由 `zpool scrub` 在线完成。
 
@@ -53,14 +53,14 @@ uberblock 也不会被覆盖。每个设备标签都带有一个 **128 KiB 的 u
 
 写时复制并非没有代价，这些代价也解释了若干调优话题：
 
-**碎片化。** 重写文件会把它的新块散布到任何有空闲空间的地方，因此先顺序写入、再随机修改的数据不会保持顺序。这就是 ZFS 对存储池使用率敏感的原因：找到连续的空闲空间越来越难，分配器也不得不更费力。参见[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)。
+**碎片化。** 重写文件会把它的新块散布到任何有空闲空间的地方，因此先顺序写入、再随机修改的数据不会保持顺序。这就是 ZFS 对存储池使用率敏感的原因：找到连续的空闲空间越来越难，分配器也不得不更费力。参见[工作负载调优](../Performance-Tuning/WorkloadTuning.md)。
 
-**需要空闲空间才能写入。** 即使删除数据也需要分配，这就是 ZFS 保留余量空间的原因——参见[配额与预留](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Datasets/Quotas%20and%20Reservations.html)。
+**需要空闲空间才能写入。** 即使删除数据也需要分配，这就是 ZFS 保留余量空间的原因——参见[配额与预留](Datasets/Quotas-and-Reservations.md)。
 
 **部分写取代价高昂。** 修改记录的一部分意味着读取整条记录、修改它，再写入新记录。常见的补救办法是让 `recordsize` 匹配应用程序的 I/O 大小，这也是数据库和虚拟机镜像需要单独设置的原因。
 
 ## 延伸阅读
 
 * [zfsconcepts(7)](../man/7/zfsconcepts.7.md)、[zpoolconcepts(7)](../man/7/zpoolconcepts.7.md)
-* [校验和](../Data-Storage/Checksums.md)、[快照与克隆](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Datasets/Snapshots%20and%20Clones.html)
-* [OpenZFS 事务延迟](../../Performance-Tuning/Transaction-Delay.md)、[ZFS I/O (ZIO) 调度器](../../Performance-Tuning/ZIO-Scheduler.md)
+* [校验和](Data-Storage/Checksums.md)、[快照、克隆与书签](Datasets/Snapshots-and-Clones.md)
+* [OpenZFS 事务延迟](../Performance-Tuning/Transaction-Delay.md)、[ZFS I/O (ZIO) 调度器](../Performance-Tuning/ZIO-Scheduler.md)

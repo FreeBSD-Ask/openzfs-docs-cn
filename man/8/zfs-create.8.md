@@ -80,7 +80,7 @@ zfs create [-ps] [-b 块大小] [-o 属性=值]… -V 大小 卷
 
 ### ZFS 用作交换空间
 
-将 swap 放到 ZFS 卷上容易导致死锁，不建议这样做。参见 [OpenZFS FAQ](../Project-and-Community/FAQ.md) 的“在 Linux 上将 ZVOL 用作交换设备”一节。
+将 swap 放到 ZFS 卷上容易导致死锁，不建议这样做。参见 [OpenZFS FAQ](../../Project-and-Community/FAQ.md) 的“在 Linux 上将 ZVOL 用作交换设备”一节。
 
 不支持将 swap 放到 ZFS 文件系统内的文件上。
 

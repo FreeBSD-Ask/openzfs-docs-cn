@@ -98,7 +98,7 @@ ZFS 负责创建快照，但不负责调度或过期清理。必须有东西决�
 
 有些工具会根据 `com.sun:auto-snapshot` 用户属性决定纳入哪些数据集，这正是它出现在示例中的原因，例如 [ZVOL](ZVOLs.md) 中的交换 zvol。
 
-复制方面的内容参见 [Send 与 receive](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Operations/Send%20and%20Receive.html)。
+复制方面的内容参见[发送与接收](../Operations/Send-and-Receive.md)。
 
 ## 克隆
 

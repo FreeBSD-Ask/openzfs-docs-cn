@@ -9,7 +9,7 @@
 [dRAID](https://docs.google.com/presentation/d/1uo0nBfY84HIhEqGWEx-Tbm8fPbJKtIP3ICo4toOPcJo/edit) 是 raidz 的一种变体，提供了集成的分布式热备盘，可实现更快的重建（resilvering），同时保留 raidz 的优势。dRAID vdev 由多个内部 raidz 组构成，每组包含 D 个数据设备和 P 个校验设备。这些组分布在所有子设备上，以充分利用可用的磁盘性能。这被称为校验去聚类（parity declustering），一直是个活跃的研究领域。下图是简化示意，但有助于说明 dRAID 与 raidz 的关键区别。
 
 
-![](../.gitbook/assets/raidz_draid.png)
+![](../../.gitbook/assets/raidz_draid.png)
 
 
 此外，dRAID vdev 必须以特定方式重新排列其子 vdev，使得无论哪块磁盘发生故障，重建 I/O（包括读写）都能在所有存活磁盘之间均匀分布。这通过使用精心选择的预计算排列映射来实现。这样既能让存储池创建保持快速，又能确保映射不会被损坏或丢失。
@@ -77,7 +77,7 @@ config:
 dRAID 的一个主要优势是它同时支持顺序重建和传统的修复重建（healing resilver）。在向分布式热备盘进行顺序重建时，性能按磁盘数量除以条带宽度（D+P）进行扩展。这可以大幅缩短重建时间，在通常时间的一小部分内恢复完整冗余。例如，下图显示了一个由 90 块机械硬盘构成、填充至 90% 容量的 dRAID 的实际顺序重建时间（以小时计）。
 
 
-![](../.gitbook/assets/draid-resilver-hours.png)
+![](../../.gitbook/assets/draid-resilver-hours.png)
 
 **dRAID 顺序重建 —— 替换一块 16TB 磁盘所需的小时数，90 块 HDD，单个分布式热备盘，池容量 100%**
 

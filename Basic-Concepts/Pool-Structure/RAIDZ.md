@@ -46,7 +46,7 @@ RAIDZ 的磁盘越多，条带越宽，空间效率越高。
 
 横排是 RAIDZ1 组中的磁盘数量，竖排是块大小（以扇区为单位）。
 
-![](../.gitbook/assets/raidz1.png)
+![](../../.gitbook/assets/raidz1.png)
 
 ### RAIDZ2 校验开销，占总存储的百分比
 
@@ -56,7 +56,7 @@ RAIDZ 的磁盘越多，条带越宽，空间效率越高。
 
 横排是 RAIDZ2 组中的磁盘数量，竖排是块大小（以扇区为单位）。
 
-![](../.gitbook/assets/raidz2.png)
+![](../../.gitbook/assets/raidz2.png)
 
 ### RAIDZ3 校验开销，占总存储的百分比
 
@@ -66,7 +66,7 @@ RAIDZ 的磁盘越多，条带越宽，空间效率越高。
 
 横排是 RAIDZ3 组中的磁盘数量，竖排是块大小（以扇区为单位）。
 
-![](../.gitbook/assets/raidz3.png)
+![](../../.gitbook/assets/raidz3.png)
 
 ### RAIDZ1 校验开销
 
@@ -76,7 +76,7 @@ RAIDZ 的磁盘越多，条带越宽，空间效率越高。
 
 横排是 RAIDZ1 组中的磁盘数量，竖排是块大小（以扇区为单位）。
 
-![](../.gitbook/assets/raidz1-1.png)
+![](../../.gitbook/assets/raidz1-1.png)
 
 ### RAIDZ2 校验开销
 
@@ -86,7 +86,7 @@ RAIDZ 的磁盘越多，条带越宽，空间效率越高。
 
 横排是 RAIDZ2 组中的磁盘数量，竖排是块大小（以扇区为单位）。
 
-![](../.gitbook/assets/raidz1-2.png)
+![](../../.gitbook/assets/raidz1-2.png)
 
 ### RAIDZ3 校验开销
 
@@ -97,7 +97,7 @@ RAIDZ 的磁盘越多，条带越宽，空间效率越高。
 
 横排是 RAIDZ3 组中的磁盘数量，竖排是块大小（以扇区为单位）。
 
-![](../.gitbook/assets/raidz1-3.png)
+![](../../.gitbook/assets/raidz1-3.png)
 
 [源代码](https://docs.google.com/spreadsheets/d/1_CO8x03VICdiIMulDjQi9NDBd53qFpUreMQVrF1uS28/edit?usp=sharing)
 

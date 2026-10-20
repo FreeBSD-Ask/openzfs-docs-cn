@@ -2,7 +2,7 @@
 
 ## 支持
 
-你可以通过[邮件列表](Project-and-Community/MailingLists.md)或 Libera Chat 上的 `#zfsonlinux` IRC 频道与社区取得联系。
+你可以通过[邮件列表](../Project-and-Community/MailingLists.md)或 Libera Chat 上的 `#zfsonlinux` IRC 频道与社区取得联系。
 
 如果对本指南有错误报告或功能建议，请[提交新 issue 并提及 @ne9z](https://github.com/openzfs/openzfs-docs/issues/new?body=@ne9z,%20I%20have%20the%20following%20issue%20with%20the%20Arch%20Linux%20ZFS%20HOWTO:)。
 
