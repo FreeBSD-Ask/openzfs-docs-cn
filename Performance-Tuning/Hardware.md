@@ -165,7 +165,7 @@ ARC 和 ZIL 会削弱低寻道时间带来的大部分优势。通过增加 ARC 
 
 可以使用以下命令格式化硬盘：
 
-```
+```sh
 nvme format /dev/nvme1n1 -l $ID
 ```
 
