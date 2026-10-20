@@ -38,11 +38,12 @@
 * 开发资源（Developer Resources）板块概述页上游仅含 toctree 与一条外链，已由 `SUMMARY.md`「开发资源」分组与 `Project-and-Community/Developer_resources.md` 覆盖，不另建页面。
 * man 页：openzfs/zfs master 的 man1/man4/man5/man7/man8 共 93 页已全部译出并登记，含 `zfs(8)`、`zpool(8)`、`zfsprops(7)`、`zfsconcepts(7)` 等大部头页面。
 
+* 「项目与社区」的 `SUMMARY.md` 分组收录上游 toctree 的三条外链：问题跟踪器、发布版本、路线图（`github.com/openzfs/zfs`）。
+* 上游已移除的三个历史页面已复核后移除（2026-10-20）：`Admin Documentation`（本地「管理文档」）、`System Administration`（本地 wiki 快照译文，核心内容已被基础概念新页覆盖）、`Module Parameters`（本地占位页，模块参数已并入 man 页；相关 3 处正文链接改指 `zfs(4)`）。本地 `Project-and-Community/Developer_resources.md` 对应上游「开发资源」板块的外链资源，保留。
+
 **仍待定夺**
 
-* 上游已移除 System Administration 与 Developer resources 独立页面（本地仍保留译文，待定夺去留）。
 * Gentoo 相关内容上游已改为外链 Gentoo Wiki（<https://wiki.gentoo.org/wiki/ZFS>），不再维护文档页；本地三页为早期版本译文。
-* 上游「项目与社区」的 toctree 含 Issue Tracker、Releases、Roadmap 三条外链，本地未在 `SUMMARY.md` 中列出（GitBook 侧边栏是否收录外链待定夺）。
 
 ## 内容架构
 
@@ -59,7 +60,7 @@
 * 内容板块目录：`Basic-Concepts/`、`Performance-Tuning/`、`Project-and-Community/`、`DeveloperResources/`（历史命名未带连字符，保持不变）
 * `man/<节号>/<命令名>.<节号>.md` — 手册页，如 `man/1/cstyle.1.md`（译自 zfs 仓库 `man/man1/cstyle.1`）
 * `msg/<消息 ID>.md` — ZFS 消息页，如 `msg/ZFS-8000-14.md`（译自上游 `docs/msg/ZFS-8000-14/index.rst`）
-* `.gitbook/assets/` — GitBook 静态资源（logo、插图等），正文中用相对链接引用（如 `../.gitbook/assets/raidz1.png`）
+* `.gitbook/assets/` — GitBook 静态资源（logo、插图等），正文中用相对链接引用（如 `../.gitbook/assets/draid-resilver-hours.png`）
 
 ### 文件命名约束
 
@@ -124,7 +125,7 @@
 
 ### 图片
 
-在正文中插入图片使用 markdown 格式，图片文件存放于 `.gitbook/assets/`，用相对链接引用（如 `![raidz1](../.gitbook/assets/raidz1.png)`）。`check-images.yml` 会校验引用与实际文件的一致性。
+在正文中插入图片使用 markdown 格式，图片文件存放于 `.gitbook/assets/`，用相对链接引用（如 `![分布式热备 resilver 耗时](../.gitbook/assets/draid-resilver-hours.png)`）。`check-images.yml` 会校验引用与实际文件的一致性。
 
 ## 翻译流程
 

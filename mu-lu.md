@@ -55,13 +55,14 @@
 ## 项目与社区
 
 * [概述](Project-and-Community.md)
-* [管理文档](Project-and-Community/index.md)
-  * [OpenZFS 系统管理](Project-and-Community/System_Administration.md)
 * [捐赠](Project-and-Community/Donate.md)
 * [常见问题解答](Project-and-Community/FAQ.md)
 * [FAQ：hole birth 缺陷](Project-and-Community/FAQ-hole-birth.md)
 * [邮件列表](Project-and-Community/MailingLists.md)
 * [签名密钥](Project-and-Community/SigningKeys.md)
+* [问题跟踪器](https://github.com/openzfs/zfs/issues)
+* [发布版本](https://github.com/openzfs/zfs/releases)
+* [路线图](https://github.com/openzfs/zfs/milestones)
 
 ## 开发资源
 
@@ -73,7 +74,6 @@
 ## 性能调优
 
 * [硬件](Performance-Tuning/Hardware.md)
-* [模块参数](Performance-Tuning/ModuleParameters.md)
 * [工作负载调优](Performance-Tuning/WorkloadTuning.md)
 * [OpenZFS 事务延迟](Performance-Tuning/Transaction-Delay.md)
 * [ZFS I/O (ZIO) 调度器](Performance-Tuning/ZIO-Scheduler.md)

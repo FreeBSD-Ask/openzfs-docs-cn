@@ -18,6 +18,7 @@
   * 重建 `Pool-Structure/Feature-Flags.md` 特性矩阵表：解析上游当日生成的矩阵页，转为 54 行 × 24 列 Markdown 表（特性标志、只读兼容、22 个实现/版本列），版本列更新至 2.2.11/2.3.9/2.4.4/master，修正 `org.zfsonlinux:allocation_classes` 等行数据，edonr 脚注改为页内「注释」节，「最后更新时间」更新为 2026-10-20T03:24:04Z
   * 全仓术语归并 45 处（13 个文件）：boot pool 统一为「启动池」、thin provisioning 统一为「精简置备」、allocation class 统一为「分配类」、sit out 统一为「暂停参与」；四组旧译法经 grep 复核归零
   * `Operations/Troubleshooting.md` 的 vdev 状态、计数器、`failmode`、事件类四组枚举（14 处）由加粗冒号独立段统一为列表项，与全仓定义列表体例（清单用 H3、短枚举用列表）对齐
+  * 按用户裁决处理三项结构遗留：`Pool-Structure/RAIDZ.md` 移除六个校验开销小节与六张静态图，跟随上游改为指向在线校验开销表的链接；复核后移除三个历史页面（`Performance-Tuning/ModuleParameters.md` 占位页、`Project-and-Community/index.md`「管理文档」与 `System_Administration.md` wiki 快照译文，上游已分别删除或从未收录，核心内容已被基础概念新页覆盖），相关 3 处正文链接改指 `zfs(4)`；`SUMMARY.md`「项目与社区」分组收录上游 toctree 的三条外链（问题跟踪器、发布版本、路线图）
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置

@@ -17,7 +17,7 @@ zarcstat 1                     # OpenZFS 2.4.0 之前为 arcstat
 cat /proc/spl/kstat/zfs/arcstats
 ```
 
-内存是迄今为止最有效的 ZFS“调优旋钮”。在添加任何缓存设备之前，先确认 ARC 是否只是太小了——关于 `zfs_arc_max` 等参数，参见[模块参数](../../Performance-Tuning/ModuleParameters.md)。
+内存是迄今为止最有效的 ZFS“调优旋钮”。在添加任何缓存设备之前，先确认 ARC 是否只是太小了——关于 `zfs_arc_max` 等参数，参见 [zfs(4)](../../man/4/zfs.4.md)。
 
 ## L2ARC（`cache` vdev）
 
@@ -76,4 +76,4 @@ zpool add pool special mirror nvme0n1 nvme1n1
 
 * [zpoolconcepts(7)](../../man/7/zpoolconcepts.7.md)——`Intent Log`、`Cache Devices`、`Special Allocation Class`
 * [zfsprops(7)](../../man/7/zfsprops.7.md)——`primarycache`、`secondarycache`、`special_small_blocks`、`logbias`、`sync`
-* [VDEV](VDEV.md)、[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)、[模块参数](../../Performance-Tuning/ModuleParameters.md)
+* [VDEV](VDEV.md)、[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)、[zfs(4)](../../man/4/zfs.4.md)

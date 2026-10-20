@@ -36,69 +36,7 @@ RAIDZ 中块的实际使用空间取决于以下几个因素：
 
 RAIDZ 的磁盘越多，条带越宽，空间效率越高。
 
-每种 RAIDZ 大小的实际校验开销可在此查看：
-
-### RAIDZ1 校验开销，占总存储的百分比
-
-对于不同大小的块（以扇区为单位，压缩后），本表显示了不同磁盘数量的 RAIDZ1 组中 RAIDZ1 校验 + 填充所占用的空间。
-
-数值（校验 + 填充开销）以总存储大小的百分比表示。例如，每个 RAIDZ1 组有 7 个磁盘时，16 扇区块（8KB 或 64KB）使用总空间的 20%（4 扇区）用于校验 + 填充。
-
-横排是 RAIDZ1 组中的磁盘数量，竖排是块大小（以扇区为单位）。
-
-![](../../.gitbook/assets/raidz1.png)
-
-### RAIDZ2 校验开销，占总存储的百分比
-
-对于不同大小的块（以扇区为单位，压缩后），本表显示了不同磁盘数量的 RAIDZ2 组中 RAIDZ2 校验 + 填充所占用的空间。
-
-数值（校验 + 填充开销）以总存储大小的百分比表示。例如，每个 RAIDZ2 组有 7 个磁盘时，16 扇区块（8KB 或 64KB）使用总空间的 33%（8 扇区）用于校验 + 填充。
-
-横排是 RAIDZ2 组中的磁盘数量，竖排是块大小（以扇区为单位）。
-
-![](../../.gitbook/assets/raidz2.png)
-
-### RAIDZ3 校验开销，占总存储的百分比
-
-对于不同大小的块（以扇区为单位，压缩后），本表显示了不同磁盘数量的 RAIDZ3 组中 RAIDZ3 校验 + 填充所占用的空间。
-
-数值（校验 + 填充开销）以总存储大小的百分比表示。例如，每个 RAIDZ3 组有 7 个磁盘时，16 扇区块（8KB 或 64KB）使用总空间的 43%（12 扇区）用于校验 + 填充。
-
-横排是 RAIDZ3 组中的磁盘数量，竖排是块大小（以扇区为单位）。
-
-![](../../.gitbook/assets/raidz3.png)
-
-### RAIDZ1 校验开销
-
-对于不同大小的块（以扇区为单位，压缩后），本表显示了不同磁盘数量的 RAIDZ1 组中 RAIDZ1 校验 + 填充所占用的空间。
-
-数值（校验 + 填充开销）以数据大小的百分比表示。例如，每个 RAIDZ1 组有 7 个磁盘时，16 扇区块（8KB 或 64KB）使用 25% 的空间（4 扇区）用于校验 + 填充。
-
-横排是 RAIDZ1 组中的磁盘数量，竖排是块大小（以扇区为单位）。
-
-![](../../.gitbook/assets/raidz1-1.png)
-
-### RAIDZ2 校验开销
-
-对于不同大小的块（以扇区为单位，压缩后），本表显示了不同磁盘数量的 RAIDZ2 组中 RAIDZ2 校验 + 填充所占用的空间。
-
-数值（校验 + 填充开销）以数据大小的百分比表示。例如，每个 RAIDZ2 组有 7 个磁盘时，16 扇区块（8KB 或 64KB）使用 50% 的空间（8 扇区）用于校验 + 填充。
-
-横排是 RAIDZ2 组中的磁盘数量，竖排是块大小（以扇区为单位）。
-
-![](../../.gitbook/assets/raidz1-2.png)
-
-### RAIDZ3 校验开销
-
-对于不同大小的块（以扇区为单位，压缩后），本表显示了不同磁盘数量的 RAIDZ3 组中 RAIDZ3 校验 + 填充所占用的空间。
-
-数值（校验 + 填充开销）以数据大小的百分比表示。例如，每个 RAIDZ3 组有 7 个磁盘时，16 扇区块（8KB 或 64KB）使用 75% 的空间（12 扇区）用于校验 + 填充。
-
-横排是 RAIDZ3 组中的磁盘数量，竖排是块大小（以扇区为单位）。
-
-![](../../.gitbook/assets/raidz1-3.png)
-
-[源代码](https://docs.google.com/spreadsheets/d/1_CO8x03VICdiIMulDjQi9NDBd53qFpUreMQVrF1uS28/edit?usp=sharing)
+每种 RAIDZ 大小的实际校验开销可在此查看：[RAIDZ 校验开销表](https://docs.google.com/spreadsheets/d/e/2PACX-1vRDgvK_cjwpLZBQcneGIS2cmEExUgqUQPblUmGGVXgG1zt-2YR3INFiWMMuYnbo5bK94t1aYGbtoLCS/pubhtml)（[数据源](https://docs.google.com/spreadsheets/d/1_CO8x03VICdiIMulDjQi9NDBd53qFpUreMQVrF1uS28/edit?usp=sharing)）。
 
 ## 性能考虑
 

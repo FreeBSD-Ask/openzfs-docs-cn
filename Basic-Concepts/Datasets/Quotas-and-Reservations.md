@@ -81,7 +81,7 @@ zfs get filesystem_count,snapshot_count pool/home
 
 在极小的存储池上，该预留会提高到至少 128 MiB；在极大的存储池上，它被限制为不超过 128 GiB，但它从不超过存储池的一半。
 
-在大池上可以调高 `spa_slop_shift` 来回收其中一部分空间——设为 6 得 1.6%，设为 7 得 0.8%——代价是恢复余量更薄。参见[模块参数](../../Performance-Tuning/ModuleParameters.md)与[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)，后者建议为分配性能保持 10% 以上的空闲空间——这与余量预留是两个问题，而通常先遇到的是前者。
+在大池上可以调高 `spa_slop_shift` 来回收其中一部分空间——设为 6 得 1.6%，设为 7 得 0.8%——代价是恢复余量更薄。参见 [zfs(4)](../../man/4/zfs.4.md) 的模块参数一节，以及[工作负载调优](../../Performance-Tuning/WorkloadTuning.md)，后者建议为分配性能保持 10% 以上的空闲空间——这与余量预留是两个问题，而通常先遇到的是前者。
 
 ## 延伸阅读
 
