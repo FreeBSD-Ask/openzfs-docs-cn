@@ -19,7 +19,32 @@
 
 ### 支持
 
-如果你需要帮助，可以通过 [邮件列表](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/Mailing%20Lists.html#mailing-lists) 或在 [Libera Chat](https://libera.chat/) 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请提交新的 issue，并 [@Zaryob](https://github.com/Zaryob)。
+如果你需要帮助，可以通过[邮件列表](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/Mailing%20Lists.html#mailing-lists)或在 [Libera Chat](https://libera.chat/) 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请提交新的 issue，并提及 [@Zaryob](https://github.com/Zaryob)。
+
+### 贡献
+
+1. 复刻并克隆：<https://github.com/openzfs/openzfs-docs>
+
+2. 安装工具：
+
+   ```sh
+   sudo zypper install python3-pip
+   pip3 install -r docs/requirements.txt
+   # 将 ~/.local/bin 加入 $PATH，例如在 ~/.bashrc 中添加：
+   PATH=$HOME/.local/bin:$PATH
+   ```
+
+3. 进行更改。
+
+4. 测试：
+
+   ```sh
+   cd docs
+   make html
+   sensible-browser _build/html/index.html
+   ```
+
+5. 将更改 `git commit --signoff` 到某个分支，`git push`，并创建拉取请求。
 
 ### 加密
 
@@ -470,7 +495,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 5. 推荐：在 chroot 中安装 openSUSE YaST2 系统：
 
    ```sh
-   zypper --root /mnt install YaST2
+   zypper --root /mnt install yast2
    ```
 
    >**注意**
@@ -682,7 +707,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
     [Service]
     Type=oneshot
     RemainAfterExit=yes
-    ExecStart=/usr/zpool import -N -o cachefile=none bpool
+    ExecStart=/sbin/zpool import -N -o cachefile=none bpool
     # 保持 zpool 缓存的变通方法
     ExecStartPre=-/bin/mv /etc/zfs/zpool.cache /etc/zfs/preboot_zpool.cache
     ExecStartPost=-/bin/mv /etc/zfs/preboot_zpool.cache /etc/zfs/zpool.cache
@@ -715,7 +740,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 2. 刷新内核文件：
 
    ```sh
-   kernel-install $(uname -r) /boot/vmlinuz-$(uname -r)
+   kernel-install add $(uname -r) /boot/vmlinuz-$(uname -r)
    ```
 
 3. 刷新 initrd 文件：
@@ -954,15 +979,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    等待新安装的系统正常启动，并以 root 登录。
 
 6. 创建用户账户：
-   将 `用户名` 替换为你希望的用户名：
+   将 `username` 替换为你希望的用户名：
 
    ```sh
-   zfs create rpool/home/用户名
-   adduser 用户名
+   zfs create rpool/home/username
+   adduser username
 
-   cp -a /etc/skel/. /home/用户名
-   chown -R 用户名：用户名 /home/用户名
-   usermod -a -G audio,cdrom,dip,floppy,netdev,plugdev,sudo,video 用户名
+   cp -a /etc/skel/. /home/username
+   chown -R username:username /home/username
+   usermod -a -G audio,cdrom,dip,floppy,netdev,plugdev,sudo,video username
    ```
 
 7. 镜像安装 GRUB（多磁盘安装时）：

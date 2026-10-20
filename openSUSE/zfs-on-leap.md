@@ -7,7 +7,7 @@
 * 本教程使用整块物理磁盘。
 * 本教程不适用于双系统。
 * 备份你的数据。一切既有数据都将丢失。
-* 这不是 openSUSE 官方教程。如果日后 openSUSE 新增了以 ZFS 为根文件系统的支持，本文档将随之更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 ZFS](https://forums.opensuse.org/showthread.php/510071-教程-Install-ZFSonLinux-on-OpenSuse)。本教程不使用 YaST2，而是通过 zypper 设置系统，其方法源自社区成员基于自身经验撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
+* 这不是 openSUSE 官方教程。如果日后 openSUSE 新增了以 ZFS 为根文件系统的支持，本文档将随之更新。此外，[openSUSE 的默认系统安装器 YaST2 不支持 ZFS](https://forums.opensuse.org/showthread.php/510071-HOWTO-Install-ZFSonLinux-on-OpenSuse)。本教程不使用 YaST2，而是通过 zypper 设置系统，其方法源自社区成员基于自身经验撰写的 openSUSE 安装方法。有关更多信息，请查看外部链接。
 
 ### 系统要求
 
@@ -19,7 +19,32 @@
 
 ### 支持
 
-如果你需要帮助，可以通过 [邮件列表](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/Mailing%20Lists.html#mailing-lists) 或在 [Libera Chat](https://libera.chat/) 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请提交新的 issue，并 [@Zaryob](https://github.com/Zaryob)。
+如果你需要帮助，可以通过[邮件列表](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/Mailing%20Lists.html#mailing-lists)或在 [Libera Chat](https://libera.chat/) 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请提交新的 issue，并提及 [@Zaryob](https://github.com/Zaryob)。
+
+### 贡献
+
+1. 复刻并克隆：<https://github.com/openzfs/openzfs-docs>
+
+2. 安装工具：
+
+   ```sh
+   sudo zypper install python3-pip
+   pip3 install -r docs/requirements.txt
+   # 将 ~/.local/bin 加入 $PATH，例如在 ~/.bashrc 中添加：
+   PATH=$HOME/.local/bin:$PATH
+   ```
+
+3. 进行更改。
+
+4. 测试：
+
+   ```sh
+   cd docs
+   make html
+   sensible-browser _build/html/index.html
+   ```
+
+5. 将更改 `git commit --signoff` 到某个分支，`git push`，并创建拉取请求。
 
 ### 加密
 
@@ -60,7 +85,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    sudo systemctl restart sshd.service
    ```
 
-   >**提示：**
+   >**提示**
    >
    >你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后，在你的主机上，通过 `ssh user@IP` 进行连接。不要忘记用 `passwd` 为用户设置密码。
 5. 禁用自动挂载：
@@ -107,7 +132,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    # 查看是否有一到多个 MD 阵列处于激活状态：
    cat /proc/mdstat
-   # 如果有，停止它们（根据需要替换 ``md0``）：
+   # 如果有，停止它们（根据需要替换 md0）：
    mdadm --stop /dev/md0
 
    # 对使用整个磁盘的阵列：
@@ -191,7 +216,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
        bpool ${DISK}-part3
    ```
 
-   对启动存储池无需自定义选项。
+   你无需为启动存储池自定义任何选项。
 
    GRUB 不支持所有的 zpool 特性。请参见 [grub-core/fs/zfs/zfs.c](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。
    此步骤为 `/boot` 创建单独的启动存储池，其特性仅限于 GRUB 支持的特性，从而能够让根存储池使用任意特性。注意 GRUB 以只读方式打开存储池，因此所有只读兼容特性均被 GRUB“支持”。
@@ -270,11 +295,11 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 * 设置 `normalization=formD` 可消除一些与 UTF-8 文件名规范化相关的极端情况。它还隐含 `utf8only=on`，意味着只允许 UTF-8 文件名。如果你希望支持非 UTF-8 文件名，请不要使用此选项。关于强制仅使用 UTF-8 文件名可能存在的问题，请参见 [The problems with enforced UTF-8 only filenames](http://utcc.utoronto.ca/~cks/space/blog/linux/ForcedUTF8Filenames)。
 * `recordsize` 未设置（保持默认 128 KiB）。如果想调整（例如 `-O recordsize=1M`），请参见[这些](https://jrs-s.net/2019/04/03/on-zfs-recordsize/) [博客](http://blog.programster.org/zfs-record-size) [文章](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSFileRecordsizeGrowth) [帖子](https://utcc.utoronto.ca/~cks/space/blog/solaris/ZFSRecordsizeAndCompression)。
 * 设置 `relatime=on` 在经典 POSIX `atime` 行为（性能影响显著）与 `atime=off`（完全禁用 atime 更新来获得最佳性能）之间提供折中。自 Linux 2.6.30 起，`relatime` 成为其他文件系统的默认设置。更多信息请参见 [RedHat 文档](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/power_management_guide/relatime)。
-* 设置 `xattr=sa` [大幅提高扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用使用，[一些桌面 GUI 应用会使用它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)；[Samba 可使用它们存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。注意 `xattr=sa` 是 [Linux 特定](https://openzfs.org/wiki/Platform_code_differences) 的。如果将 `xattr=sa` 存储池迁移到 ZFS-on-Linux 以外的 OpenZFS 实现，扩展属性将无法读取（数据仍可用）。如果扩展属性的可移植性对你重要，请省略上面的 `-O xattr=sa`。即便不希望整个存储池使用 `xattr=sa`，在 `/var/log` 上使用通常是安全的。
+* 设置 `xattr=sa` [大幅提高扩展属性的性能](https://github.com/zfsonlinux/zfs/commit/82a37189aac955c81a59a5ecc3400475adb56355)。在 ZFS 内部，扩展属性用于实现 POSIX ACL。扩展属性也可被用户空间应用使用，[一些桌面 GUI 应用会使用它们](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux)；[Samba 可使用它们存储 Windows ACL 和 DOS 属性；Samba Active Directory 域控制器需要它们](https://wiki.samba.org/index.php/Setting_up_a_Share_Using_Windows_ACLs)。注意 `xattr=sa` 是 [Linux 特有](https://openzfs.org/wiki/Platform_code_differences)的。如果将 `xattr=sa` 存储池迁移到 ZFS-on-Linux 以外的 OpenZFS 实现，扩展属性将无法读取（数据仍可用）。如果扩展属性的可移植性对你重要，请省略上面的 `-O xattr=sa`。即便不希望整个存储池使用 `xattr=sa`，在 `/var/log` 上使用通常是安全的。
 * 确保包含磁盘路径中的 `-part4` 部分。如果忘记，将指定整个磁盘，ZFS 会重新分区，你将丢失引导加载器分区。
-* ZFS 原生加密 [现](https://github.com/openzfs/zfs/commit/31b160f0a6c673c8f926233af2ed6d5354808393) 默认使用 `aes-256-gcm`。
+* ZFS 原生加密[现](https://github.com/openzfs/zfs/commit/31b160f0a6c673c8f926233af2ed6d5354808393)默认使用 `aes-256-gcm`。
 * 对于 LUKS，密钥大小选择为 512 位。但 XTS 模式需要两个密钥，因此 LUKS 密钥被一分为二，`-s 512` 即表示 AES-256。
-* 你的口令很可能是最薄弱环节。请谨慎选择。参考 [cryptsetup FAQ 第 5 节](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions#5-security-aspects) 获取指导。
+* 你的口令很可能是最薄弱环节。请谨慎选择。参考 [cryptsetup FAQ 第 5 节](https://gitlab.com/cryptsetup/cryptsetup/wikis/FrequentlyAskedQuestions#5-security-aspects)获取指导。
 
 **提示：**
 
@@ -502,8 +527,8 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 5. 推荐：在 chroot 中安装 openSUSE YaST2 系统：
 
    ```sh
-   zypper --root /mnt install YaST2
-   zypper --root /mnt install -t pattern YaST2_basis
+   zypper --root /mnt install yast2
+   zypper --root /mnt install -t pattern yast2_basis
    ```
 
    这将方便初学者配置网络及其他系统设置。
@@ -513,10 +538,10 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 ## 第 5 步：系统配置
 
 1. 配置主机名：
-   将 `主机名` 替换为你希望使用的主机名：
+   将 `HOSTNAME` 替换为你希望使用的主机名：
 
    ```sh
-   echo 主机名 > /mnt/etc/hostname
+   echo HOSTNAME > /mnt/etc/hostname
    vi /mnt/etc/hosts
    ```
 
@@ -532,7 +557,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    127.0.1.1       FQDN HOSTNAME
    ```
 
-   >**提示：**
+   >**提示**
    >
    >如果觉得 `vi` 难用，可以使用 `nano`。
 
@@ -557,7 +582,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    chroot /mnt /usr/bin/env DISK=$DISK bash --login
    ```
 
-   >**注意：**
+   >**注意**
    >
    >这里使用的是 `--rbind` 而非 `--bind`。
 
@@ -600,7 +625,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zypper install kernel-default kernel-firmware
    ```
 
-   >**注意：**
+   >**注意**
    >
    >如果安装了 base pattern，需要卸载 busybox-grep 才能安装 kernel-default 包。
 
@@ -632,7 +657,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    使用 `initramfs` 是为了解决 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906) 的问题。
 
-   >**提示：**
+   >**提示**
    >
    >如果创建 mirror 或 raidz 拓扑，为 `luks2` 等磁盘重复添加 `/etc/crypttab` 条目。
 
@@ -694,7 +719,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
     zypper remove os-prober
     ```
 
-    仅在双系统环境中需要 os-prober，否则可避免 update-bootloader 报错。
+    这样可以避免 `update-bootloader` 报错。`os-prober` 仅在双系统配置中才需要。
 
 13. 设置 root 密码：
 
@@ -771,12 +796,11 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    mkinitrd
    ```
 
-   >**注意：**
+   >**注意**
    >
-   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED”。
-   解决方法：检查 cryptsetup 的安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
+   >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED”。解决方法：检查 cryptsetup 的安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
 
-   >**注意：**
+   >**注意**
    >
    >即使已将 zfs 配置添加到系统模块 `/etc/modules.d`，若 dracut 未识别，还需强制添加：
 
@@ -821,15 +845,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    update-bootloader
    ```
 
-   >**注意：**
+   >**注意**
    >
    >如果出现 `os-prober` 错误可忽略。
 
-   >**注意：**
+   >**注意**
    >
    >如果安装 grub2 时出现问题，可考虑使用 systemd-boot。
 
-   >**注意：**
+   >**注意**
    >
    >如果命令无输出，可使用经典的 `grub.cfg` 生成：
    >
@@ -1015,15 +1039,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    等待新安装的系统正常启动，并以 root 登录。
 
 6. 创建用户账户：
-   将 `用户名` 替换为你希望的用户名：
+   将 `username` 替换为你希望的用户名：
 
    ```sh
-   zfs create rpool/home/用户名
-   adduser 用户名
+   zfs create rpool/home/username
+   adduser username
 
-   cp -a /etc/skel/. /home/用户名
-   chown -R 用户名：用户名 /home/用户名
-   usermod -a -G audio,cdrom,dip,floppy,netdev,plugdev,sudo,video 用户名
+   cp -a /etc/skel/. /home/username
+   chown -R username:username /home/username
+   usermod -a -G audio,cdrom,dip,floppy,netdev,plugdev,sudo,video username
    ```
 
 7. 镜像安装 GRUB（多磁盘安装时）：
@@ -1092,7 +1116,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    echo RESUME=none > /etc/initramfs-tools/conf.d/resume
    ```
 
-   `RESUME=none` 用于禁用休眠恢复。由于 zvol 在启动时尚未导入（存储池未导入），恢复脚本无法找到 swap，如果不禁用，启动过程会停滞约 30 秒等待 swap zvol 出现。
+   `RESUME=none` 用于禁用休眠恢复。由于恢复脚本运行时存储池尚未导入、zvol 尚不存在，恢复无法进行；如果不禁用，启动过程会停滞约 30 秒等待 swap zvol 出现。
 
 3. 启用 swap 设备：
 
@@ -1145,7 +1169,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    >
    >如果出现 `osprober` 错误，可忽略。
 
-6. 可选：仅针对 LUKS 安装，备份 LUKS 头：
+6. 可选：仅针对 LUKS 安装，备份 LUKS 头部：
 
    ```sh
    sudo cryptsetup luksHeaderBackup /dev/disk/by-id/scsi-SATA_disk1-part4 \

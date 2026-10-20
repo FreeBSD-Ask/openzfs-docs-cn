@@ -36,13 +36,14 @@
    ```
 
 6. 目标磁盘
+
    使用以下命令列出可用磁盘：
 
    ```sh
    find /dev/disk/by-id/
    ```
 
-   如果使用 virtio 作为磁盘总线，请关闭虚拟机并为磁盘设置序列号。对于 QEMU，使用 `-drive format=raw,file=disk2.img,serial=AaBb`。对于 libvirt，编辑域 XML。示例参见 [此页面](https://bugzilla.redhat.com/show_bug.cgi?id=1245013)。
+   如果使用 virtio 作为磁盘总线，请关闭虚拟机并为磁盘设置序列号。对于 QEMU，使用 `-drive format=raw,file=disk2.img,serial=AaBb`。对于 libvirt，编辑 domain XML。示例参见 [此页面](https://bugzilla.redhat.com/show_bug.cgi?id=1245013)。
 
    声明磁盘数组：
 
@@ -63,7 +64,8 @@
    ```
 
 8. 设置分区大小：
-  设置 swap 大小（单位 GB），如果不希望 swap 占用过多空间则设为 1。
+
+   设置 swap 大小（单位 GB），如果不希望 swap 占用过多空间则设为 1。
 
    ```ini
    SWAPSIZE=4
@@ -78,7 +80,9 @@
 ## 系统安装
 
 1. 对磁盘进行分区。
-   注意：必须清除目标磁盘上一切既有的分区表和数据结构。
+
+   注意：必须清除目标磁盘上所有现有的分区表和数据结构。
+
    对于基于闪存的存储，可使用下面的 blkdiscard 命令完成：
 
    ```sh
@@ -171,9 +175,9 @@
 
 5. 创建根系统容器：
 
-   > ```sh
-   > zfs create -o canmount=noauto -o mountpoint=legacy rpool/root
-   > ```
+   ```sh
+   zfs create -o canmount=noauto -o mountpoint=legacy rpool/root
+   ```
 
    创建系统数据集，使用 `mountpoint=legacy` 管理挂载点：
 

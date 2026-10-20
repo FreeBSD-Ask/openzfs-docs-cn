@@ -40,7 +40,7 @@
    network interface: wlan0
    WiFi name:         <ssid>
    ip address:        dhcp
-   <此处按回车完成安装>
+   <enter done to finish network config>
    manual netconfig:  n
    ```
 
@@ -52,8 +52,8 @@
    setup-sshd
    # 示例：
    ssh server:        openssh
-   allow root:        "prohibit-password" 或 "yes"
-   ssh key:           "none" 或 "<公钥>"
+   allow root:        "prohibit-password" or "yes"
+   ssh key:           "none" or "<public key>"
    ```
 
 7. 设置 root 密码或配置 `/root/.ssh/authorized_keys`。

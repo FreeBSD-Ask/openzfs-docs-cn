@@ -1,5 +1,9 @@
 # 在 NixOS 中启用 ZFS 支持
 
+## 支持
+
+通过[邮件列表](../Project-and-Community/MailingLists.md)或 Libera Chat 上的 IRC 频道 [#zfsonlinux](ircs://irc.libera.chat/#zfsonlinux) 联系社区。如果你有与本教程相关的 Bug 报告或功能请求，请[提交新的 issue 并提及 @ne9z](https://github.com/openzfs/openzfs-docs/issues/new?body=@ne9z,%20I%20have%20the%20following%20issue%20with%20the%20Nix%20ZFS%20HOWTO:)。
+
 ## 安装
 
 >**注意**
@@ -35,4 +39,30 @@ NixOS Live 镜像默认内置了 ZFS 支持。
    ```sh
    reboot
    ```
+
+## 贡献
+
+你可以为本文档作出贡献：复刻（fork）本仓库，编辑文档，然后提交拉取请求。
+
+1. 要在本地测试你的更改，请使用本仓库中的 devShell：
+
+   ```sh
+   git clone https://github.com/ne9z/nixos-live openzfs-docs-dev
+   cd openzfs-docs-dev
+   nix develop ./openzfs-docs-dev/#docs
+   ```
+
+2. 在 openzfs-docs 仓库中构建页面：
+
+   ```sh
+   make html
+   ```
+
+3. 检查 make 输出中的错误与警告。如果没有错误：
+
+   ```sh
+   xdg-open _build/html/index.html
+   ```
+
+4. 将更改 `git commit --signoff` 到某个分支，`git push`，并创建拉取请求，提及 @ne9z。
 
