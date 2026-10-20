@@ -60,7 +60,7 @@
 LUKS 会对几乎所有内容进行加密：操作系统、交换分区、用户主目录以及其他数据。唯一未加密的数据是引导加载程序、内核和 initrd。系统启动时必须在控制台输入密码，否则无法启动。性能表现良好，但 LUKS 位于 ZFS 下层，因此如果使用多块磁盘（镜像或 raidz 拓扑），每个磁盘上的数据都需要单独加密一次。
 
 
-## 第一步：准备安装环境
+## 第 1 步：准备安装环境
 
 1.1 启动 Debian GNU/Linux Live CD。如果出现提示，请使用用户名 `user` 和密码 `live` 进行登录。根据需要将系统连接到互联网（例如接入你的 WiFi 网络）。
 
@@ -100,7 +100,7 @@ $ sudo -i
 
 * 手动安装 dkms 依赖只是为了让它来自 stretch 而非 stretch-backports，这并非关键步骤。
 
-## 第二步：磁盘格式化
+## 第 2 步：磁盘格式化
 
 2.1 如果复用磁盘，请根据需要进行清理：
 
@@ -221,7 +221,7 @@ GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](ht
 * 如果创建镜像或 raidz 拓扑，可使用 `zpool create ... rpool mirror /dev/disk/by-id/scsi-SATA_disk1-part4 /dev/disk/by-id/scsi-SATA_disk2-part4`（或将 `mirror` 替换为 `raidz`、`raidz2` 或 `raidz3`，并列出额外磁盘的分区）。对于 LUKS，使用 `/dev/mapper/luks1`、`/dev/mapper/luks2` 等，需要通过 `cryptsetup` 创建。
 * 存储池名称可自定义。如果要更改，需在所有操作中保持一致。在可自动安装到 ZFS 的系统上，根存储池默认命名为 `rpool`。
 
-## 第三步：系统安装
+## 第 3 步：系统安装
 
 3.1 创建作为容器的文件系统数据集：
 
@@ -346,7 +346,7 @@ GRUB 并不支持所有 ZFS 存储池特性。参见 [grub-core/fs/zfs/zfs.c](ht
 
 `debootstrap` 命令会使新系统处于未配置状态。替代方法是将既有可用系统的全部内容复制到新的 ZFS 根中。
 
-## 第四步：系统配置
+## 第 4 步：系统配置
 
 4.1 配置主机名（将 `HOSTNAME` 替换为所需主机名）。
 
@@ -405,7 +405,7 @@ Pin-Priority: 990
 # chroot /mnt /bin/bash --login
 ```
 
->**注意：**
+>**注意**
 >
 >使用的是 `--rbind`，而不是 `--bind`。
 
@@ -444,7 +444,7 @@ Pin-Priority: 990
 
 * 使用 `initramfs` 是为了绕过 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906) 的问题。
 
->**提示：**
+>**提示**
 >
 >如果你创建的是镜像或 raidz 拓扑，请为 `luks2` 等重复添加 `/etc/crypttab` 条目，并根据每块磁盘进行相应调整。
 
@@ -475,7 +475,7 @@ Pin-Priority: 990
 
 * `mkdosfs` 中的 `-s 1` 仅在驱动器呈现 4 KiB 逻辑扇区（“4Kn”硬盘）时才需要，用于满足 FAT32 的最小簇大小要求（针对 512 MiB 分区）；在呈现 512 B 扇区的驱动器上也可以正常工作。
 
->**注意：**
+>**注意**
 >
 >如果你创建的是镜像或 raidz 拓扑，此步骤仅在第一块磁盘上安装 GRUB，其他磁盘将在后续步骤中处理。
 
@@ -526,7 +526,7 @@ WantedBy=zfs-import.target
 
 在出现提示时选择 `Yes`。
 
-## 第五步：安装 GRUB
+## 第 5 步：安装 GRUB
 
 5.1 验证 ZFS 引导文件系统是否被识别：
 
@@ -542,7 +542,7 @@ zfs
 update-initramfs: Generating /boot/initrd.img-4.9.0-8-amd64
 ```
 
->**注意：**
+>**注意**
 >
 >在使用 LUKS 时，可能会显示“WARNING could not determine root device from /etc/fstab”。这是因为 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906)。
 
@@ -574,7 +574,7 @@ Found initrd image: /boot/initrd.img-4.9.0-8-amd64
 done
 ```
 
->**注意：**
+>**注意**
 >
 >如果存在来自 `osprober` 的报错，请忽略。
 
@@ -638,7 +638,7 @@ Installation finished. No error reported.
 # echo rpool/tmp /tmp zfs nodev,relatime 0 0 >> /etc/fstab
 ```
 
-## 第六步：首次启动
+## 第 6 步：首次启动
 
 6.1 对初始安装进行快照：
 
@@ -711,9 +711,9 @@ Installation finished. No error reported.
 # mount /boot/efi
 ```
 
-## 第七步：（可选）配置交换空间
+## 第 7 步：（可选）配置交换空间
 
->**注意**：
+>**注意**
 >
 >在内存压力极高的系统上，无论还剩多少 swap 空间可用，使用 zvol 作为交换设备都可能导致系统锁死。目前该问题正在调查中：[https://github.com/zfsonlinux/zfs/issues/7734](https://github.com/zfsonlinux/zfs/issues/7734)
 
@@ -732,7 +732,7 @@ Installation finished. No error reported.
 
 7.2 配置交换设备：
 
->**注意**：
+>**注意**
 >
 >在配置文件中始终使用长别名 `/dev/zvol`，绝不要使用短 `/dev/zdX` 设备名。
 
@@ -750,7 +750,7 @@ Installation finished. No error reported.
 # swapon -av
 ```
 
-## 第八步：安装完整软件
+## 第 8 步：安装完整软件
 
 8.1 升级最小系统：
 
@@ -764,7 +764,7 @@ Installation finished. No error reported.
 # tasksel
 ```
 
->**注意**：
+>**注意**
 >
 >默认会勾选“Debian 桌面环境”和“打印服务器”。如果希望安装服务器版本，请取消勾选这些选项。
 
@@ -786,7 +786,7 @@ done
 # reboot
 ```
 
-### 第九步：最终清理
+### 第 9 步：最终清理
 
 9.1 等待系统正常启动，使用你创建的账户登录。确保系统（包括网络）正常工作。
 
@@ -816,7 +816,7 @@ $ sudo vi /etc/default/grub
 $ sudo update-grub
 ```
 
->**注意**：
+>**注意**
 >
 >如果存在来自 `osprober` 的报错，请忽略。
 

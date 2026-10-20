@@ -61,7 +61,7 @@ ZFS 原生加密会对根池中的数据以及大多数元数据进行加密。�
 
 LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加载器、内核和 initrd。系统在控制台输入口令之前无法启动。性能表现良好，但 LUKS 位于 ZFS 之下，因此如果使用多块磁盘（mirror 或 raidz 拓扑），数据需要在每块磁盘上分别加密一次。
 
-## 步骤 1：准备安装环境
+## 第 1 步：准备安装环境
 
 1. 启动 Debian GNU/Linux Live CD。如果提示登录，请使用用户名 `user` 和密码 `live`。根据需要将系统连接到互联网（例如接入你的 WiFi 网络）。打开终端。
 2. 配置并更新软件源：
@@ -116,7 +116,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 我们需要先构建并加载模块，否则在安装 zfsutils-linux 时，`zfs-mount.service` [将无法启动](https://github.com/zfsonlinux/zfs/issues/9599)。
 
 
-## 步骤 2：磁盘格式化
+## 第 2 步：磁盘格式化
 
 1. 使用磁盘名称设置变量：
 
@@ -326,7 +326,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 * 在使用 LUKS 的 mirror 或 raidz 拓扑时，请使用 `/dev/mapper/luks1`、`/dev/mapper/luks2` 等，这些需要通过 `cryptsetup` 创建。
 * 存储池名称是任意的。如果更改了名称，必须在各处保持一致。在能够自动安装到 ZFS 的系统上，根存储池默认命名为 `rpool`。
 
-## 步骤 3：安装系统
+## 第 3 步：安装系统
 
 1. 创建作为容器的文件系统数据集：
 
@@ -462,7 +462,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    cp /etc/zfs/zpool.cache /mnt/etc/zfs/
    ```
 
-## 步骤 4：系统配置
+## 第 4 步：系统配置
 
 1. 配置主机名：
    将 `HOSTNAME` 替换为所需的主机名：
@@ -545,7 +545,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    chroot /mnt /usr/bin/env DISK=$DISK bash --login
    ```
 
-   >**注意：**
+   >**注意**
    >
    >此处使用的是 `--rbind`，而不是 `--bind`。
 6. 配置基础系统环境：
@@ -573,7 +573,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    echo REMAKE_INITRD=yes > /etc/dkms/zfs.conf
    ```
 
-   >**注意：**
+   >**注意**
    >
    >请忽略任何类似 `ERROR: Couldn't resolve device` 和 `WARNING: Couldn't determine root device` 的报错提示。[cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906)。
 8. 仅针对 LUKS 安装，配置 `/etc/crypttab`：
@@ -586,7 +586,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
    使用 `initramfs` 是针对 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906) 的一种变通方案。
-   >**提示：**
+   >**提示**
    >
    >如果你创建的是 mirror 或 raidz 拓扑，请为 `luks2` 等重复添加 `/etc/crypttab` 条目，并根据每块磁盘进行相应调整。
 9. 安装 GRUB
@@ -688,7 +688,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
     在出现提示时选择 `Yes`。
 
-## 步骤 5：安装 GRUB
+## 第 5 步：安装 GRUB
 
 1. 验证是否识别了 ZFS 启动文件系统：
 
@@ -726,7 +726,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    update-grub
    ```
 
-   >**注意：**
+   >**注意**
    >
    >请忽略来自 `osprober` 的报错（若有）。
 6. 安装引导加载器：
@@ -786,7 +786,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    sed -Ei "s|/mnt/?|/|" /etc/zfs/zfs-list.cache/*
    ```
 
-## 步骤 6：首次启动
+## 第 6 步：首次启动
 
 1. 可选：对初始安装创建快照：
 
@@ -859,9 +859,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
      mount /boot/efi
      ```
 
-## 步骤 7：可选：配置 Swap
+## 第 7 步：可选：配置 Swap
 
->**注意**：
+>**注意**
 >
 >在内存压力极高的系统上，无论还剩多少 swap 空间可用，使用 zvol 作为 swap 都可能导致系统死锁。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
@@ -877,7 +877,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    你可以根据需要调整大小（即 `4G` 部分）。
    压缩算法选择 `zle`，因为它是开销最低的算法。由于本指南推荐 `ashift=12`（磁盘上 4 KiB 块），在常见的 4 KiB 页面大小情况下，没有压缩算法能减少 I/O。唯一例外是全零页面，ZFS 会自动丢弃；但必须启用某种压缩才能达到这一效果。
 2. 配置 swap 设备：
-   >**注意**：
+   >**注意**
    >
    >在配置文件中应始终使用完整的 `/dev/zvol` 别名，绝不可使用简短的 `/dev/zdX` 设备名。
 
@@ -894,7 +894,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    swapon -av
    ```
 
-## 步骤 8：完整软件安装
+## 第 8 步：完整软件安装
 
 1. 更新最小系统：
 
@@ -908,7 +908,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    tasksel --new-install
    ```
 
-   >**注意**：
+   >**注意**
    >
    >默认会勾选“Debian 桌面环境”和“打印服务器”。如果你需要安装服务器，请取消勾选这些选项。
 3. 可选：禁用日志压缩：
@@ -928,7 +928,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    reboot
    ```
 
-## 步骤 9：最终清理
+## 第 9 步：最终清理
 
 1. 等待系统正常启动。使用你创建的账户登录，确保系统（包括网络）正常运行。
 2. 可选：删除初始安装的快照：
@@ -966,7 +966,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    sudo update-grub
    ```
 
-   >**注意**：
+   >**注意**
    >
    >如果存在来自 `osprober` 的报错，请忽略。
 6. 可选：仅针对 LUKS 安装，备份 LUKS 头：
@@ -977,7 +977,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    ```
 
    将备份妥善保存（例如存储在云端）。它受你的 LUKS 口令短语保护，但你可能想使用额外的加密。
-   >**提示**：
+   >**提示**
    >
    >如果你创建了镜像或 raidz 拓扑，请对每个 LUKS 卷（如 `luks2` 等）重复此操作。
 
@@ -985,7 +985,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 ### 使用 Live CD 进行救援
 
-按照 [步骤 1：准备安装环境](https://openzfs.github.io/openzfs-docs/Getting%20Started/Debian/Debian%20Buster%20Root%20on%20ZFS.html#step-1-prepare-the-install-environment) 操作。
+按照 [第 1 步：准备安装环境](https://openzfs.github.io/openzfs-docs/Getting%20Started/Debian/Debian%20Buster%20Root%20on%20ZFS.html#step-1-prepare-the-install-environment) 操作。
 
 对于 LUKS，首先解锁磁盘：
 

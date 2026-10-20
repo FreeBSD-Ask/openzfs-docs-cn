@@ -310,7 +310,7 @@ $ zpool add -o ashift=12 tank mirror sdc sdd
 
 你可以使用 ZVOL 作为交换设备，但需要进行适当配置。
 
->**警告：**
+>**警告**
 >
 >目前在 ZVOL 上使用 swap 可能会导致死锁，如遇此情况，请将日志发送到 [此处](https://github.com/zfsonlinux/zfs/issues/7734)。
 

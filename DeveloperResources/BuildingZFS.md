@@ -75,11 +75,11 @@ make -s -j$(nproc)
 ```
 
 
->**提示：**
+>**提示**
 >
 >可以向 configure 传递 `--with-linux=PATH` 和 `--with-linux-obj=PATH`，来指定安装在非默认位置的内核。
 
->**提示：**
+>**提示**
 >
 > 可以向 configure 传递 `--enable-debug`，来启用所有 ASSERT 以及额外的正确性测试。
 
@@ -171,6 +171,6 @@ sudo ./scripts/zloop.sh
 ./scripts/zfs-tests.sh -vx
 ```
 
->**提示：**
+>**提示**
 >
 >除非为 zfs 目录及其父目录设置了组读权限，否则将跳过 **delegate** 测试。
