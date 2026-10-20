@@ -26,7 +26,7 @@ zpool scrub -s -a | 池名…
 
 开始一次 scrub，或继续一个已暂停的 scrub。普通 scrub 会检查指定池中的所有数据，并验证每个块的校验和。彻底 scrub（thorough scrub）还会在读取块时对其进行解密和/或解压。对于冗余（镜像、raidz 或 draid）设备，ZFS 会自动修复 scrub 过程中发现的任何损坏。`zpool status` 命令会报告 scrub 的进度，并在完成后汇总 scrub 的结果。
 
-scrub 与 resilver 是非常相似的操作。区别在于，resilver 只检查 ZFS 已知过期的数据（例如在向镜像中新建设备或替换现有设备时），而 scrub 检查所有数据，以发现因硬件故障或磁盘失效导致的静默错误。
+scrub 与 resilver 是非常相似的操作。区别在于，resilver 只检查 ZFS 已知过期的数据（例如向镜像附加新设备或替换现有设备时），而 scrub 检查所有数据，以发现因硬件故障或磁盘失效导致的静默错误。
 
 对带有加密文件系统的池执行 scrub 时，普通的校验和验证无需加载密钥，但彻底 scrub 需要（参见下文的 `-t`）。
 
@@ -91,7 +91,9 @@ scrub 分为两部分：元数据扫描与块 scrub。元数据扫描会把块�
 
 ## 示例
 
-### 示例 1：正在执行 scrub 的池的状态
+### 示例 1
+
+正在执行 scrub 的池的状态：
 
 ```sh
 # zpool status

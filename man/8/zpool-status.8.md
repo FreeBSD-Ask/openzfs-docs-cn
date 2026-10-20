@@ -26,7 +26,7 @@ zpool status [-DdegiLPpstx] [-v|-vv] [-c 脚本1[,脚本2,…]] [-j|--json [--js
 
 ### `-d`
 
-显示顶级 VDEV 上发生过的 Direct I/O 读/写校验和验证错误的数量。有关可导致 Direct I/O 写校验和验证失败发生的条件详情，参见 zfs(4) 中的 `zfs_vdev_direct_write_verify`。如果 I/O 已发出且仍在传输途中时缓冲区内容被改动，也可能发生 Direct I/O 读校验和验证错误。发生 Direct I/O 读校验和验证错误时，该 I/O 会经由 ARC 重新发出。
+显示顶级 VDEV 上发生过的 Direct I/O 读/写校验和验证错误的数量。有关可导致 Direct I/O 写校验和验证失败发生的条件详情，参见 zfs(4) 中的 `zfs_vdev_direct_write_verify`。如果 I/O 已发出且仍在途时缓冲区内容被改动，也可能发生 Direct I/O 读校验和验证错误。发生 Direct I/O 读校验和验证错误时，该 I/O 会经由 ARC 重新发出。
 
 ### `-e`
 

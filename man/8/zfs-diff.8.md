@@ -54,7 +54,7 @@ zfs diff [-FHth] 快照 快照 | 文件系统
 
 ### `-h`
 
-不对非 ASCII 路径进行 `\e0ooo` 转义。
+不对非 ASCII 路径进行 `\0ooo` 转义。
 
 ## 示例
 

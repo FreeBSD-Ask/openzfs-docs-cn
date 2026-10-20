@@ -15,7 +15,7 @@ zfs userspace [-Hinp] [-o field[,field]…] [-s field]… [-S field]… [-t type
 ```
 
 ```sh
-zfs groupspace [-Hinp] [-o field[,field]…] [-s field]… [-S field]… [-t type[,type]…] 文件系统|快照|路径
+zfs groupspace [-Hinp] [-o field[,field]…] [-s field]… [-S field]… [-t type[,type]…] 文件系统|快照
 ```
 
 ```sh
@@ -60,13 +60,13 @@ zfs projectspace [-Hp] [-o field[,field]…] [-s field]… [-S field]… 文件�
 
 只打印以下集合中的指定类型：`all`、`posixuser`、`smbuser`、`posixgroup`、`smbgroup`。默认为 `-t posixuser,smbuser`。也可以更改默认值以包含组类型。
 
-### `zfs groupspace [-Hinp] [-o field[,field]…] [-s field]… [-S field]… [-t type[,type]…] filesystem|snapshot|path`
+### `zfs groupspace [-Hinp] [-o field[,field]…] [-s field]… [-S field]… [-t type[,type]…] filesystem|snapshot`
 
 显示指定文件系统或快照中每个组占用的空间及其配额。此子命令与 `userspace` 相同，只是默认显示的类型为 `-t posixgroup,smbgroup`。
 
-### `zfs projectspace [-Hp] [-o field[,field]…] [-s field]… [-S field]…] filesystem|snapshot|path`
+### `zfs projectspace [-Hp] [-o field[,field]…] [-s field]… [-S field]… filesystem|snapshot|path`
 
-显示指定文件系统、快照或路径中每个项目占用的空间及其配额。此子命令与 `userspace` 相同，只是项目标识符是数字而不是名称。因此既不需要用于把 SID 转换为 POSIX ID 的 `-i` 选项，也不需要用于数字 ID 的 `-n` 选项和用于类型的 `-t` 选项。
+显示指定文件系统或快照中每个项目占用的空间及其配额。此子命令与 `userspace` 相同，只是项目标识符是数字而不是名称。因此既不需要用于把 SID 转换为 POSIX ID 的 `-i` 选项，也不需要用于数字 ID 的 `-n` 选项和用于类型的 `-t` 选项。
 
 ## 参考文献
 

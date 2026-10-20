@@ -105,11 +105,11 @@ zfs create [-ps] [-b 块大小] [-o 属性=值]… -V 大小 卷
   向 /pool/project/production 填充数据
 # zfs snapshot pool/project/production@today
 # zfs clone pool/project/production@today pool/project/beta
-  对 /pool/project/beta 进行修改并测试
+  修改 /pool/project/beta 并进行测试
 # zfs promote pool/project/beta
 # zfs rename pool/project/production pool/project/legacy
 # zfs rename pool/project/beta pool/project/production
-  不再需要旧版本后，可以将其销毁
+  旧版本不再需要时即可销毁
 # zfs destroy pool/project/legacy
 ```
 

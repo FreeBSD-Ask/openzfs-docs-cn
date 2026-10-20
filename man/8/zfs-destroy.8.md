@@ -114,7 +114,7 @@ zfs destroy 文件系统 | 卷#书签
 # zfs promote pool/project/beta
 # zfs rename pool/project/production pool/project/legacy
 # zfs rename pool/project/beta pool/project/production
-  旧版本不再需要后即可将其销毁
+  旧版本不再需要时即可销毁
 # zfs destroy pool/project/legacy
 ```
 

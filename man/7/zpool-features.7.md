@@ -6,7 +6,7 @@
 
 ## 说明
 
-ZFS 存储池的磁盘格式版本通过“特性”（features）指定，取代了旧的磁盘格式编号（最后支持的磁盘格式编号为 28）。要为池启用某个特性，请运行 `zpool upgrade`，或将 `feature@特性名` 属性设置为 `enabled`。有关如何成组启用特性集，另见下文“兼容性特性集”一节。
+ZFS 存储池的磁盘格式版本通过“特性”（features）指定，取代了旧的磁盘格式编号（最后支持的磁盘格式编号为 28）。要为池启用某个特性，请运行 `zpool upgrade`，或将 `feature@feature-name` 属性设置为 `enabled`。有关如何成组启用特性集，另见下文“兼容性特性集”一节。
 
 池格式不影响文件系统版本兼容性，也不影响在池之间发送文件系统的功能。
 
@@ -14,11 +14,11 @@ ZFS 存储池的磁盘格式版本通过“特性”（features）指定，取�
 
 ### 特性识别
 
-每个特性都有一个形如 `com.example:特性名` 的 GUID。反向 DNS 名称确保该 GUID 在所有 ZFS 实现中都是唯一的。
+每个特性都有一个形如 `com.example:feature-name` 的 GUID。反向 DNS 名称确保该 GUID 在所有 ZFS 实现中都是唯一的。
 
 当在池上遇到不受支持的特性时，将通过其 GUID 进行识别。有关这些特性的信息，请查阅创建该池的 ZFS 实现的文档。
 
-每个受支持的特性还有一个短名称。按惯例，特性的短名称是其 GUID 中冒号（`:`）之后的部分，即 `com.example:特性名` 的短名称为 `特性名`。不过，如果遵循该惯例会导致名称冲突，不同 ZFS 实现之间的短名称可能会有所不同。
+每个受支持的特性还有一个短名称。按惯例，特性的短名称是其 GUID 中冒号（`:`）之后的部分，即 `com.example:feature-name` 的短名称为 `feature-name`。不过，如果遵循该惯例会导致名称冲突，不同 ZFS 实现之间的短名称可能会有所不同。
 
 ### 特性状态
 
@@ -36,7 +36,7 @@ ZFS 存储池的磁盘格式版本通过“特性”（features）指定，取�
 
 该特性的磁盘格式变更尚未做出，且除非管理员将该特性移到 `enabled` 状态，否则也不会做出。特性一旦被启用，就无法再被禁用。
 
-受支持特性的状态通过形如 `feature@短名称` 的池属性暴露。
+受支持特性的状态通过形如 `feature@short-name` 的池属性暴露。
 
 ### 只读兼容性
 
@@ -44,7 +44,7 @@ ZFS 存储池的磁盘格式版本通过“特性”（features）指定，取�
 
 ### 不受支持的特性
 
-对于已导入池中已启用的每个不受支持的特性，都有一个名为 `unsupported@特性名` 的池属性，说明为何允许在存在不受支持特性的情况下导入。此属性的可能取值如下：
+对于已导入池中已启用的每个不受支持的特性，都有一个名为 `unsupported@feature-name` 的池属性，说明为何允许在存在不受支持特性的情况下导入。此属性的可能取值如下：
 
 #### `inactive`
 
@@ -66,7 +66,7 @@ ZFS 存储池的磁盘格式版本通过“特性”（features）指定，取�
 
 请求的特性在使用 `zpool create -o compatibility=…` 创建池时生效，并控制使用 `zpool upgrade` 时启用哪些特性。`zpool status` 不会对不属于所请求特性集的已禁用特性发出警告。
 
-特殊值 `legacy` 会阻止启用任何特性，无论是通过 `zpool upgrade`，还是通过 `zpool set feature@特性名=enabled`。此设置还会阻止池被升级到更新的磁盘格式版本。这是一个安全措施，用于防止意外启用新特性而破坏兼容性。
+特殊值 `legacy` 会阻止启用任何特性，无论是通过 `zpool upgrade`，还是通过 `zpool set feature@feature-name=enabled`。此设置还会阻止池被升级到更新的磁盘格式版本。这是一个安全措施，用于防止意外启用新特性而破坏兼容性。
 
 按惯例，`/usr/share/zfs/compatibility.d` 中的兼容性文件由发行版提供，包含重要版本的主流发行版所支持的特性集，以及每年年初普遍支持的特性集。`/etc/zfs/compatibility.d` 中的兼容性文件（如果存在）优先于 `/usr/share/zfs/compatibility.d` 中同名的文件。
 
@@ -162,14 +162,14 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 此特性启用在校验和与去重中使用 BLAKE3 哈希算法。BLAKE3 是一种注重高性能的安全哈希算法。
 
-当 `blake3` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=blake3 数据集` 在任何数据集上启用 `blake3` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `blake3`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `blake3` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
+当 `blake3` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=blake3 dset` 在任何数据集上启用 `blake3` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `blake3`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `blake3` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
 
 ### `block_cloning`
 
 * **GUID**：`com.fudosecurity:block_cloning`
 * **只读兼容**：是
 
-启用此特性后，ZFS 会对 `copy_file_range(2)` 之类的操作使用块克隆。块克隆允许为单个块创建多个引用。它比复制数据快得多（因为实际数据既不被读取也不被写入），且不占用额外空间。在某些条件下（如 `recordsize` 相同、主加密密钥相同等），可以在数据集之间克隆块。ZFS 会尽力跨数据集克隆，包括已加密的数据集。根据操作系统和/或 ZFS 内部实现的不同，各种（非显而易见的）原因都会对此形成限制。
+启用此特性后，ZFS 会对 `copy_file_range(2)` 之类的操作使用块克隆。块克隆允许为单个块创建多个引用。它比复制数据快得多（因为实际数据既不被读取也不被写入），且不占用额外空间。在某些条件下（如 `recordsize` 相同、主加密密钥相同等），可以在数据集之间克隆块。ZFS 会尽力跨数据集克隆，包括已加密的数据集。由于操作系统和/或 ZFS 内部实现的种种（非显而易见的）原因，这一能力会受到限制。
 
 克隆第一个块时，此特性变为 `active`。当最后一个被克隆的块被释放时，它回到 `enabled` 状态。
 
@@ -188,7 +188,7 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 * **依赖**：`extensible_dataset`
 * **只读兼容**：是
 
-此特性启用 `zfs bookmark` 命令。只要池中还存在任何书签，此特性就为 `active`。运行 `zfs list -t bookmark -r 池名` 可以列出池中的所有书签。
+此特性启用 `zfs bookmark` 命令。只要池中还存在任何书签，此特性就为 `active`。运行 `zfs list -t bookmark -r poolname` 可以列出池中的所有书签。
 
 ### `bookmark_v2`
 
@@ -204,7 +204,7 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 * **依赖**：`bookmark`、`extensible_dataset`、`bookmark_v2`
 * **只读兼容**：否
 
-此特性启用附加的书签记账字段，从而支持 `written#书签` 属性（自书签以来写入的空间）以及从书签开始的增量发送流大小的估算。
+此特性启用附加的书签记账字段，从而支持 `written#bookmark` 属性（自书签以来写入的空间）以及从书签开始的增量发送流大小的估算。
 
 创建书签时，此特性变为 `active`；当所有带有这些字段的书签都被销毁后，会回到 `enabled` 状态。
 
@@ -264,7 +264,7 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它提供极高的哈希性能（比 SHA-256 快 350% 以上），但因不适合作为通用安全哈希算法而未被选中。该实现使用了 ZFS 中的新盐值校验功能，即在把待校验的数据块送入算法之前，先用存储在池上的一个保密 256 位随机密钥对校验和进行预置。因此生成的校验和对特定池是唯一的，可以防止启用去重的系统遭到哈希碰撞攻击。
 
-当 `edonr` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=edonr 数据集` 在任何数据集上启用 `edonr` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `edonr`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `edonr` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
+当 `edonr` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=edonr dset` 在任何数据集上启用 `edonr` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `edonr`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `edonr` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
 
 ### `embedded_data`
 
@@ -454,17 +454,17 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `project_quota`
 
-* **GUID**：`org.zfsonlinear:project_quota`
+* **GUID**：`org.zfsonlinux:project_quota`
 * **依赖**：`extensible_dataset`
 * **只读兼容**：是
 
 此特性允许管理员按项目标识符（ID）统计空间与对象使用情况。
 
-项目 ID 是基于对象的属性。升级现有文件系统时，没有项目 ID 的对象会被分配为零项目 ID。启用此特性后，新创建的对象在父目录设置了继承标志（通过 `chattr [+ -]P` 或 `zfs project -s | -C`）时会继承父目录的项目 ID；否则新对象的项目 ID 为零。对象的所有者（或有权限的用户）可以随时通过 `chattr -p 项目ID` 或 `zfs project -p 项目ID` 更改对象的项目 ID。
+项目 ID 是基于对象的属性。升级现有文件系统时，没有项目 ID 的对象会被分配为零项目 ID。启用此特性后，新创建的对象在父目录设置了继承标志（通过 `chattr [+-]P` 或 `zfs project -s|-C`）时会继承父目录的项目 ID；否则新对象的项目 ID 为零。对象的所有者（或有权限的用户）可以随时通过 `chattr -p prjid` 或 `zfs project -p prjid` 更改对象的项目 ID。
 
 此特性一被启用即变为 `active`，且永不回到 `disabled` 状态。
 
-每个文件系统会在重新挂载时自动升级，或者在该文件系统下新建文件时自动升级。也可以通过 `zfs set version=current 文件系统` 触发文件系统的升级。升级过程在后台运行，对于包含大量文件的文件系统可能需要较长时间才能完成。
+每个文件系统会在重新挂载时自动升级，或者在该文件系统下新建文件时自动升级。也可以通过 `zfs set version=current fs` 触发文件系统的升级。升级过程在后台运行，对于包含大量文件的文件系统可能需要较长时间才能完成。
 
 ### `raidz_expansion`
 
@@ -480,7 +480,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 * **依赖**：`bookmarks`、`extensible_dataset`
 * **只读兼容**：否
 
-此特性启用带删减的 `zfs send`。这类发送会创建删减书签，用于保存创建该发送流的 send 所删减的块列表。有关带删减发送的更多信息，参见 zfs-send(8)。
+此特性启用带遮蔽的 `zfs send`。这类发送会创建遮蔽书签，用于保存创建该发送流的 send 所遮蔽的块列表。有关遮蔽发送的更多信息，参见 zfs-send(8)。
 
 ### `redacted_datasets`
 
@@ -488,7 +488,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 * **依赖**：`extensible_dataset`
 * **只读兼容**：否
 
-此特性启用接收带删减的 `zfs send` 流，接收后会创建带删减的数据集。这些数据集缺少部分块，因此不能被安全挂载，其内容也不能被安全读取。有关带删减接收的更多信息，参见 zfs-send(8)。
+此特性启用接收带遮蔽的 `zfs send` 流，接收后会创建遮蔽数据集。这些数据集缺少部分块，因此不能被安全挂载，其内容也不能被安全读取。有关遮蔽接收的更多信息，参见 zfs-send(8)。
 
 ### `redaction_list_spill`
 
@@ -496,7 +496,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 * **依赖**：`redaction_bookmarks`
 * **只读兼容**：否
 
-此特性使 `zfs redact` 创建的删减列表能够容纳多得多的条目。创建条目数超过 36 的删减列表时，此特性变为 `active`；当池中不再存在长删减列表时，会回到 `enabled` 状态。有关带删减发送的更多信息，参见 zfs-send(8)。
+此特性使 `zfs redact` 创建的遮蔽列表能够容纳多得多的条目。创建条目数超过 36 的遮蔽列表时，此特性变为 `active`；当池中不再存在长遮蔽列表时，会回到 `enabled` 状态。有关遮蔽发送的更多信息，参见 zfs-send(8)。
 
 ### `resilver_defer`
 
@@ -515,7 +515,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 此特性启用在校验和与去重中使用 SHA-512/256 截断哈希算法（FIPS 180-4）。SHA-512 原生的 64 位算术使其在 64 位硬件上比 SHA-256 快约 50%，因此对于哈希性能重要、但因种种原因无法使用更快的 `skein` 与 `edonr` 算法的系统而言，它是一个改动很小的良好替换选择。
 
-当 `sha512` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=sha512 数据集` 在任何数据集上启用 `sha512` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `sha512`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `sha512` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
+当 `sha512` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=sha512 dset` 在任何数据集上启用 `sha512` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `sha512`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `sha512` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
 
 ### `skein`
 
@@ -525,7 +525,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 此特性启用在校验和与去重中使用 Skein 哈希算法。Skein 是一种高性能安全哈希算法，曾是 NIST SHA-3 竞赛的入围者。它在 64 位硬件上提供极高的安全性与高性能（比 SHA-256 快 80%）。该实现同样使用了 ZFS 中的新盐值校验功能，即在把待校验的数据块送入算法之前，先用存储在池上的一个保密 256 位随机密钥对校验和进行预置。因此生成的校验和对特定池是唯一的，可以防止启用去重的系统遭到哈希碰撞攻击。
 
-当 `skein` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=skein 数据集` 在任何数据集上启用 `skein` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `skein`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `skein` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
+当 `skein` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set checksum=skein dset` 在任何数据集上启用 `skein` 校验和（参见 zfs-set(8)）。一旦 `checksum` 属性被设置为 `skein`，此特性即变为 `active`，并且直到所有曾经把 checksum 设置为 `skein` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
 
 ### `spacemap_histogram`
 
@@ -545,14 +545,15 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `userobj_accounting`
 
-* **GUID**：`org.zfsonlinear:userobj_accounting`
+* **GUID**：`org.zfsonlinux:userobj_accounting`
+* **依赖**：`extensible_dataset`
 * **只读兼容**：是
 
 此特性允许管理员按用户和组统计对象使用情况。
 
 此特性一被启用即变为 `active`，且永不回到 `enabled` 状态。
 
-每个文件系统会在重新挂载时自动升级，或者在该文件系统下新建文件时自动升级。也可以通过 `zfs set version=current 文件系统` 触发文件系统的升级。升级过程在后台运行，对于包含大量文件的文件系统可能需要较长时间才能完成。
+每个文件系统会在重新挂载时自动升级，或者在该文件系统下新建文件时自动升级。也可以通过 `zfs set version=current fs` 触发文件系统的升级。升级过程在后台运行，对于包含大量文件的文件系统可能需要较长时间才能完成。
 
 ### `vdev_zaps_v2`
 
@@ -592,7 +593,7 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 `zstd` 是一种高性能压缩算法，兼具高压缩比与高速。与 `gzip` 相比，`zstd` 的压缩比略好而速度快得多。与 `lz4` 相比，`zstd` 的压缩比好得多而速度仅略慢。通常，`zstd` 的压缩速度为每线程 250 到 500 MB/s，解压缩速度超过每线程 1 GB/s。
 
-当 `zstd` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set compress=zstd 数据集` 为任意数据集开启 `zstd` 压缩（参见 zfs-set(8)）。一旦 `compress` 属性被设置为 `zstd`，此特性即变为 `active`，并且直到所有曾经把 compress 属性设置为 `zstd` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
+当 `zstd` 特性被设置为 `enabled` 时，管理员可以使用 `zfs set compress=zstd dset` 为任意数据集开启 `zstd` 压缩（参见 zfs-set(8)）。一旦 `compress` 属性被设置为 `zstd`，此特性即变为 `active`，并且直到所有曾经把 compress 属性设置为 `zstd` 的文件系统全部被销毁后，才会回到 `enabled` 状态。
 
 ## 参考文献
 
