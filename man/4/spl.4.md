@@ -7,21 +7,21 @@
 
 ## 说明
 
-### `spl_kmem_cache_kmem_threads=4`（无符号整数类型 uint）
+### `spl_kmem_cache_kmem_threads=4` (uint)
 
 为 `spl_kmem_cache` 任务队列创建的线程数量。该任务队列负责为 kmem 缓存分配新的 slab 以供使用。对于大多数系统和工作负载，仅需少量线程。
 
-### `spl_kmem_cache_obj_per_slab=8`（无符号整数类型 uint）
+### `spl_kmem_cache_obj_per_slab=8` (uint)
 
 缓存中每个 slab 的首选对象数量。一般来说，较大的值会增加缓存的内存占用，同时减少执行分配所需的时间。而较小的值可最小化内存占用并改善缓存回收时间，但单次分配可能需要更长时间。
 
-### `spl_kmem_cache_max_size=32`（64 位）或 `spl_kmem_cache_max_size=4`（32 位）（无符号整数类型 uint）
+### `spl_kmem_cache_max_size=32`（64 位）或 `spl_kmem_cache_max_size=4`（32 位）(uint)
 
 kmem 缓存 slab 的最大大小（MiB）。这实际上将缓存对象的最大大小限制为 **spl_kmem_cache_max_size**/**spl_kmem_cache_obj_per_slab**。
 
 无法创建对象尺寸大于此限制的缓存。
 
-### `spl_kmem_cache_slab_limit=16384`（无符号整数类型 uint）
+### `spl_kmem_cache_slab_limit=16384` (uint)
 
 对于小对象，应使用 Linux slab 分配器以最有效地利用内存。对于大对象，则首选 SPL 实现。该值用于确定小对象和大对象的分界点。该分界点只适用于自动选择缓存的情况。显式请求 Linux slab 缓存或 SPL 缓存时，将覆盖该值。
 
