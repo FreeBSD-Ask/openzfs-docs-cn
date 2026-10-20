@@ -13,22 +13,34 @@
 | snapshot | 快照 | |
 | clone | 克隆 | |
 | vdev | 保留英文（小写） | 标题或首次出现可写作“虚拟设备（vdev）” |
+| leaf vdev | 叶子 vdev | 与 top-level vdev（顶级 vdev）对应 |
 | zvol | 保留英文（小写） | 上游命令输出中的 ZVOL 大写保持原样 |
 | mirror | 镜像 | |
 | stripe、striping | 条带、条带化 | |
 | parity | 校验 | RAIDZ 语境 |
 | redundancy | 冗余 | |
 | scrub | 保留英文 | 描述扫描验证动作时可译“清洗”，全文统一 |
+| thorough scrub | 彻底 scrub | `zpool scrub -t` 语境 |
+| error scrub | 错误 scrub | 复制类 scrub 语境 |
 | resilver | 保留英文 | 泛指重建数据的动作时可译“重建”，全文统一 |
 | TRIM | 保留英文 | |
 | initialize | 初始化 | zpool initialize 子命令语境 |
 | ARC、L2ARC、ZIL、SLOG、ZED、ZEDLET | 保留英文 | 大小写与现有译文一致 |
+| txg | 事务组（txg） | 首次出现加注英文，与 `Basic-Concepts/Copy-on-write.md` 一致 |
+| deadman | deadman 定时器 | 保留英文 deadman，不译“死人开关” |
+| sit out | 暂停参与 | 首次出现保留 `*sit out*` 并括注 |
+| inflight | 在途 | I/O 与事务语境 |
 | feature flags | 特性标志 | |
 | checksum | 校验和 | |
 | compression | 压缩 | |
 | deduplication、dedup | 去重 | |
 | encryption | 加密 | |
 | copies | 副本数 | 属性 `copies` 名保留英文 |
+| thin provisioning | 精简置备 | 全仓统一用此译法（历史译文中的“精简供给”“精简配置”逐步归并） |
+| thick provisioning | 厚置备 | 与“精简置备”相对 |
+| slop space | 余量空间 | `spa_slop_shift` 语境；不译“余料空间” |
+| pin | 钉住 | ARC 固定页面语境 |
+| consumer | 使用方 | 指接入存储池的调用方，不译“消费者” |
 | checkpoint | 检查点 | |
 | bookmark | 书签 | |
 | hold | 保留（建议） | `zfs hold` 语境；ARC/引用计数语境的 holds 译"持有数"，按上下文区分 |
@@ -46,14 +58,27 @@
 | reservation | 预留值 | |
 | refreservation | 引用预留值（建议） | |
 | send、receive | 发送、接收 | `zfs send/receive` 作为命令名时保留英文 |
+| replication stream package | 复制流包 | `zfs send -R` 生成的流 |
 | import、export | 导入、导出 | `zpool import/export` 作为命令名时保留英文 |
 | attach、detach | 附加、分离 | |
 | mount、unmount/umount | 挂载、卸载 | |
 | share | 共享 | |
+| usershare | 用户共享（USERSHARE） | Samba 语境；`man/7/zfsprops.7.md` 中作 USERSHARE |
 | delegation | 委托（建议） | `zfs allow` 委托管理语境 |
+| allowlist | 许可名单 | 不译“允许列表” |
 | key | 密钥 | encryption root 暂译“加密根”（建议） |
 | raw | 保留英文 | `zfs send -w` 语境不译；形容词可用“原始的” |
 | block cloning | 块克隆 | |
+| BRT | 块引用表（BRT） | block reference table，块克隆的元数据表 |
+| livelist | livelist（保留） | 克隆的异步销毁清单，不译 |
+| condense | 保留英文 | `zpool condense` 子命令语境 |
+| objset | 对象集 | |
+| redup、reduplicated | 反去重 | 保留 redup 原文可作括注 |
+| gang block | gang 块 | 不译“帮块” |
+| logical birth time | 逻辑出生时间 | |
+| tree quota | 目录树配额 | `zfs project` 语境 |
+| redacted | 遮蔽（数据集） | `zfs send --redact` 语境，作定语写“遮蔽数据集” |
+| overlay | overlay 挂载 | 保留 overlay，不译“覆盖” |
 | special vdev | special vdev（保留） | 首次出现可写作“特殊 vdev（special vdev）” |
 | Root on ZFS | 以 ZFS 为根文件系统 | 页面标题统一句式“构建以 ZFS 为根文件系统的 <发行版>” |
 | distribution | 发行版 | |

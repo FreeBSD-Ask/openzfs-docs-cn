@@ -58,7 +58,7 @@ zfs create -o encryption=on \
 
 同样的 32 字节，以十六进制书写。
 
-`keylocation` 指定密钥的读取位置：`prompt`（默认——交互式）、`file:///绝对路径`，或 `http://` / `https://` 地址，后者使机器可以在启动时从密钥服务器获取密钥。
+`keylocation` 指定密钥的读取位置：`prompt`（默认——交互式）、`file:///absolute/path`，或 `http://` / `https://` 地址，后者使机器可以在启动时从密钥服务器获取密钥。
 
 ## 加密根与继承
 
