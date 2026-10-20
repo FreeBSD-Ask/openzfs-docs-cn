@@ -77,7 +77,7 @@ zvol 的固定块大小。仅在创建时设置。
 
 #### `compression`、`checksum`、`dedup`、`copies`
 
-参见[压缩](Compression.md)、[校验和](Checksums.md)与[去重](Deduplication.md)。
+参见[压缩](../Data-Storage/Compression.md)、[校验和](../Data-Storage/Checksums.md)与[去重](../Data-Storage/Deduplication.md)。
 
 ### 行为
 
