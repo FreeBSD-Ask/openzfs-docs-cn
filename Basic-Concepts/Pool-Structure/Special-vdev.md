@@ -1,0 +1,93 @@
+# 特殊 vdev
+
+`special` vdev 是持有特定*分配类*而非通用池数据的顶层 vdev：元数据、用户数据的间接块、去重表，以及——按数据集可选——小文件块。
+
+它不是缓存。被路由到那里的块**只**存在于那里。这一事实决定了本页其余全部内容。
+
+>**警告**
+>
+> `special` vdev 的冗余程度必须不低于存储池的普通 vdev。丢失它就会丢失整个存储池，与丢失任何其他顶层 vdev 完全相同。绝不要在具备冗余的存储池中把它作为单个设备加入。
+
+## 为何有帮助
+
+在机械盘存储池上，元数据访问是随机 I/O 的主要来源：目录遍历、`zfs list`、`find`、备份扫描，以及最明显的 scrub 与 resilver——它们必须走遍整棵块树。把这一类内容移到闪存上，就能把这些随机读转化为存储池实际可承受的负载，而无需为全闪存存储池付费。
+
+这通常比添加 L2ARC 收益更大、更可靠，因为它是永久性的放置，而不是需要预热、还要占用 ARC 表头的缓存。参见[缓存与辅助设备](Caching.md)。
+
+## 添加
+
+```sh
+zpool add pool special mirror nvme0n1 nvme1n1
+zpool list -v pool                  # 按 vdev 的使用情况，含 special 类
+```
+
+在分配 `special` 或 `dedup` 设备之前，存储池必须已经至少有一个普通 vdev。多个特殊 vdev 会在它们之间对分配做负载均衡。
+
+## 究竟哪些块会落到那里
+
+选择按块进行，顺序如下：
+
+1. **去重表**：若存储池有 `dedup` vdev 则放入其中，否则放入特殊 vdev。把 `zfs_ddt_data_is_special` 模块参数设为 0，可将它们排除在特殊类之外。
+2. **元数据**——ZFS 标记为元数据的所有对象类型——进入特殊类。
+3. **用户数据的间接块**（0 级以上的所有块）也会进入，由 `zfs_user_indirect_is_special` 控制（默认开启）。这些就是块指针，正因如此，树遍历才会快得多。
+4. **小的用户数据块**只有在数据集通过 `special_small_blocks` 选择加入时才会进入——而且仅当该类低于其元数据预留时，详见下文。
+5. 其余一切进入普通类。
+
+**ZIL** 是另一种情况。意图日志块的分配顺序是：专用 `log` vdev → 特殊 vdev 上预留的日志空间 → 特殊类本身 → 普通 vdev 上预留的日志空间 → 普通类。因此，没有 SLOG 时特殊 vdev 会吸收 ZIL，但 SLOG 始终优先。
+
+## 小块：`special_small_blocks`
+
+```sh
+zfs set special_small_blocks=32K pool/data
+```
+
+大小小于或等于该值的块——按**压缩与加密之后**的大小计算——会被放入特殊类。默认值为 0，表示该功能关闭；最大值为最大块大小（16 MiB）。它是按数据集的属性，因此可以只在划算的地方启用。
+
+这里有两点常令人意外：
+
+**比较的是物理大小。** 一条 128 KiB 的记录若压缩到 20 KiB，就按 20 KiB 的块计算。因此把阈值设得接近 `recordsize`，会把远超预期的内容拉到特殊 vdev 上——对于压缩率高的数据集，可能全部都会过去。
+
+**存在元数据预留。** 只有当特殊类的占用低于 `100 - zfs_special_class_metadata_reserve_pct`（默认 75%）时，才会接受小块。最后四分之一只留给元数据。这是元数据的下限，而不是该 vdev 的上限：元数据本身可以把它完全填满。
+
+## 填满之后
+
+不再放得下的分配会回落到普通类。不会有任何失败，也不会丢失数据——但从那一刻起写入的元数据会落在慢速磁盘上，收益便悄然退化。已有的块从不迁移，两个方向都不迁移。
+
+因此，监控占用率是值得的：
+
+```sh
+zpool list -v pool
+```
+
+容量规划取决于工作负载，很难从原理上预测。诚实的做法是测量你实际拥有的存储池——`zdb -bbb pool` 会按块类型报告空间使用情况，可从中读出元数据总量——然后留出充裕的余量，因为估算偏小的代价是一个无法缩小的 vdev。
+
+## 移除
+
+```sh
+zpool remove pool special-1
+```
+
+这只能在与其他顶层 vdev 移除相同的约束下进行：存储池**不得**包含任何 raidz 或 draid 顶层 vdev；所有顶层 vdev 必须具有相同的 `ashift`；加密数据集的密钥必须已加载；并且必须启用 `device_removal` 特性。
+
+实际结论很直接：**在 raidz 存储池上，特殊 vdev 永远无法移除。** 添加它是一项永久决定。参见[更改存储池布局](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Pool%20Structure/Changing%20Pool%20Layout.html)。
+
+## 相关的 vdev 类型
+
+### `dedup`
+
+同样的思路，但仅限去重表。当启用了去重、又希望其表与元数据隔离时使用。同样的冗余要求，同样的移除限制。参见[去重](https://openzfs.github.io/openzfs-docs/Basic%20Concepts/Data%20Storage/Deduplication.html)。
+
+### `log`（SLOG）
+
+严格来说不是同一意义上的分配类——它存放意图日志，并且只在崩溃后被读取。丢失现代 SLOG 最多损失最后几秒的同步写入，而不是存储池。
+
+### `cache`（L2ARC）
+
+真正的缓存：数据的第二份副本，原数据仍存在于存储池中。丢失它无害。
+
+## 延伸阅读
+
+* [zpoolconcepts(7)](../../man/7/zpoolconcepts.7.md)——`Special Allocation Class`
+* [zfsprops(7)](../../man/7/zfsprops.7.md)——`special_small_blocks`
+* [zpool-add(8)](../../man/8/zpool-add.8.md)、[zpool-remove(8)](../../man/8/zpool-remove.8.md)
+* [VDEV](VDEV.md)、[缓存与辅助设备](Caching.md)
