@@ -20,7 +20,7 @@ vdev（virtual device，虚拟设备）是 ZFS 存储池的基本构建单元。
 
 OpenZFS 支持多种类型的 vdev。顶级 vdev 承载数据，提供冗余：
 
-* **单设备（Single device）**：单独一块磁盘、一个文件或一个分区充当的顶级 vdev。它不提供冗余，一旦丢失，整个池都会丢失。注意 ZFS 中并不存在 “stripe” vdev 类型——条带化是池在其各顶级 vdev **之间**做的事，而不是一种独立的 vdev。
+* **单设备（Single device）**：单独一块磁盘、一个文件或一个分区充当的顶级 vdev。它不提供冗余，一旦丢失，整个池都会丢失。注意 ZFS 中并不存在“stripe” vdev 类型——条带化是池在其各顶级 vdev **之间**做的事，而不是一种独立的 vdev。
 * **镜像（Mirror）**：将相同数据存储在两块或多块磁盘上的 vdev，可提供冗余。
 * [RAIDZ](RAIDZ.md)：通过校验提供容错能力的 vdev，类似传统 RAID 5/6。RAIDZ 有三个等级：
 
