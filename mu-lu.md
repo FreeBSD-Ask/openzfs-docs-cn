@@ -81,15 +81,39 @@
 
 ## 基础概念
 
+* [概述](Basic-Concepts/index.md)
 * [写时复制](Basic-Concepts/Copy-on-write.md)
 * 存储池结构（Pool Structure）
-  * [特性标志](Basic-Concepts/Pool-Structure/Feature-Flags.md)
-  * [RAIDZ (ZFS RAID)](Basic-Concepts/Pool-Structure/RAIDZ.md)
+  * [存储池结构概述](Basic-Concepts/Pool-Structure/index.md)
   * [虚拟设备（VDEV）](Basic-Concepts/Pool-Structure/VDEV.md)
+  * [RAIDZ (ZFS RAID)](Basic-Concepts/Pool-Structure/RAIDZ.md)
   * [分布式 RAID (dRAID)](Basic-Concepts/Pool-Structure/dRAID-Howto.md)
+  * [缓存与辅助设备](Basic-Concepts/Pool-Structure/Caching.md)
+  * [特殊 vdev](Basic-Concepts/Pool-Structure/Special-vdev.md)
+  * [更改存储池布局](Basic-Concepts/Pool-Structure/Changing-Pool-Layout.md)
+  * [特性标志](Basic-Concepts/Pool-Structure/Feature-Flags.md)
+* 数据集（Datasets）
+  * [数据集概述](Basic-Concepts/Datasets/index.md)
+  * [数据集与属性](Basic-Concepts/Datasets/Datasets-and-Properties.md)
+  * [ZVOL](Basic-Concepts/Datasets/ZVOLs.md)
+  * [快照、克隆与书签](Basic-Concepts/Datasets/Snapshots-and-Clones.md)
+  * [配额与预留](Basic-Concepts/Datasets/Quotas-and-Reservations.md)
+  * [ACL 与扩展属性](Basic-Concepts/Datasets/ACLs.md)
 * 数据存储（Data Storage）
+  * [数据存储概述](Basic-Concepts/Data-Storage/index.md)
   * [ZFS 的校验和及其用途](Basic-Concepts/Data-Storage/Checksums.md)
+  * [压缩](Basic-Concepts/Data-Storage/Compression.md)
+  * [去重](Basic-Concepts/Data-Storage/Deduplication.md)
+  * [块克隆](Basic-Concepts/Data-Storage/Block-Cloning.md)
+  * [原生加密](Basic-Concepts/Data-Storage/Encryption.md)
 * 操作（Operations）
+  * [操作概述](Basic-Concepts/Operations/index.md)
+  * [发送与接收](Basic-Concepts/Operations/Send-and-Receive.md)
+  * [Scrub 与 resilver](Basic-Concepts/Operations/Scrub-and-Resilver.md)
+  * [TRIM](Basic-Concepts/Operations/TRIM.md)
+  * [共享数据集](Basic-Concepts/Operations/Sharing.md)
+  * [委托管理](Basic-Concepts/Operations/Delegated-Administration.md)
+  * [启动时的存储池](Basic-Concepts/Operations/Boot-Process.md)
   * [故障排除](Basic-Concepts/Operations/Troubleshooting.md)
 
 ## 手册页
