@@ -22,6 +22,8 @@
   * 按用户裁决「必须与上游一致」完成结构终核：移除 Gentoo 三页并在 `SUMMARY.md` 按上游 toctree 改为 Gentoo Wiki 外链；移除本地特有的 `Performance-Tuning/Async-Write.md`（内容已由 `man/4/zfs.4.md` 的相关参数条目与「ZFS I/O 调度器」页覆盖）；`Git 和 GitHub 入门指南` 由 `Project-and-Community/` 迁至 `DeveloperResources/` 对齐上游目录；`GettingStarted.md` 按上游修正——删除残留的 Aaron Toponce 推荐句，补译「首次使用者应从基础概念的写时复制与 VDEV 读起」一段
   * 经上游树映射比对确认不再存在的差异：上游根级 `Fedora.rst`/`RHEL and CentOS.rst` 为 `:orphan:` 跳转页、两个板块 index 无正文，本地均不设对应页（`SUMMARY.md` 分组即 toctree）；msg 15 页与上游一致
   * 表格管道符按 CJK 显示宽度全量对齐（6 张表：校验和两表、块克隆、共享数据集、缓存、特性矩阵），分隔行统一左对齐；新增本地工具 `script/align-table.py`，特性矩阵生成脚本输出已同步为对齐格式
+  * 完成 man 页 93 页终核（批次 M1–M6，逐段对照 openzfs/zfs `7c3d85aa` troff）：修复 `zpool-features` 特性 GUID 错拼 2 处（`org.zfsonlinear`→`org.zfsonlinux`）、`zfs-send` 概述漏 `-U`、`zpool-iostat`/`zpool-list` 的 `-T u|d` 顺序、`zpoolconcepts` draid 标题缺 `[parity]` 段、`zpool-create` 多余的「选项」节（上游无 OPTIONS 节）、`zpool-condense` 长选项单横线→双横线、`zfs.4` 六处段落软换行、三页滚动快照示例快照名补空格、占位符篡改还原约 30 处；机器校验全量（93 页与上游清单一一对应、属性/选项计数吻合、lint 0 错误、链接 0 悬空）；上游自身缺陷 5 处记录于校对工作单待反馈
+  * 术语表收录终核批次候选 11 条（rotational=机械盘并全仓统一、hold、enclosure、channel、switch、slot、spill block、demand、DMU buffer cache 等），`man/4/zfs.4.md` 六处「轮替盘/轮替 vdev」误译统一为「机械盘」
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置
