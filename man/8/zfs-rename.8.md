@@ -56,14 +56,14 @@ zfs rename -r 快照 快照
 
 ```sh
 # zfs create pool/project/production
-  用数据填充 /pool/project/production
+  向 /pool/project/production 填充数据
 # zfs snapshot pool/project/production@today
 # zfs clone pool/project/production@today pool/project/beta
-  对 /pool/project/beta 做出更改并进行测试
+  修改 /pool/project/beta 并进行测试
 # zfs promote pool/project/beta
 # zfs rename pool/project/production pool/project/legacy
 # zfs rename pool/project/beta pool/project/production
-  当不再需要 legacy 版本时，可以销毁它
+  旧版本不再需要时即可销毁
 # zfs destroy pool/project/legacy
 ```
 
@@ -73,13 +73,13 @@ zfs rename -r 快照 快照
 
 ```sh
 # zfs destroy -r pool/users@7daysago
-# zfs rename -r pool/users@6daysago@7daysago
-# zfs rename -r pool/users@5daysago@6daysago
-# zfs rename -r pool/users@4daysago@5daysago
-# zfs rename -r pool/users@3daysago@4daysago
-# zfs rename -r pool/users@2daysago@3daysago
-# zfs rename -r pool/users@yesterday@2daysago
-# zfs rename -r pool/users@today@yesterday
+# zfs rename -r pool/users@6daysago @7daysago
+# zfs rename -r pool/users@5daysago @6daysago
+# zfs rename -r pool/users@4daysago @5daysago
+# zfs rename -r pool/users@3daysago @4daysago
+# zfs rename -r pool/users@2daysago @3daysago
+# zfs rename -r pool/users@yesterday @2daysago
+# zfs rename -r pool/users@today @yesterday
 # zfs snapshot -r pool/users@today
 ```
 

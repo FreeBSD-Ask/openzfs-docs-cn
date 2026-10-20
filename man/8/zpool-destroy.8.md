@@ -22,7 +22,7 @@ zpool destroy [-f] 池名
 
 ### 示例 1：销毁 ZFS 存储池
 
-以下命令销毁池 tank 及其中包含的所有数据集：
+以下命令销毁池 `tank` 及其中包含的所有数据集：
 
 ```sh
 # zpool destroy -f tank

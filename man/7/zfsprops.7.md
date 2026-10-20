@@ -94,7 +94,7 @@
 
 #### `redact_snaps`
 
-对于书签，这是该书签包含 redaction 列表的快照 GUID 列表。对于快照，这是该快照被 redact 时所参照的快照 GUID 列表。
+对于书签，这是该书签所含遮蔽列表针对的快照 GUID 列表。对于快照，这是该快照被遮蔽时所参照的快照 GUID 列表。
 
 #### `referenced`
 
@@ -260,7 +260,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 #### `canmount=on|off|noauto`
 
-如果该属性设为 `off`，文件系统将无法挂载，并且会被 `zfs mount -a` 忽略。将该属性设为 `off` 类似于将 `mountpoint` 属性设置为`none`，只不过数据集仍具有正常的 `mountpoint` 属性，且该属性可以被继承。将此属性设置为 `off` 可以让数据集仅用于继承属性。设置 `canmount=off` 的一个示例是让两个数据集拥有相同的 `mountpoint`，这样两个数据集的子数据集都会出现在同一个目录中，但可能具有不同的继承特性。
+如果该属性设为 `off`，文件系统将无法挂载，并且会被 `zfs mount -a` 忽略。将该属性设为 `off` 类似于将 `mountpoint` 属性设置为 `none`，只不过数据集仍具有正常的 `mountpoint` 属性，且该属性可以被继承。将此属性设置为 `off` 可以让数据集仅用于继承属性。设置 `canmount=off` 的一个示例是让两个数据集拥有相同的 `mountpoint`，这样两个数据集的子数据集都会出现在同一个目录中，但可能具有不同的继承特性。
 
 设置为 `noauto` 时，数据集只能通过显式操作进行挂载和卸载。数据集在创建或导入时不会被自动挂载，`zfs mount -a` 命令也不会挂载它，`zfs unmount -a` 命令也不会卸载它。
 
@@ -268,7 +268,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 #### `checksum=on|off|fletcher2|fletcher4|sha256|noparity|sha512|skein|edonr|blake3`
 
-控制用于验证数据完整性的校验和。默认值为 `on`，它会自动选择适当的算法（当前为 `fletcher4`，但未来版本可能会更改）。值 `off` 会禁用对用户数据的完整性检查。值 `noparity` 不仅会禁用完整性检查，也不会维护用户数据的校验信息。该设置由驻留在 RAID-Z 存储池上的转储设备内部使用，其他数据集不应使用。禁用校验和**并非**推荐做法。
+控制用于验证数据完整性的校验和。默认值为 `on`，它会自动选择适当的算法（当前为 `fletcher4`，但未来版本可能会更改）。值 `off` 会禁用对用户数据的完整性检查。值 `noparity` 不仅会禁用完整性检查，也不会为用户数据维护校验。该设置由驻留在 RAID-Z 存储池上的转储设备内部使用，其他数据集不应使用。禁用校验和**并非**推荐做法。
 
 `sha512`、`skein`、`edonr` 与 `blake3` 校验和算法要求在存储池上启用相应特性。
 
@@ -326,7 +326,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 请记住，如果顶级 vdev 缺失，ZFS 不会导入该存储池。**不要**例如创建一个两磁盘条带池，然后在一些数据集上设置 `copies=2`，以为这样就为它们设置了冗余。当磁盘发生故障时，你将无法导入该存储池，并会丢失所有数据。
 
-加密数据集不能设置为 `copies=3`，因为实现会将部分加密元数据存储在本应存放第三副本的位置。
+加密数据集不能设置为 `copies=3`，因为实现会将部分加密元数据存储在本应存放第三个副本的位置。
 
 #### `devices=on|off`
 
@@ -410,7 +410,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 此值表示将小文件或 zvol 块纳入特殊分配类的阈值块大小。经过压缩与加密后小于或等于此值的块会被分配到特殊分配类，更大的块则被分配到常规类。有效取值范围为 0 到最大块大小（`16 MiB`）。默认大小为 0，表示不会有小文件或 zvol 块被分配到特殊类。
 
-在设置此属性之前，必须先向存储池添加一个 special vdev。有关特殊分配类的更多细节，请参见 zpoolconcepts(7)。
+在设置此属性之前，必须先向存储池添加一个 special 类 vdev。有关特殊分配类的更多细节，请参见 zpoolconcepts(7)。
 
 #### `mountpoint=path|none|legacy`
 
@@ -446,7 +446,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 限制可以在一个数据集及其后代上创建的快照数量。在已经设置 `snapshot_limit` 的数据集的后代上再设置 `snapshot_limit`，不会覆盖祖先的 `snapshot_limit`，而是施加一个额外的限制。如果用户被允许更改该限制，则该限制不会被强制执行。例如，这意味着从全局 zone 创建的递归快照会计入 zone 内的每个被委托的数据集。要使用此特性，必须先启用它（参见 zpool-features(7)）。
 
-#### `userquota@user=0|none`
+#### `userquota@user=size|none`
 
 限制指定用户消耗的空间量。用户空间占用由 `userspace@user` 属性识别。
 
@@ -463,31 +463,31 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 在 Linux 上创建的文件始终具有 POSIX 属主。
 
-#### `defaultuserquota=0|none`
+#### `defaultuserquota=size|none`
 
 设置默认用户配额，应用于每个未设置专属用户配额的用户。值 `0` 会禁用 defaultuserquota。
 
-#### `userobjquota@user=0|none`
+#### `userobjquota@user=size|none`
 
 `userobjquota` 与 `userquota` 类似，但它限制用户可以创建的对象数量。有关对象如何计数的更多信息，请参见 `userobjused`。
 
-#### `defaultuserobjquota=0|none`
+#### `defaultuserobjquota=size|none`
 
 设置默认用户对象配额，应用于每个未设置专属 userobj 配额的用户。值 `0` 会禁用 defaultuserobjquota。
 
-#### `groupquota@group=0|none`
+#### `groupquota@group=size|none`
 
 限制指定组消耗的空间量。组空间占用由 `groupused@group` 属性识别。非特权用户只能访问其所在组的空间占用。root 用户，或通过 `zfs allow` 被授予 `groupquota` 权限的用户，可以获取与设置所有组的配额。
 
-#### `defaultgroupquota=0|none`
+#### `defaultgroupquota=size|none`
 
 设置默认组配额，应用于每个未设置专属组配额的组。值 `0` 会禁用 defaultgroupquota。
 
-#### `groupobjquota@group=0|none`
+#### `groupobjquota@group=size|none`
 
 `groupobjquota` 与 `groupquota` 类似，但它限制一个组可以消耗的对象数量。有关对象如何计数的更多信息，请参见 `userobjused`。
 
-#### `defaultgroupobjquota=0|none`
+#### `defaultgroupobjquota=size|none`
 
 为每个组设置默认组对象配额，适用于每个未设置专属 groupobj 配额的组。值 `0` 会禁用 defaultgroupobjquota。
 
@@ -633,7 +633,7 @@ root 用户，或通过 `zfs allow` 被授予 `projectquota` 权限的用户，�
 
 预留值保持与卷的逻辑大小相等，以防止使用者出现意外行为。没有预留值时，卷可能耗尽空间，导致未定义行为或数据损坏，具体取决于卷的使用方式。在使用卷的过程中更改卷的大小时（尤其是缩小时）也可能出现这些后果。调整卷的大小时务必格外小心。
 
-虽然不推荐，但仍可以通过为 `zfs create -V` 命令指定 `-s` 选项，或在卷创建之后更改 `refreservation` 属性的值（在存储池版本 8 或更早的池上为 `reservation` 属性）来创建“稀疏卷”（sparse volume，也称“精简置备”，thin provisioned）。“稀疏卷”是指 `refreservation` 的值小于卷大小加上存储其元数据所需空间的卷。存储池空间不足时会返回 ENOSPC。对于稀疏卷，对 `volsize` 的更改不会反映到 `refreservation` 中。非稀疏的卷称为“厚置备”（thick provisioned）。将 `refreservation` 设为 `auto` 可以使稀疏卷变为厚置备。
+虽然不推荐，但仍可以通过为 `zfs create -V` 命令指定 `-s` 选项，或在卷创建之后更改 `refreservation` 属性的值（在存储池版本 8 或更早的池上为 `reservation` 属性）来创建“稀疏卷”（sparse volume，也称“精简置备”，thin provisioned）。“稀疏卷”是指 `refreservation` 的值小于卷大小加上存储其元数据所需空间的卷。存储池空间不足时，对稀疏卷的写入可能因 ENOSPC 而失败。对于稀疏卷，对 `volsize` 的更改不会反映到 `refreservation` 中。非稀疏的卷称为“厚置备”（thick provisioned）。将 `refreservation` 设为 `auto` 可以使稀疏卷变为厚置备。
 
 #### `volmode=default|full|geom|dev|none`
 

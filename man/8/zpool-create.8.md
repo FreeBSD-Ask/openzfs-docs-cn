@@ -26,8 +26,6 @@ zpool create [-dfn] [-m 挂载点] [-o 属性=值]… [-o feature@feature=值] [
 
 默认情况下，新池会启用所有支持的 feature flags（特性标志）。`-d` 选项与 `-o compatibility` 属性（例如 `-o compatibility=2020`）可用于限制启用的特性标志，从而使该池可以在其他版本的 ZFS 上导入。
 
-## 选项
-
 ### `-d`
 
 不在新池上启用任何特性标志。可以通过 `-o` 将各个特性标志对应的属性设为 `enabled` 来单独启用它们。有关特性标志属性的详情，参见 zpool-features(7)。

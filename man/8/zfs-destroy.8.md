@@ -124,13 +124,13 @@ zfs destroy 文件系统 | 卷#书签
 
 ```sh
 # zfs destroy -r pool/users@7daysago
-# zfs rename -r pool/users@6daysago@7daysago
-# zfs rename -r pool/users@5daysago@6daysago
-# zfs rename -r pool/users@4daysago@5daysago
-# zfs rename -r pool/users@3daysago@4daysago
-# zfs rename -r pool/users@2daysago@3daysago
-# zfs rename -r pool/users@yesterday@2daysago
-# zfs rename -r pool/users@today@yesterday
+# zfs rename -r pool/users@6daysago @7daysago
+# zfs rename -r pool/users@5daysago @6daysago
+# zfs rename -r pool/users@4daysago @5daysago
+# zfs rename -r pool/users@3daysago @4daysago
+# zfs rename -r pool/users@2daysago @3daysago
+# zfs rename -r pool/users@yesterday @2daysago
+# zfs rename -r pool/users@today @yesterday
 # zfs snapshot -r pool/users@today
 ```
 

@@ -27,18 +27,18 @@ kmem 缓存 slab 的最大大小（MiB）。这实际上将缓存对象的最大
 
 当自动选择缓存时，体积为 **spl_kmem_cache_slab_limit** 及更小的对象将使用 Linux slab 分配器分配，更大的对象则使用 SPL 分配器。对于使用 4K 页的架构，16K 的分界被认为是最优的。
 
-### `spl_kmem_alloc_warn=32768`（无符号整数类型 uint）
+### `spl_kmem_alloc_warn=32768` (uint)
 
 一般来说，`kmem_alloc` 的分配应保持较小值，最好只占用几页，因为它们必须在物理上连续。因此，任何超过合理阈值的 `kmem_alloc` 分配都会向控制台打印一条限速警告。
 
 默认警告阈值设置为八页，但为了适应使用大页的系统，上限设为 32K。选择该值是为了足够小，以确保最大的分配能够被快速发现和修复，同时又足够大，以避免在分配大小超过最优但不严重时记录警告。由于该值可调，建议开发者在测试时将其设置得更低，以便快速捕获任何新的较大分配。通过将阈值设置为零，可以禁用这些警告。
 
-### `spl_kmem_alloc_max=KMALLOC_MAX_SIZE/4`（无符号整数类型 uint）
+### `spl_kmem_alloc_max=KMALLOC_MAX_SIZE/4` (uint)
 
-较小的 `kmem_alloc` 分配若超过 **KMALLOC_MAX_SIZE** 将会失败。略小于该限制的分配可能会成功，但由于寻找连续空闲页的开销，仍应避免。因此，设置了留有 4 倍合理安全余量的最大 kmem 大小。大于此最大值的 `kmem_alloc` 分配会迅速失败。小于或等于此值的 `vmem_alloc` 分配将使用 `kmalloc`，但超过此值时会切换到 `vmalloc`。
+较大的 `kmem_alloc` 分配若超过 **KMALLOC_MAX_SIZE** 将会失败。略小于该限制的分配可能会成功，但由于寻找连续空闲页的开销，仍应避免。因此，设置了留有 4 倍合理安全余量的最大 kmem 大小。大于此最大值的 `kmem_alloc` 分配会迅速失败。小于或等于此值的 `vmem_alloc` 分配将使用 `kmalloc`，但超过此值时会切换到 `vmalloc`。
 
 
-### `spl_kmem_cache_magazine_size=0`（无符号整数类型 uint）
+### `spl_kmem_cache_magazine_size=0` (uint)
 
 缓存 magazine 是一种优化手段，旨在最小化分配内存的开销。它通过维护每个 CPU 的最近释放对象缓存来实现，可以在不加锁的情况下重新分配这些对象。这能提升竞争激烈的缓存的性能。然而，由于 magazine 中的对象会阻止原本空闲的 slab 被立即释放，因此在低内存机器上可能并不理想。
 

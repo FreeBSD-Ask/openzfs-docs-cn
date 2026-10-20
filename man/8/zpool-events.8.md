@@ -259,7 +259,7 @@ ashift 对齐要求提高时发出。
 
 ### `sitout`
 
-某个 `RAIDZ` 或 `DRAID` vdev 触发 `autosit` 逻辑时发出。该逻辑检测到此类 vdev 中某块磁盘明显慢于其他磁盘时，会暂时把它置为 sitout，以保持池的性能。
+某个 `RAIDZ` 或 `DRAID` vdev 触发 `autosit` 逻辑时发出。该逻辑检测到此类 vdev 中某块磁盘明显慢于其他磁盘时，会暂时使其暂停参与（sit out），以保持池的性能。
 
 ## 有效载荷
 

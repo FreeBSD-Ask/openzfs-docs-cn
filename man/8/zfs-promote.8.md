@@ -24,14 +24,14 @@ zfs promote 克隆
 
 ```sh
 # zfs create pool/project/production
-  用数据填充 /pool/project/production
+  向 /pool/project/production 填充数据
 # zfs snapshot pool/project/production@today
 # zfs clone pool/project/production@today pool/project/beta
-  对 /pool/project/beta 做出更改并进行测试
+  修改 /pool/project/beta 并进行测试
 # zfs promote pool/project/beta
 # zfs rename pool/project/production pool/project/legacy
 # zfs rename pool/project/beta pool/project/production
-  当不再需要 legacy 版本时，可以销毁它
+  旧版本不再需要时即可销毁
 # zfs destroy pool/project/legacy
 ```
 
