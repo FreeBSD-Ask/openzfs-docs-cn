@@ -952,7 +952,7 @@ ZFS 允许用于未刷写元数据变更的系统总内存比例，以百万分�
 
 ### **zfs_vdev_async_write_min_active = 2** (uint)
 
-每个设备最小异步写 I/O 操作数。较低值有助于轮替盘延迟优化，但可能降低 resilver 性能。默认值 **2** 是折中选择，设置为 **3** 可进一步提升 resilver 性能，但会增加延迟。
+每个设备最小异步写 I/O 操作数。较低值有助于机械盘延迟优化，但可能降低 resilver 性能。默认值 **2** 是折中选择，设置为 **3** 可进一步提升 resilver 性能，但会增加延迟。
 
 ### **zfs_vdev_initializing_max_active = 1** (uint)
 
@@ -1559,27 +1559,27 @@ vdev I/O 最大聚合大小。
 
 ### **zfs_vdev_aggregation_limit_non_rotating = 131072** B (128 KiB) (uint)
 
-非轮替介质 vdev 的最大 I/O 聚合大小。
+非机械盘 vdev 的最大 I/O 聚合大小。
 
 ### **zfs_vdev_mirror_rotating_inc = 0** (int)
 
-负载均衡算法用于轮替 vdev 时选择最空闲镜像成员的增量值。当 I/O 紧跟前一个操作时，用于基于负载做决策。
+负载均衡算法用于机械盘 vdev 时选择最空闲镜像成员的增量值。当 I/O 紧跟前一个操作时，用于基于负载做决策。
 
 ### **zfs_vdev_mirror_rotating_seek_inc = 5** (int)
 
-负载均衡算法用于轮替 vdev 时选择最空闲镜像成员的增量值。当 I/O 不具备前一个操作的局部性（由 **zfs_vdev_mirror_rotating_seek_offset** 定义）时使用。位于此偏移范围内但不紧跟前一操作的 I/O 增量取一半。
+负载均衡算法用于机械盘 vdev 时选择最空闲镜像成员的增量值。当 I/O 不具备前一个操作的局部性（由 **zfs_vdev_mirror_rotating_seek_offset** 定义）时使用。位于此偏移范围内但不紧跟前一操作的 I/O 增量取一半。
 
 ### **zfs_vdev_mirror_rotating_seek_offset = 1048576** B (1 MiB) (int)
 
-轮替 vdev 上最后排队的 I/O 操作被视为具备局部性的最大距离。详见 ZFS I/O 调度器。
+机械盘 vdev 上最后排队的 I/O 操作被视为具备局部性的最大距离。详见 ZFS I/O 调度器。
 
 ### **zfs_vdev_mirror_non_rotating_inc = 0** (int)
 
-非轮替 vdev 上，当 I/O 操作不紧跟前一操作时，负载均衡算法选择最空闲镜像成员时的负载增量值。
+非机械盘 vdev 上，当 I/O 操作不紧跟前一操作时，负载均衡算法选择最空闲镜像成员时的负载增量值。
 
 ### **zfs_vdev_mirror_non_rotating_seek_inc = 1** (int)
 
-非轮替 vdev 上，当 I/O 操作不具备由 **zfs_vdev_mirror_rotating_seek_offset** 定义的局部性时，负载均衡算法选择最空闲镜像成员的负载增量值。位于此偏移范围内但不紧跟前一操作的 I/O 增量取一半。
+非机械盘 vdev 上，当 I/O 操作不具备由 **zfs_vdev_mirror_rotating_seek_offset** 定义的局部性时，负载均衡算法选择最空闲镜像成员的负载增量值。位于此偏移范围内但不紧跟前一操作的 I/O 增量取一半。
 
 ### **zfs_vdev_read_gap_limit = 32768** B (32 KiB) (uint)
 

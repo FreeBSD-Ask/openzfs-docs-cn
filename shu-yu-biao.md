@@ -92,6 +92,15 @@
 | 消息 ID（ZFS-8000-XX） | 保留原样 | 字符、顺序不得改动 |
 | 拷贝 | 复制 | 禁止使用“拷贝”；属性 `copies` 语境译“副本数” |
 | shell | shell | 不译“壳”、“外壳” |
+| rotational | 机械盘 | 正文叙述统一“机械盘”（vdev 语境“机械盘 vdev”）；`rotational` 属性名与含 `rotating` 的参数名保留英文；禁止“轮替盘” |
+| hold | 保留 | `zfs hold`/释放语境译“保留”；zdb、统计场景中的持有计数译“持有数” |
+| enclosure | 机箱 | vdev_id.conf 语境 |
+| channel | 通道 | vdev_id.conf 语境 |
+| switch | 交换机 | vdev_id.conf 多路径语境 |
+| slot | 插槽 | 机箱插槽位；FAQ 与 man/1 已统一 |
+| spill block | spill 块 | 保留英文 |
+| demand | 按需 | zarcstat/zarcsummary 字段（demand read=按需读取） |
+| DMU buffer cache | DMU 缓冲区缓存 | |
 
 ## 一般约定
 
