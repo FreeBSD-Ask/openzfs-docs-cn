@@ -81,7 +81,7 @@ zpool upgrade -a                # 在所有池上启用
 >
 > 升级要有意识地进行，不要因为 `zpool status` 提示了就条件反射地升级。未升级的池照常工作，只是不提供较新的特性。
 
-注意，`zpool status` 报告 “some supported features are not enabled” 只是提示性信息。尤其在根池或引导池上，请先确认引导加载程序支持哪些特性——参见[以 ZFS 为根文件系统的指南](../../GettingStarted.md)。
+注意，`zpool status` 报告“some supported features are not enabled”只是提示性信息。尤其在根池或引导池上，请先确认引导加载程序支持哪些特性——参见[以 ZFS 为根文件系统的指南](../../GettingStarted.md)。
 
 ## `zfs upgrade` 是另一回事
 
