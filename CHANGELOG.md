@@ -15,6 +15,7 @@
   * 基础概念 30 页完成 6 路并发审校（批次 BC1–BC6，约 131 处修改）：修正事实性错误 5 处（快照定时销毁条件、zvol 特性主体、volmode `dev` 取值含义、`zdb -S` 输出含义、VDEV「单设备」类型与故障处理语义反转）；`Operations/Troubleshooting.md` 经判定上游已整页重写，按 master（`0c1de93`）整页重译（48 行 → 193 行，11 节逐一对应）；`Pool-Structure/RAIDZ.md` 补译「读取」「一块慢盘」「扩容」三节，`Feature-Flags.md` 补译「特性状态」「只读兼容」「兼容性特性集」「升级存储池」四节正文与「`zfs upgrade` 是另一回事」整节
   * 术语表新增 24 条：txg（事务组）、leaf vdev（叶子 vdev）、thorough scrub（彻底 scrub）、error scrub（错误 scrub）、thin provisioning（精简置备）、thick provisioning（厚置备）、slop space（余量空间）、pin（钉住）、consumer（使用方）、replication stream package（复制流包）、usershare（用户共享/USERSHARE）、allowlist（许可名单）、BRT（块引用表）、livelist（保留）、condense（保留英文）、objset（对象集）、redup/reduplicated（反去重）、gang block（gang 块）、logical birth time（逻辑出生时间）、tree quota（目录树配额）、redacted（遮蔽数据集）、overlay（overlay 挂载）、quiescing（静止）、bit rot（保留英文）、deadman（deadman 定时器）、allocation class（分配类）
   * `AGENTS.md` 同步：基础概念结构差异标记为已同步并记录板块版本（master `0c1de93`）；代理派发纪律改为「允许并发、单轮不超过 10 路」；新增「占位符保持上游英文原样」编写规范
+  * 重建 `Pool-Structure/Feature-Flags.md` 特性矩阵表：解析上游当日生成的矩阵页，转为 54 行 × 24 列 Markdown 表（特性标志、只读兼容、22 个实现/版本列），版本列更新至 2.2.11/2.3.9/2.4.4/master，修正 `org.zfsonlinux:allocation_classes` 等行数据，edonr 脚注改为页内「注释」节，「最后更新时间」更新为 2026-10-20T03:24:04Z
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置

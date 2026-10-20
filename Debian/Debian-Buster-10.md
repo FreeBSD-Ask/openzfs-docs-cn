@@ -227,9 +227,9 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
      ```
 
 
-   你通常不需要为引导池自定义任何选项。
+   你通常不需要为启动池自定义任何选项。
 
-   GRUB 并不支持所有的 ZFS 存储池特性。参见 [`grub-core/fs/zfs/zfs.c`](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。这一步为 `/boot` 创建了一个独立的引导池，其特性限制在 GRUB 支持的范围内，从而能让根池使用任意/所有特性。请注意，GRUB 以只读方式打开池，因此所有只读兼容的特性都被 GRUB 视为“支持”。
+   GRUB 并不支持所有的 ZFS 存储池特性。参见 [`grub-core/fs/zfs/zfs.c`](http://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#n276) 中的 `spa_feature_names`。这一步为 `/boot` 创建了一个独立的启动池，其特性限制在 GRUB 支持的范围内，从而能让根池使用任意/所有特性。请注意，GRUB 以只读方式打开池，因此所有只读兼容的特性都被 GRUB 视为“支持”。
 
    **提示：**
 
@@ -248,10 +248,10 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 **特性说明：**
 
-* `allocation_classes` 特性应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在引导池上使用此特性。如果想让引导池更快，更合理的做法是将整个池放在更快的磁盘上，而不是将其用作特殊 vdev。
-* `spacemap_v2` 特性经过测试，可安全使用。引导池较小，所以在实际中影响不大。
-* `project_quota` 特性经过测试，可安全使用。对于引导池，这个特性几乎不会有实际意义。
-* `resilver_defer` 特性应该安全，但由于引导池足够小，通常不需要启用。
+* `allocation_classes` 特性应该能安全使用。然而，除非你确实在使用它（例如作为特殊 vdev），否则启用它没有意义。几乎不可能有人会在启动池上使用此特性。如果想让启动池更快，更合理的做法是将整个池放在更快的磁盘上，而不是将其用作特殊 vdev。
+* `spacemap_v2` 特性经过测试，可安全使用。启动池较小，所以在实际中影响不大。
+* `project_quota` 特性经过测试，可安全使用。对于启动池，这个特性几乎不会有实际意义。
+* `resilver_defer` 特性应该安全，但由于启动池足够小，通常不需要启用。
 * 作为只读兼容特性，`userobj_accounting` 特性理论上应兼容，但在实际中，GRUB 可能会出现报错“invalid dnode type”。无论如何，这个特性对 `/boot` 并不重要。
 
 

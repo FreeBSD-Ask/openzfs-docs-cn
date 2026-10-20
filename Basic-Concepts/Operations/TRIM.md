@@ -1,6 +1,6 @@
 # TRIM
 
-TRIM（`BLKDISCARD`、ATA TRIM、SCSI UNMAP）告诉设备存储池已不再使用哪些块，从而让 SSD 回收它们以做磨损均衡，让精简供给的后端存储释放空间。没有它，SSD 最终会认为自己写过的每个块都仍在使用，写入性能随之下降。
+TRIM（`BLKDISCARD`、ATA TRIM、SCSI UNMAP）告诉设备存储池已不再使用哪些块，从而让 SSD 回收它们以做磨损均衡，让精简置备的后端存储释放空间。没有它，SSD 最终会认为自己写过的每个块都仍在使用，写入性能随之下降。
 
 ZFS 提供两种模式：自动的后台模式与按需模式。二者相互独立——无论 `autotrim` 如何设置，都可以运行手动 TRIM。
 
@@ -43,7 +43,7 @@ systemctl enable zfs-trim-monthly@tank.timer --now
 
 ## 哪些设备可以进行 TRIM
 
-支持 `BLKDISCARD` 的块设备——SSD、精简供给的 LUN——以及位于支持打洞（hole punching）的文件系统上的文件 vdev。对机械硬盘执行 TRIM 没有任何作用。
+支持 `BLKDISCARD` 的块设备——SSD、精简置备的 LUN——以及位于支持打洞（hole punching）的文件系统上的文件 vdev。对机械硬盘执行 TRIM 没有任何作用。
 
 如果 `zpool trim` 报告设备不支持 TRIM，请检查存储链路：某些 HBA 与 USB 桥接器不会透传该命令。参见[硬件](../../Performance-Tuning/Hardware.md)中关于 ATA TRIM 的讨论。
 

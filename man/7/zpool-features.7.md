@@ -141,7 +141,7 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 * **GUID**：`org.zfsonlinux:allocation_classes`
 * **只读兼容**：是
 
-此特性启用独立分配类别的支持。使用 `zpool create` 或 `zpool add` 命令创建专用分配类别 vdev（dedup 或 special）时，此特性变为 `active`。借助设备移除功能，若所有专用分配类别 vdev 都被移除，它可以回到 `enabled` 状态。
+此特性启用独立分配类的支持。使用 `zpool create` 或 `zpool add` 命令创建专用分配类 vdev（dedup 或 special）时，此特性变为 `active`。借助设备移除功能，若所有专用分配类 vdev 都被移除，它可以回到 `enabled` 状态。
 
 ### `async_destroy`
 

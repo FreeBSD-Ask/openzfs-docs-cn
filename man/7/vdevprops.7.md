@@ -158,11 +158,11 @@ vdev 空间的已用百分比
 
 #### `sit_out`
 
-仅对 RAIDZ 与 dRAID vdev 有效。当检测到慢速磁盘异常落后者且该 vdev 当前处于轮休（sit out）状态时为 true。可以手动设置该属性使 vdev 轮休；若启用了 `autosit` 逻辑，也会自动设置。轮休期间，vdev 不参与正常读取，其数据将按需由校验信息重建。
+仅对 RAIDZ 与 dRAID vdev 有效。当检测到慢速磁盘异常落后者且该 vdev 当前处于暂停参与（sit out）状态时为 true。可以手动设置该属性使 vdev 暂停参与；若启用了 `autosit` 逻辑，也会自动设置。暂停参与期间，vdev 不参与正常读取，其数据将按需由校验信息重建。
 
 #### `autosit`
 
-仅对 RAIDZ 与 dRAID vdev 有效。设置后启用内核级的慢速磁盘检测逻辑。该逻辑会自动使性能显著落后的 vdev 轮休，如 `sit_out` 属性所述。
+仅对 RAIDZ 与 dRAID vdev 有效。设置后启用内核级的慢速磁盘检测逻辑。该逻辑会自动使性能显著落后的 vdev 暂停参与，如 `sit_out` 属性所述。
 
 #### `path`
 
@@ -174,7 +174,7 @@ vdev 空间的已用百分比
 
 #### `alloc_bias=none|log|special|dedup`
 
-控制顶级 vdev 的分配类别。更改在池导出并重新导入后生效。不支持改为或改出 log，因为日志设备故障时可能导致数据丢失。设置为 `special` 与 `dedup` 需要启用 `feature@allocation_classes`。至少要有一个顶级 vdev 保持在 normal（即 `none`）类别。
+控制顶级 vdev 的分配类。更改在池导出并重新导入后生效。不支持改为或改出 log，因为日志设备故障时可能导致数据丢失。设置为 `special` 与 `dedup` 需要启用 `feature@allocation_classes`。至少要有一个顶级 vdev 保持在 normal（即 `none`）类别。
 
 #### `scheduler=auto|on|off`
 
