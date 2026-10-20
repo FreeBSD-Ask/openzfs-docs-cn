@@ -224,3 +224,4 @@ $RECYCLE.BIN/
 /script/*
 !/script/校对工作单.md
 /.workbuddy
+/.workbuddy-ai
