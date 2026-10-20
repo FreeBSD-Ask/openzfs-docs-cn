@@ -17,6 +17,7 @@
 * Debian
   * [在 Debian 中启用 ZFS 支持](Debian/index.md)
   * [构建以 ZFS 为根文件系统的 Debian 13 (Trixie)](Debian/Debian-Trixie-13.md)
+  * [Debian GNU Linux initrd 文档](Debian/Debian-GNU-Linux-initrd-documentation.md)
   * [构建以 ZFS 为根文件系统的 Debian 12 (Bookworm)](Debian/Debian-Bookworm-12.md)
   * [构建以 ZFS 为根文件系统的 Debian 11 (Bullseye)](Debian/Debian-Bullseye-11.md)
   * [构建以 ZFS 为根文件系统的 Debian 10 (Buster)](Debian/Debian-Buster-10.md)
@@ -54,10 +55,11 @@
 ## 项目与社区
 
 * [概述](Project-and-Community.md)
-* [系统管理](Project-and-Community/index.md)
+* [管理文档](Project-and-Community/index.md)
   * [OpenZFS 系统管理](Project-and-Community/System_Administration.md)
 * [捐赠](Project-and-Community/Donate.md)
 * [常见问题解答](Project-and-Community/FAQ.md)
+* [FAQ：hole birth 缺陷](Project-and-Community/FAQ-hole-birth.md)
 * [邮件列表](Project-and-Community/MailingLists.md)
 * [签名密钥](Project-and-Community/SigningKeys.md)
 
@@ -79,12 +81,16 @@
 
 ## 基础概念
 
-* [ZFS 的校验和及其用途](Basic-Concepts/Checksums.md)
-* [特性标志](Basic-Concepts/Feature-Flags.md)
-* [RAIDZ (ZFS RAID)](Basic-Concepts/RAIDZ.md)
-* [故障排除](Basic-Concepts/Troubleshooting.md)
-* [虚拟设备（VDEV）](Basic-Concepts/VDEV.md)
-* [分布式 RAID (dRAID)](Basic-Concepts/dRAID.md)
+* [写时复制](Basic-Concepts/Copy-on-write.md)
+* 存储池结构（Pool Structure）
+  * [特性标志](Basic-Concepts/Pool-Structure/Feature-Flags.md)
+  * [RAIDZ (ZFS RAID)](Basic-Concepts/Pool-Structure/RAIDZ.md)
+  * [虚拟设备（VDEV）](Basic-Concepts/Pool-Structure/VDEV.md)
+  * [分布式 RAID (dRAID)](Basic-Concepts/Pool-Structure/dRAID-Howto.md)
+* 数据存储（Data Storage）
+  * [ZFS 的校验和及其用途](Basic-Concepts/Data-Storage/Checksums.md)
+* 操作（Operations）
+  * [故障排除](Basic-Concepts/Operations/Troubleshooting.md)
 
 ## 手册页
 
