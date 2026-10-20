@@ -132,7 +132,7 @@ session  optional  pam_zfs_key.so mount_recursively
     rpool/home/alice
 ```
 
-要自动解锁生效，用户的登录密码必须与数据集的口令短语一致。数据集必须具有由 ZFS 管理的挂载点（而非 legacy），且为 `canmount=on`，才能自动挂载。
+要自动解锁生效，用户的登录密码必须与数据集的密码短语一致。数据集必须具有由 ZFS 管理的挂载点（而非 legacy），且为 `canmount=on`，才能自动挂载。
 
 ### 示例 7：多个主目录与密码同步检查
 

@@ -38,7 +38,7 @@ zpool import [-DflmMt] [-F [-nTX]] [--rewind-to-checkpoint] [-c 缓存文件|-d 
 
 仅列出已销毁的池。
 
-### `zpool import -a [-DflmMN] [-F [-nTX]] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s]`
+### `zpool import -a [-DflmMN] [-F [-nTX]] [--rewind-to-checkpoint] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s]`
 
 导入在搜索目录中找到的所有池。该命令与上一条命令相同，区别在于它会导入所有可用设备数量充足的池。除非指定 `-D` 选项，否则不会导入已销毁的池（即此前用 `zpool destroy` 命令销毁的池）。
 
@@ -114,7 +114,7 @@ zpool import [-DflmMt] [-F [-nTX]] [--rewind-to-checkpoint] [-c 缓存文件|-d 
 
 指定用于回滚的 txg。隐含 `-FX`。有关池恢复模式的更多详情，参见上文的 `-X` 选项。**警告**：此选项可能对池的健康造成极大危害，仅应作为最后手段使用。
 
-### `zpool import [-DflmMt] [-F [-nTX]] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s] pool|id [newpool]`
+### `zpool import [-DflmMt] [-F [-nTX]] [--rewind-to-checkpoint] [-c cachefile|-d dir|device] [-o mntopts] [-o property=value]… [-R root] [-s] pool|id [newpool]`
 
 导入指定的池。可以通过池名或数字标识符来标识池。如果指定了 `newpool`，则使用名称 `newpool` 导入该池；否则，将使用其导出时的名称导入。
 

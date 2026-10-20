@@ -32,7 +32,7 @@ zpool export [-f] [-a | 池名…]
 
 ### 示例 1：导出 ZFS 存储池
 
-以下命令导出池 tank 中的设备，以便将其迁移位置或稍后导入：
+以下命令导出池 `tank` 中的设备，以便移动位置或稍后导入：
 
 ```sh
 # zpool export tank

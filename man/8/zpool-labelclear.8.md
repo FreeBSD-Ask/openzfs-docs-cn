@@ -22,6 +22,6 @@ zpool labelclear [-f] 设备
 
 ## 参考文献
 
-zpool-destroy(8)、zpool-detach(8)、zpool-remove(8)
+zpool-destroy(8)、zpool-detach(8)、zpool-remove(8)、zpool-replace(8)
 
 2022 年 7 月 11 日

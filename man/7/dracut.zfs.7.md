@@ -77,7 +77,7 @@ zfs-import-scan.service ↓                       ↓           | zfs-import-cac
 
 #### `root=zfs:AUTO`、`root=zfs:`、`root=zfs`、`[root=]`
 
-导入后，搜索第一个设置了 `bootfs` 属性的池，如同在上面指定了其值作为 dataset 一样使用。
+导入后，搜索第一个设置了 `bootfs` 属性的池，并将其值视作上文指定的 dataset 使用。
 
 #### `rootfstype=zfs root=dataset`
 
@@ -139,7 +139,7 @@ zfs-import-scan.service ↓                       ↓           | zfs-import-cac
 
 ### `dracut-zfs-generator`（systemd generator）
 
-生成 `sysroot.mount`（使用 `rootflags=`，如有的话）。如果显式指定了启动数据集，还会生成必要的挂载点（`sysroot-etc.mount`、`sysroot-bin.mount` 等）；否则生成 `zfs-nonroot-necessities.service`，在 `/sysroot` 之后使用 `BOOTFS=` 显式挂载它们。
+生成 `sysroot.mount`（使用 `rootflags=`，如有的话）。如果显式指定了启动数据集，还会生成必要的挂载点（`sysroot-etc.mount`、`sysroot-bin.mount` 等）；否则生成 `zfs-nonroot-necessities.service`，在挂载 `/sysroot` 后使用 `BOOTFS=` 显式挂载它们。
 
 ### `zfs-snapshot-bootfs.service`、`zfs-rollback-bootfs.service`（systemd services）
 
@@ -147,7 +147,7 @@ zfs-import-scan.service ↓                       ↓           | zfs-import-cac
 
 ### `zfs-needshutdown.sh`（cleanup）
 
-如果导入了任何池，则发出需要关闭钩子的信号。
+如果导入了任何池，则发出需要关机钩子的信号。
 
 ### `export-zfs.sh`（shutdown）
 

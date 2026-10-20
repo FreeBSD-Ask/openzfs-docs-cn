@@ -2,7 +2,7 @@
 
 ## 名称
 
-`dbufstat` — 显示 DMU 缓冲缓存的统计信息
+`dbufstat` — 显示 DMU 缓冲区缓存的统计信息
 
 ## 概述
 
@@ -12,7 +12,7 @@ dbufstat [-bdhnrtvx] [-f 字段[,字段…]] [-F 字段=值[,…]] [-i 文件] [
 
 ## 说明
 
-`dbufstat` 显示 DMU（数据管理单元，Data Management Unit）缓冲缓存的统计信息，该缓存也称为 dbuf 缓存。这些信息读取自 `dbufs` kstat（Linux 上为 `/proc/spl/kstat/zfs/dbufs`，FreeBSD 上为 `kstat.zfs.misc.dbufs`）。
+`dbufstat` 显示 DMU（数据管理单元，Data Management Unit）缓冲区缓存的统计信息，该缓存也称为 dbuf 缓存。这些信息读取自 `dbufs` kstat（Linux 上为 `/proc/spl/kstat/zfs/dbufs`，FreeBSD 上为 `kstat.zfs.misc.dbufs`）。
 
 `dbufstat` 能以三种模式显示数据：
 

@@ -16,7 +16,7 @@ vdev_id 是一个 udev 辅助工具，它通过解析 vdev_id.conf(5) 将存储�
 
 当前支持的拓扑有 sas_direct、sas_expander、sas_switch 和 scsi。还支持一种多路径模式，该模式下通过检查驱动程序所报告的第一个处于运行状态的组件磁盘来处理 dm-mpath 设备。在多路径模式下，通往给定机箱的每条路径都应在配置文件中包含一个同名的通道定义。
 
-vdev_id 还支持使用配置文件关键字 `alias`，基于 /dev 层次结构中现有的 udev 链接创建别名。详情参见 vdev_id.conf(5)。
+vdev_id 还支持使用配置文件关键字 `alias`，基于 `/dev` 层次结构中现有的 udev 链接创建别名。详情参见 vdev_id.conf(5)。
 
 ## 选项
 

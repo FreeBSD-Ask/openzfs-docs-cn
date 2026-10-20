@@ -13,7 +13,7 @@ zfs send [-DLPUVbcehnpsvw] [-R [-X dataset [, dataset]…]] [[-I | -i] snapshot]
 ```
 
 ```sh
-zfs send [-DLPVcensvw] [-i snapshot | bookmark] filesystem | volume | snapshot
+zfs send [-DLPUVcensvw] [-i snapshot | bookmark] filesystem | volume | snapshot
 ```
 
 ```sh
@@ -44,7 +44,7 @@ zfs redact snapshot redaction_bookmark redaction_snapshot …
 
 #### `-I snapshot`
 
-生成一个流包，从第一个 `snapshot` 到第二个 `snapshot` 发送其间的所有中间快照。例如，`-I @a fs@d` 相当于 `-i @a fs@b ; -i @b fs@c ; -i @c fs@d`。增量源可以像 `-i` 选项那样指定。
+生成一个流包，从第一个 `snapshot` 到第二个 `snapshot` 发送其间的所有中间快照。例如，`-I @a fs@d` 类似于 `-i @a fs@b ; -i @b fs@c ; -i @c fs@d`。增量源可以像 `-i` 选项那样指定。
 
 #### `-L`、`--large-block`
 
@@ -76,7 +76,7 @@ zfs redact snapshot redaction_bookmark redaction_snapshot …
 
 #### `-b`、`--backup`
 
-仅发送已接收的属性值，不论这些值是否被本地设置覆盖，但前提是该数据集曾被接收过。当你希望 `zfs receive` 恢复已发送到数据集上备份的已接收属性，并避免发送那些可能与源数据集毫无关系、仅与数据备份方式有关的本地设置时，使用此选项。
+仅发送已接收的属性值，不论这些值是否被本地设置覆盖，但前提是该数据集曾被接收过。当你希望 `zfs receive` 恢复在所发送数据集上备份的已接收属性，并避免发送那些可能与源数据集毫无关系、仅与数据备份方式有关的本地设置时，使用此选项。
 
 #### `-c`、`--compressed`
 
@@ -118,7 +118,7 @@ zfs redact snapshot redaction_bookmark redaction_snapshot …
 
 流的格式是确定的。你将能够在未来版本的 ZFS 上接收你的流。
 
-### `zfs send [-DLPVcensvw] [-i snapshot | bookmark] filesystem | volume | snapshot`
+### `zfs send [-DLPVcenvw] [-i snapshot | bookmark] filesystem | volume | snapshot`
 
 生成一个发送流，其对象可以是文件系统，也可以是从书签开始的增量流。如果目标是文件系统或卷，则池必须为只读，或者该文件系统必须未挂载。当从文件系统或卷生成的流被接收时，默认的快照名称为 `--head--`。
 
@@ -150,7 +150,7 @@ zfs redact snapshot redaction_bookmark redaction_snapshot …
 
 #### `-i snapshot | bookmark`
 
-生成增量发送流。增量源必须是目标历史中较早的一个快照。它通常位于目标文件系统自身的历史中，这种情况下可以指定为名称的最后组成部分（`#` 或 `@` 字符及其后面的内容）。
+生成增量发送流。增量源必须是目标历史中较早的一个快照。它通常是目标文件系统中较早的一个快照，这种情况下可以指定为名称的最后组成部分（`#` 或 `@` 字符及其后面的内容）。
 
 如果增量目标是克隆，则增量源可以是原始快照，也可以是原始文件系统中更早的快照，或者是原始快照的原始快照，依此类推。
 

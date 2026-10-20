@@ -7,7 +7,7 @@
 ## 概述
 
 ```sh
-zpool iostat [[[-c 脚本] [-lq]]|-rw] [-T d|u] [-ghHLnpPvy] [[池名…]|[池名 vdev…]|vdev…] [间隔 [次数]]
+zpool iostat [[[-c 脚本] [-lq]]|-rw] [-T u|d] [-ghHLnpPvy] [[池名…]|[池名 vdev…]|vdev…] [间隔 [次数]]
 ```
 
 ## 说明
@@ -36,9 +36,9 @@ vdev 的底层路径（`/dev/sd*`）。用于 device mapper、多路径或分区
 
 vdev 所在机箱（如有）的 sysfs 路径。
 
-### `-T d|u`
+### `-T u|d`
 
-显示时间戳。指定 `d` 使用标准日期格式，参见 date(1)。指定 `u` 使用时间内部表示的可打印形式，参见 time(1)。
+显示时间戳。指定 `u` 使用时间内部表示的可打印形式，参见 time(1)。指定 `d` 使用标准日期格式，参见 date(1)。
 
 ### `-g`
 

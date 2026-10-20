@@ -34,7 +34,7 @@ cstyle [-chpvCP] [文件]…
 
 ### `-g`
 
-同时输出 GitHub Action 风格的 `::error` 信息。
+同时输出 GitHub Actions 风格的 `::error` 信息。
 
 ## 环境
 

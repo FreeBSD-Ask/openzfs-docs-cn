@@ -7,7 +7,7 @@
 ## 概述
 
 ```sh
-mount.zfs [-sfnvh] [-o options] dataset mountpoint
+mount.zfs [-sfnvh] [-o 选项] 数据集 挂载点
 ```
 
 ## 说明

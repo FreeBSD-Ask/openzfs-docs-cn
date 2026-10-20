@@ -68,7 +68,7 @@ RAID-Z 块的数据大小。实际大小为 `2^zio_size_shift`。
 
 调试选项：在收到 SIGSEGV 或 SIGABRT 信号时附加 gdb 调试器。
 
-## 参考资料
+## 参考文献
 
 ztest(1)
 
