@@ -1,5 +1,7 @@
 # 编辑日志
 
+* 2026.10.21
+  * 加粗渲染修复（用户指示）：全仓 70 个文件 777 处 `**加粗**` 统一为定界符外侧恰好一个半角空格（行首、行尾与链接文本边界例外），修复中文及全角标点紧贴 `**` 导致 GitBook 渲染失败；新增 lint 脚本 `.github/scripts/bold_spacing.py`（支持 `--fix`），规则与运行命令写入 `AGENTS.md`
 * 2026.10.20
   * 完成 man 页全量翻译（源：openzfs/zfs master 7c3d85aa，2026-10-18），新增 83 页：
     * man(1)：dbufstat、zarcsummary
@@ -24,8 +26,8 @@
   * 表格管道符按 CJK 显示宽度全量对齐（6 张表：校验和两表、块克隆、共享数据集、缓存、特性矩阵），分隔行统一左对齐；新增本地工具 `script/align-table.py`，特性矩阵生成脚本输出已同步为对齐格式
   * 完成 man 页 93 页终核（批次 M1–M6，逐段对照 openzfs/zfs `7c3d85aa` troff）：修复 `zpool-features` 特性 GUID 错拼 2 处（`org.zfsonlinear`→`org.zfsonlinux`）、`zfs-send` 概述漏 `-U`、`zpool-iostat`/`zpool-list` 的 `-T u|d` 顺序、`zpoolconcepts` draid 标题缺 `[parity]` 段、`zpool-create` 多余的“选项”节（上游无 OPTIONS 节）、`zpool-condense` 长选项单横线→双横线、`zfs.4` 六处段落软换行、三页滚动快照示例快照名补空格、占位符篡改还原约 30 处；机器校验全量（93 页与上游清单一一对应、属性/选项计数吻合、lint 0 错误、链接 0 悬空）；上游自身缺陷 5 处记录于校对工作单待反馈
   * 术语表收录终核批次候选 11 条（rotational=机械盘并全仓统一、hold、enclosure、channel、switch、slot、spill block、demand、DMU buffer cache 等），`man/4/zfs.4.md` 六处“轮替盘/轮替 vdev”误译统一为“机械盘”
-  * 新增引号规则（用户指示）：禁止使用日式半角引号（直角引号「」），一律改用“”或‘’；全仓排查正文内容页零残留，`AGENTS.md`、`CHANGELOG.md`、校对工作单三个元文档共 57 对已统一替换，规则写入 `AGENTS.md` 引号规范
-  * 翻译进度与目录复核：SUMMARY 191 条（内链 187、外链 4）与实体文件双向核对零缺漏，187 页 H1 与登记标题全量一致；进度快照固化至 `AGENTS.md`「翻译进度快照」（板块 × 页数 × 源基线 × 校对批次）与 `README.md`「翻译进度」节，并更新“当前翻译 git 版本”与 man 页基线表述，便于下次上游同步时接手
+  * 新增引号规则（用户指示）：禁止使用日式半角引号（日式直角引号），一律改用“”或‘’；全仓排查正文内容页零残留，`AGENTS.md`、`CHANGELOG.md`、校对工作单三个元文档共 57 对已统一替换，规则写入 `AGENTS.md` 引号规范
+  * 翻译进度与目录复核：SUMMARY 191 条（内链 187、外链 4）与实体文件双向核对零缺漏，187 页 H1 与登记标题全量一致；进度快照固化至 `AGENTS.md`“翻译进度快照”（板块 × 页数 × 源基线 × 校对批次）与 `README.md`“翻译进度”节，并更新“当前翻译 git 版本”与 man 页基线表述，便于下次上游同步时接手
 * 2026.10.18
   * 新增 AGENTS.md（AI 助手与贡献者工作指南，适配本项目）
   * 修复 `.github/.markdownlint.json` 无效语法（MD004 配置对象错位、`siblings_only` 类型错误、末尾逗号），此前 markdown-lint2 工作流无法解析该配置

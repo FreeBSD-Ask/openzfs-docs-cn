@@ -74,7 +74,7 @@ ZFS 存储池的磁盘格式版本通过“特性”（features）指定，取�
 
 兼容性文件可以包含注释：从 `#` 到行尾的任何文本都会被忽略。
 
-**示例**：
+**示例** ：
 
 ```sh
 example# cat /usr/share/zfs/compatibility.d/grub2
@@ -138,15 +138,15 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `allocation_classes`
 
-* **GUID**：`org.zfsonlinux:allocation_classes`
-* **只读兼容**：是
+* **GUID** ：`org.zfsonlinux:allocation_classes`
+* **只读兼容** ：是
 
 此特性启用独立分配类的支持。使用 `zpool create` 或 `zpool add` 命令创建专用分配类 vdev（dedup 或 special）时，此特性变为 `active`。借助设备移除功能，若所有专用分配类 vdev 都被移除，它可以回到 `enabled` 状态。
 
 ### `async_destroy`
 
-* **GUID**：`com.delphix:async_destroy`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:async_destroy`
+* **只读兼容** ：是
 
 销毁文件系统需要遍历其所有数据，才能把已用空间归还给池。若没有 `async_destroy`，在所有空间都被回收之前，文件系统都不会被完全移除。如果销毁操作因重启或断电而中断，下次打开池时将需要同步完成该销毁操作。
 
@@ -156,9 +156,9 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `blake3`
 
-* **GUID**：`org.openzfs:blake3`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.openzfs:blake3`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用在校验和与去重中使用 BLAKE3 哈希算法。BLAKE3 是一种注重高性能的安全哈希算法。
 
@@ -166,8 +166,8 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `block_cloning`
 
-* **GUID**：`com.fudosecurity:block_cloning`
-* **只读兼容**：是
+* **GUID** ：`com.fudosecurity:block_cloning`
+* **只读兼容** ：是
 
 启用此特性后，ZFS 会对 `copy_file_range(2)` 之类的操作使用块克隆。块克隆允许为单个块创建多个引用。它比复制数据快得多（因为实际数据既不被读取也不被写入），且不占用额外空间。在某些条件下（如 `recordsize` 相同、主加密密钥相同等），可以在数据集之间克隆块。ZFS 会尽力跨数据集克隆，包括已加密的数据集。由于操作系统和/或 ZFS 内部实现的种种（非显而易见的）原因，这一能力会受到限制。
 
@@ -175,8 +175,8 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `block_cloning_endian`
 
-* **GUID**：`com.truenas:block_cloning_endian`
-* **只读兼容**：是
+* **GUID** ：`com.truenas:block_cloning_endian`
+* **只读兼容** ：是
 
 此特性修正块克隆所使用的块引用表（BRT）中 ZAP 条目的字节序问题。在最初的块克隆实现中，BRT 的 ZAP 条目被错误地存为 8 个单字节条目的数组，而不是单个 8 字节条目，导致池不具备字节序安全性。
 
@@ -184,25 +184,25 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `bookmarks`
 
-* **GUID**：`com.delphix:bookmarks`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:bookmarks`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：是
 
 此特性启用 `zfs bookmark` 命令。只要池中还存在任何书签，此特性就为 `active`。运行 `zfs list -t bookmark -r poolname` 可以列出池中的所有书签。
 
 ### `bookmark_v2`
 
-* **GUID**：`com.datto:bookmark_v2`
-* **依赖**：`bookmark`、`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`com.datto:bookmark_v2`
+* **依赖** ：`bookmark`、`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用更大书签的创建与管理，ZFS 中的其他特性需要它们。创建 v2 书签时，此特性变为 `active`；当所有 v2 书签都被销毁后，会回到 `enabled` 状态。
 
 ### `bookmark_written`
 
-* **GUID**：`com.delphix:bookmark_written`
-* **依赖**：`bookmark`、`extensible_dataset`、`bookmark_v2`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:bookmark_written`
+* **依赖** ：`bookmark`、`extensible_dataset`、`bookmark_v2`
+* **只读兼容** ：否
 
 此特性启用附加的书签记账字段，从而支持 `written#bookmark` 属性（自书签以来写入的空间）以及从书签开始的增量发送流大小的估算。
 
@@ -210,8 +210,8 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `device_rebuild`
 
-* **GUID**：`org.openzfs:device_rebuild`
-* **只读兼容**：是
+* **GUID** ：`org.openzfs:device_rebuild`
+* **只读兼容** ：是
 
 此特性使 `zpool attach` 与 `zpool replace` 命令在 resilver 时能够执行顺序重建（而不是修复式重建）。
 
@@ -221,15 +221,15 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `device_removal`
 
-* **GUID**：`com.delphix:device_removal`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:device_removal`
+* **只读兼容** ：否
 
 此特性使 `zpool remove` 命令可以移除顶级 vdev，通过迁移其数据来缩减池的总大小。对顶级 vdev 使用 `zpool remove` 命令时，此特性变为 `active`，且永不回到 `enabled` 状态。
 
 ### `draid`
 
-* **GUID**：`org.openzfs:draid`
-* **只读兼容**：否
+* **GUID** ：`org.openzfs:draid`
+* **只读兼容** ：否
 
 此特性启用 `draid` vdev 类型。dRAID 是 RAID-Z 的一种变体，提供内置的分布式热备盘，可在保留 RAID-Z 优点的同时实现更快的 resilver。数据、校验与备用空间被组织成冗余组，并均匀分布到所有设备上。
 
@@ -237,9 +237,9 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `draid_failure_domains`
 
-* **GUID**：`com.seagate:draid_failure_domains`
-* **依赖**：`draid`
-* **只读兼容**：否
+* **GUID** ：`com.seagate:draid_failure_domains`
+* **依赖** ：`draid`
+* **只读兼容** ：否
 
 此特性启用在 `draid` vdev 类型中使用故障域。故障域允许属于同一个域的整组设备故障，而不会使池离线。由于共享公共组件（如机箱、HBA 或 SAS expander）而可能同时故障的设备，是组成故障域的良好候选。例如，在多机箱的部署中，你可以把每个机箱内的设备集合定义为故障域，此时故障组会跨越各个机箱。换言之，dRAID 的排列使得每个故障组中的第 i 个设备属于第 i 个机箱，从而可以容忍整个机箱的故障。故障组的大小等于故障域的数量，且不能小于冗余组的大小（校验 + 数据 + 备用盘）。
 
@@ -247,8 +247,8 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `dynamic_gang_header`
 
-* **GUID**：`com.klarasystems:dynamic_gang_header`
-* **只读兼容**：否
+* **GUID** ：`com.klarasystems:dynamic_gang_header`
+* **只读兼容** ：否
 
 此特性启用基于池扇区大小的更大 gang header。启用后，gang header 会使用为其分配的整个空间，而不是始终限制在 512 字节。这可以减少极端碎片化场景下对嵌套 gang tree 的需求。
 
@@ -256,9 +256,9 @@ example# zpool create -o compatibility=grub2 bootpool vdev
 
 ### `edonr`
 
-* **GUID**：`org.illumos:edonr`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.illumos:edonr`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用在校验和中使用 Edon-R 哈希算法，包括用于 nopwrite（如果同时启用了压缩，当写入数据与某块的校验和匹配时，对该块的覆写将被忽略）。出于充分的谨慎，Edon-R 与去重一起使用时要求校验：`zfs set dedup=edonr,verify`（参见 zfs-set(8)）。
 
@@ -268,8 +268,8 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `embedded_data`
 
-* **GUID**：`com.delphix:embedded_data`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:embedded_data`
+* **只读兼容** ：否
 
 此特性提升高度可压缩块的性能与压缩比。内容可压缩到 112 字节或更小的块可以利用此特性。
 
@@ -279,8 +279,8 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `empty_bpobj`
 
-* **GUID**：`com.delphix:empty_bpobj`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:empty_bpobj`
+* **只读兼容** ：是
 
 此特性提升单个文件系统或卷创建大量快照及使用这些快照的性能，同时减少所需的磁盘空间。
 
@@ -290,8 +290,8 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `enabled_txg`
 
-* **GUID**：`com.delphix:enabled_txg`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:enabled_txg`
+* **只读兼容** ：是
 
 启用此特性后，ZFS 会记录启用新特性时所处的事务组号。这不会带来任何用户可见的影响，但其他特性可能会依赖此特性。
 
@@ -299,38 +299,38 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `encryption`
 
-* **GUID**：`com.datto:encryption`
-* **依赖**：`bookmark_v2`、`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`com.datto:encryption`
+* **依赖** ：`bookmark_v2`、`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用原生加密数据集的创建与管理。创建加密数据集时，此特性变为 `active`；当所有使用此特性的数据集都被销毁后，会回到 `enabled` 状态。
 
 ### `extensible_dataset`
 
-* **GUID**：`com.delphix:extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:extensible_dataset`
+* **只读兼容** ：否
 
 此特性允许更灵活地使用 ZFS 内部数据结构，其他特性可以依赖它。第一个依赖特性使用它时，此特性变为 `active`；当所有使用此特性的数据集都被销毁后，会回到 `enabled` 状态。
 
 ### `fast_dedup`
 
-* **GUID**：`com.klarasystems:fast_dedup`
-* **只读兼容**：是
+* **GUID** ：`com.klarasystems:fast_dedup`
+* **只读兼容** ：是
 
 此特性允许在新的去重表上启用更高级的去重功能。创建新的去重表后（即新建池之后，或在已启用去重的数据集上使用新的校验和之后）写入第一个被去重的块时，此特性变为 `active`。当所有使用它的被去重块都被释放后，会回到 `enabled` 状态。
 
 ### `filesystem_limits`
 
-* **GUID**：`com.joyent:filesystem_limits`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：是
+* **GUID** ：`com.joyent:filesystem_limits`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：是
 
 此特性启用文件系统限制与快照限制。这些限制用于控制设置了限制的那个树位置可以创建多少个文件系统和/或快照。一旦在任何数据集上设置了任一限制属性，此特性就为 `active`，且永不回到 `enabled` 状态。
 
 ### `head_errlog`
 
-* **GUID**：`com.delphix:head_errlog`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:head_errlog`
+* **只读兼容** ：否
 
 此特性启用升级版的 errlog，它需要对磁盘上的错误日志格式做出变更。现在每个 head 数据集的错误日志会分别存储在 zap 对象中，并以 head id 作为键。启用此特性后，`zpool status` 的输出会列出每个受错误块影响的数据集。对于密钥未加载的加密文件系统，我们无法检查其快照或克隆是否存在错误，这些错误也不会被报告。错误块本身会针对文件系统报告，而不带文件名。
 
@@ -338,9 +338,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `hole_birth`
 
-* **GUID**：`com.delphix:hole_birth`
-* **依赖**：`enabled_txg`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:hole_birth`
+* **依赖** ：`enabled_txg`
+* **只读兼容** ：否
 
 此特性存在或曾存在缺陷，后果是：如果你从受影响的数据集执行 `zfs send -i`（或 `-R`，因为它内部使用 `-i`），接收方不会看到任何校验和或其他错误，但接收端生成的快照与源端并不一致。因此 `zfs send -i` 默认已禁用该特性（参见 zfs(4) 中的 `send_holes_without_birth_time`）。
 
@@ -356,17 +356,17 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `large_blocks`
 
-* **GUID**：`org.open-zfs:large_blocks`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.open-zfs:large_blocks`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性允许把数据集上的 record size 设置为大于 128 KiB。当某个数据集包含块大小超过 128 KiB 的文件时，此特性变为 `active`；当所有曾经把 recordsize 设置为大于 128 KiB 的文件系统都被销毁后，会回到 `enabled` 状态。
 
 ### `large_dnode`
 
-* **GUID**：`org.zfsonlinux:large_dnode`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.zfsonlinux:large_dnode`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性允许把数据集中的 dnode 大小设置为大于 512 B。
 
@@ -374,9 +374,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `large_microzap`
 
-* **GUID**：`com.klarasystems:large_microzap`
-* **依赖**：`extensible_dataset`、`large_blocks`
-* **只读兼容**：是
+* **GUID** ：`com.klarasystems:large_microzap`
+* **依赖** ：`extensible_dataset`、`large_blocks`
+* **只读兼容** ：是
 
 此特性允许“micro” ZAP 增长到超过 128 KiB，而不会被升级为“fat” ZAP。micro ZAP 第一次增长到超过 128 KiB 时，此特性变为 `active`。只有当所有曾经拥有较大 micro ZAP 的数据集都被销毁后，它才会回到 `enabled` 状态。
 
@@ -384,17 +384,17 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `livelist`
 
-* **GUID**：`com.delphix:livelist`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:livelist`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：是
 
 当克隆上发生了大量随机/稀疏写入时，此特性允许以比传统方法更快的速度删除克隆。克隆创建之后所有被分配和被释放的块都由该克隆的 livelist 跟踪，删除克隆时会引用这份 livelist。创建克隆时此特性被激活，并保持 `active`，直到所有克隆都被销毁。
 
 ### `log_spacemap`
 
-* **GUID**：`com.delphix:log_spacemap`
-* **依赖**：`com.delphix:spacemap_v2`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:log_spacemap`
+* **依赖** ：`com.delphix:spacemap_v2`
+* **只读兼容** ：是
 
 此特性提升高度碎片化池的性能，尤其适用于随机写占比较大的工作负载。其做法是：每个 TXG 把所有 metaslab 变更记录在单个 spacemap 上，而不是把多次写入分散写到所有 metaslab spacemap 上。
 
@@ -402,9 +402,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `longname`
 
-* **GUID**：`org.zfsonlinux:longname`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.zfsonlinux:longname`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性允许创建文件名最长达 1023 字节的文件和目录。同时新增了一个数据集属性 `longname`，用于单独开关每个数据集的长文件名支持。即使数据集中包含长文件名文件，此属性也可以被关闭。此时无法再创建长文件名文件，但已有的长文件名文件仍可被查找。
 
@@ -412,8 +412,8 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `lz4_compress`
 
-* **GUID**：`org.illumos:lz4_compress`
-* **只读兼容**：否
+* **GUID** ：`org.illumos:lz4_compress`
+* **只读兼容** ：否
 
 `lz4` 是一种高性能实时压缩算法，相比旧的 `lzjb` 压缩，压缩与解压缩速度显著更快，压缩比也更高。通常，`lz4` 在可压缩数据上比 `lzjb` 快约 50%，在不可压缩数据上快约 200%。其解压缩速度也快约 80%，同时压缩比提升约 10%。
 
@@ -423,8 +423,8 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `multi_vdev_crash_dump`
 
-* **GUID**：`com.joyent:multi_vdev_crash_dump`
-* **只读兼容**：否
+* **GUID** ：`com.joyent:multi_vdev_crash_dump`
+* **只读兼容** ：否
 
 此特性允许在由多个 vdev 组成的池上配置 dump 设备。这些 vdev 可以采用任意镜像或 raidz 配置。
 
@@ -434,9 +434,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `obsolete_counts`
 
-* **GUID**：`com.delphix:obsolete_counts`
-* **依赖**：`device_removal`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:obsolete_counts`
+* **依赖** ：`device_removal`
+* **只读兼容** ：是
 
 此特性是 `device_removal` 的增强，随着时间推移会减少跟踪已移除设备所需的内存。当间接块被释放或重新映射时，会将其间接映射中的对应部分标记为“obsolete”，即不再需要。
 
@@ -444,9 +444,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `physical_rewrite`
 
-* **GUID**：`com.truenas:physical_rewrite`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：是
+* **GUID** ：`com.truenas:physical_rewrite`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：是
 
 此特性启用保留逻辑出生时间的物理块重写，避免重写后的块被不必要地包含在增量 `zfs send` 流中。启用后可使用 `zfs rewrite -P` 命令。
 
@@ -454,9 +454,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `project_quota`
 
-* **GUID**：`org.zfsonlinux:project_quota`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：是
+* **GUID** ：`org.zfsonlinux:project_quota`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：是
 
 此特性允许管理员按项目标识符（ID）统计空间与对象使用情况。
 
@@ -468,40 +468,40 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `raidz_expansion`
 
-* **GUID**：`org.openzfs:raidz_expansion`
-* **依赖**：`none`
-* **只读兼容**：否
+* **GUID** ：`org.openzfs:raidz_expansion`
+* **依赖** ：`none`
+* **只读兼容** ：否
 
 此特性使 `zpool attach` 子命令能够将新设备附加到 RAID-Z 组，从而扩展池中的总可用空间。参见 zpool-attach(8)。
 
 ### `redaction_bookmarks`
 
-* **GUID**：`com.delphix:redaction_bookmarks`
-* **依赖**：`bookmarks`、`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:redaction_bookmarks`
+* **依赖** ：`bookmarks`、`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用带遮蔽的 `zfs send`。这类发送会创建遮蔽书签，用于保存创建该发送流的 send 所遮蔽的块列表。有关遮蔽发送的更多信息，参见 zfs-send(8)。
 
 ### `redacted_datasets`
 
-* **GUID**：`com.delphix:redacted_datasets`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:redacted_datasets`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用接收带遮蔽的 `zfs send` 流，接收后会创建遮蔽数据集。这些数据集缺少部分块，因此不能被安全挂载，其内容也不能被安全读取。有关遮蔽接收的更多信息，参见 zfs-send(8)。
 
 ### `redaction_list_spill`
 
-* **GUID**：`com.delphix:redaction_list_spill`
-* **依赖**：`redaction_bookmarks`
-* **只读兼容**：否
+* **GUID** ：`com.delphix:redaction_list_spill`
+* **依赖** ：`redaction_bookmarks`
+* **只读兼容** ：否
 
 此特性使 `zfs redact` 创建的遮蔽列表能够容纳多得多的条目。创建条目数超过 36 的遮蔽列表时，此特性变为 `active`；当池中不再存在长遮蔽列表时，会回到 `enabled` 状态。有关遮蔽发送的更多信息，参见 zfs-send(8)。
 
 ### `resilver_defer`
 
-* **GUID**：`com.datto:resilver_defer`
-* **只读兼容**：是
+* **GUID** ：`com.datto:resilver_defer`
+* **只读兼容** ：是
 
 此特性允许在已有 resilver 进行中的情况下推迟新的 resilver。如果没有此特性，任何新的 resilver 都会导致当前正在运行的 resilver 立即从头重新开始。
 
@@ -509,9 +509,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `sha512`
 
-* **GUID**：`org.illumos:sha512`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.illumos:sha512`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用在校验和与去重中使用 SHA-512/256 截断哈希算法（FIPS 180-4）。SHA-512 原生的 64 位算术使其在 64 位硬件上比 SHA-256 快约 50%，因此对于哈希性能重要、但因种种原因无法使用更快的 `skein` 与 `edonr` 算法的系统而言，它是一个改动很小的良好替换选择。
 
@@ -519,9 +519,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `skein`
 
-* **GUID**：`org.illumos:skein`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.illumos:skein`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 此特性启用在校验和与去重中使用 Skein 哈希算法。Skein 是一种高性能安全哈希算法，曾是 NIST SHA-3 竞赛的入围者。它在 64 位硬件上提供极高的安全性与高性能（比 SHA-256 快 80%）。该实现同样使用了 ZFS 中的新盐值校验功能，即在把待校验的数据块送入算法之前，先用存储在池上的一个保密 256 位随机密钥对校验和进行预置。因此生成的校验和对特定池是唯一的，可以防止启用去重的系统遭到哈希碰撞攻击。
 
@@ -529,15 +529,15 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `spacemap_histogram`
 
-* **GUID**：`com.delphix:spacemap_histogram`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:spacemap_histogram`
+* **只读兼容** ：是
 
 此特性让 ZFS 能够维护更多关于池内空闲空间组织方式的信息。如果启用此特性，它会在创建新的空间映射对象时，或把现有空间映射升级到新格式时被激活，并且永不回到 `enabled` 状态。
 
 ### `spacemap_v2`
 
-* **GUID**：`com.delphix:spacemap_v2`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:spacemap_v2`
+* **只读兼容** ：是
 
 此特性启用新的空间映射编码，该编码在有益时由两个字（而非一个字）组成。新编码使空间映射能以更高的磁盘效率表示大范围的空间区域，同时提高其最大可寻址偏移量。
 
@@ -545,9 +545,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `userobj_accounting`
 
-* **GUID**：`org.zfsonlinux:userobj_accounting`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：是
+* **GUID** ：`org.zfsonlinux:userobj_accounting`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：是
 
 此特性允许管理员按用户和组统计对象使用情况。
 
@@ -557,8 +557,8 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `vdev_zaps_v2`
 
-* **GUID**：`com.klarasystems:vdev_zaps_v2`
-* **只读兼容**：否
+* **GUID** ：`com.klarasystems:vdev_zaps_v2`
+* **只读兼容** ：否
 
 此特性为根 vdev 创建一个 ZAP 对象。
 
@@ -568,9 +568,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `zilsaxattr`
 
-* **GUID**：`org.openzfs:zilsaxattr`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：是
+* **GUID** ：`org.openzfs:zilsaxattr`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：是
 
 此特性启用 ZIL 中 `xattr=sa` 扩展属性的日志记录。启用后，只要做出变更时数据集设置了 `sync=always`，或在变更之后对该数据集调用了 `sync(2)`，扩展属性变更（包括 `xattrdir=dir` 与 `xattr=sa`）都保证持久。
 
@@ -578,8 +578,8 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `zpool_checkpoint`
 
-* **GUID**：`com.delphix:zpool_checkpoint`
-* **只读兼容**：是
+* **GUID** ：`com.delphix:zpool_checkpoint`
+* **只读兼容** ：是
 
 此特性启用 `zpool checkpoint` 命令，可以对池在命令发出时的状态建立检查点，之后可以回退到该检查点或将其丢弃。
 
@@ -587,9 +587,9 @@ Edon-R 是一种性能极高的哈希算法，曾参与 NIST SHA-3 竞赛。它�
 
 ### `zstd_compress`
 
-* **GUID**：`org.freebsd:zstd_compress`
-* **依赖**：`extensible_dataset`
-* **只读兼容**：否
+* **GUID** ：`org.freebsd:zstd_compress`
+* **依赖** ：`extensible_dataset`
+* **只读兼容** ：否
 
 `zstd` 是一种高性能压缩算法，兼具高压缩比与高速。与 `gzip` 相比，`zstd` 的压缩比略好而速度快得多。与 `lz4` 相比，`zstd` 的压缩比好得多而速度仅略慢。通常，`zstd` 的压缩速度为每线程 250 到 500 MB/s，解压缩速度超过每线程 1 GB/s。
 

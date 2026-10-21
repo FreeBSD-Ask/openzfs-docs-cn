@@ -268,7 +268,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 #### `checksum=on|off|fletcher2|fletcher4|sha256|noparity|sha512|skein|edonr|blake3`
 
-控制用于验证数据完整性的校验和。默认值为 `on`，它会自动选择适当的算法（当前为 `fletcher4`，但未来版本可能会更改）。值 `off` 会禁用对用户数据的完整性检查。值 `noparity` 不仅会禁用完整性检查，也不会为用户数据维护校验。该设置由驻留在 RAID-Z 存储池上的转储设备内部使用，其他数据集不应使用。禁用校验和**并非**推荐做法。
+控制用于验证数据完整性的校验和。默认值为 `on`，它会自动选择适当的算法（当前为 `fletcher4`，但未来版本可能会更改）。值 `off` 会禁用对用户数据的完整性检查。值 `noparity` 不仅会禁用完整性检查，也不会为用户数据维护校验。该设置由驻留在 RAID-Z 存储池上的转储设备内部使用，其他数据集不应使用。禁用校验和 **并非** 推荐做法。
 
 `sha512`、`skein`、`edonr` 与 `blake3` 校验和算法要求在存储池上启用相应特性。
 
@@ -324,7 +324,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 更改此属性仅影响新写入的数据。因此，请在创建文件系统时使用 `-o copies=N` 选项设置此属性。
 
-请记住，如果顶级 vdev 缺失，ZFS 不会导入该存储池。**不要**例如创建一个两磁盘条带池，然后在一些数据集上设置 `copies=2`，以为这样就为它们设置了冗余。当磁盘发生故障时，你将无法导入该存储池，并会丢失所有数据。
+请记住，如果顶级 vdev 缺失，ZFS 不会导入该存储池。 **不要** 例如创建一个两磁盘条带池，然后在一些数据集上设置 `copies=2`，以为这样就为它们设置了冗余。当磁盘发生故障时，你将无法导入该存储池，并会丢失所有数据。
 
 加密数据集不能设置为 `copies=3`，因为实现会将部分加密元数据存储在本应存放第三个副本的位置。
 
@@ -338,7 +338,7 @@ root 用户或被授予 `projectobjused` 权限（通过 `zfs allow`）的用户
 
 如果设置为 `verify`，当两个块的签名相同时，ZFS 会逐字节比较以确保块内容完全一致。对于 `edonr` 算法，必须指定 `verify`。
 
-除非必要，否则**不**应在系统上启用去重。参见 zfsconcepts(7) 的“去重”一节。
+除非必要，否则 **不** 应在系统上启用去重。参见 zfsconcepts(7) 的“去重”一节。
 
 #### `direct=disabled|standard|always`
 
@@ -669,9 +669,9 @@ root 用户，或通过 `zfs allow` 被授予 `projectquota` 权限的用户，�
 
 授权采用累加式三层模型，所有层都必须通过：
 
-* **L0（身份验证）**：用户命名空间属主的 UID 必须与 `zoned_uid` 值匹配。
-* **L1（dsl_deleg）**：池管理员必须使用 zfs-allow(8) 在委托根上授予按操作的权限。当池委托关闭（`zpool set delegation=off`）时，无论具备何种 capability，所有写操作都会被拒绝。
-* **L2（capability tier，能力层级）**：用户命名空间内的 Linux capability 决定允许的操作类别：`CAP_FOWNER` 用于非破坏性操作（创建、快照、设置属性），`CAP_SYS_ADMIN` 用于破坏性操作（销毁、重命名、克隆）。两者都是命名空间化的 capability，作用域为用户命名空间而非初始（init）命名空间。
+* **L0（身份验证）** ：用户命名空间属主的 UID 必须与 `zoned_uid` 值匹配。
+* **L1（dsl_deleg）** ：池管理员必须使用 zfs-allow(8) 在委托根上授予按操作的权限。当池委托关闭（`zpool set delegation=off`）时，无论具备何种 capability，所有写操作都会被拒绝。
+* **L2（capability tier，能力层级）** ：用户命名空间内的 Linux capability 决定允许的操作类别：`CAP_FOWNER` 用于非破坏性操作（创建、快照、设置属性），`CAP_SYS_ADMIN` 用于破坏性操作（销毁、重命名、克隆）。两者都是命名空间化的 capability，作用域为用户命名空间而非初始（init）命名空间。
 
 只读操作（`zfs list`、`zfs get`）不需要任何 capability，也不需要 `zfs allow` 授权；可见性仅由 `zoned_uid` 的委托作用域控制。
 

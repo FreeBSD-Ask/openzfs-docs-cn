@@ -195,7 +195,7 @@ nvme format /dev/nvme1n1 -l $ID
 * Samsung PM1725/PM1725a
 * Samsung XS1715
 * Toshiba ZD6300
-* Seagate Nytro 5000 M.2（XP1920LE30002 测试过；购买前请 **阅读下面备注**）
+* Seagate Nytro 5000 M.2（XP1920LE30002 测试过；购买前请 **阅读下面备注** ）
 
   * 这是一款价格低廉的 22110 M.2 企业级硬盘，使用面向消费者的 MLC，并针对以读取为主的工作负载进行了优化。它不适合作为 SLOG 设备（这属于以写入为主的工作负载）。
   * 该硬盘的[手册](https://www.seagate.com/www-content/support-content/enterprise-storage/solid-state-drives/nytro-5000/_shared/docs/nytro-5000-mp2-pm-100810195d.pdf)指定了气流要求。如果硬盘未能从机箱风扇获得足够气流，将在空闲状态下过热。其热节流将严重降低性能，使写入吞吐量降至规格的十分之一，并且读取延迟可达到数百毫秒。在持续负载下，设备温度会不断升高，直到出现“可靠性下降”事件，至少一个 NVMe 命名空间中的所有数据丢失。此时，必须进行安全擦除才能再次使用该 NVMe 命名空间。即使在正常情况下有足够气流，在企业环境下风扇故障后仍可能在负载下发生数据丢失。任何在企业环境中部署此硬盘的人都应注意这种故障模式。

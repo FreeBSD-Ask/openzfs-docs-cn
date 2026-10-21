@@ -115,7 +115,7 @@
    done
    ```
 
-3. **仅 LUKS**：为根存储池设置加密的 LUKS 容器：
+3. **仅 LUKS** ：为根存储池设置加密的 LUKS 容器：
 
    ```sh
    for i in ${DISK}; do

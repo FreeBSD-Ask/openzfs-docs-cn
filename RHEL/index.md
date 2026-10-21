@@ -52,7 +52,7 @@ dnf install -y kernel-devel
 dnf install -y zfs
 ```
 
->**注意**
+> **注意**
 >
 >从 DKMS 切换到 kABI 跟踪 kmod 时，请首先卸载现有的 DKMS 软件包。这将移除所有已安装内核的内核模块，然后可以按照下节所述安装 kABI 跟踪 kmod。
 
@@ -82,7 +82,7 @@ dnf install zfs
 echo zfs >/etc/modules-load.d/zfs.conf
 ```
 
->**注意**
+> **注意**
 >
 >当更新到新的 EL 点版本时，由于内核中上游 kABI 的变化，现有 kmod 软件包可能无法工作。当前发行版软件包的配置可能已提供了更新的软件包，但如果版本号不更新，包管理器可能不会自动安装该软件包。升级时，用户应验证 *kmod-zfs* 软件包是否提供了适用的内核模块，如有必要重新安装 *kmod-zfs* 软件包。
 
@@ -122,7 +122,7 @@ sudo dnf config-manager --enable zfs-latest
 sudo dnf install zfs
 ```
 
->**注意**
+> **注意**
 >
 >DKMS 软件包使用 *zfs-latest*，kABI 跟踪 kmod 软件包使用 *zfs-latest-kmod*。
 
@@ -138,7 +138,7 @@ sudo dnf config-manager --enable zfs-legacy
 sudo dnf install zfs
 ```
 
->**注意**
+> **注意**
 >
 >DKMS 软件包使用 *zfs-legacy*，kABI 跟踪 kmod 软件包使用 *zfs-legacy-kmod*。
 
@@ -154,7 +154,7 @@ sudo dnf config-manager --enable zfs-x.y
 sudo dnf install zfs
 ```
 
->**注意**
+> **注意**
 >
 >DKMS 软件包使用 *zfs-x.y*，kABI 跟踪 kmod 软件包使用 *zfs-x.y-kmod*。
 

@@ -21,25 +21,25 @@
 
 确保已安装构建最新 ZFS 2.1 版本所需的软件包：
 
-* **RHEL/CentOS 7**：
+* **RHEL/CentOS 7** ：
 
 ```sh
 sudo yum install epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel ncompress
 sudo yum install --enablerepo=epel dkms python-packaging
 ```
 
->**注意**
+> **注意**
 >
 >RHEL/CentOS 7 生命周期已结束。在下面的安装说明中请使用 dnf 而非 yum。
 
-* **RHEL/CentOS 8**：
+* **RHEL/CentOS 8** ：
 
 ```sh
 sudo dnf install --skip-broken epel-release gcc make autoconf automake libtool rpm-build kernel-rpm-macros libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) kernel-abi-stablelists-$(uname -r | sed 's/\.[^.]\+$//') python3 python3-devel python3-setuptools python3-cffi libffi-devel ncompress
 sudo dnf install --skip-broken --enablerepo=epel --enablerepo=powertools python3-packaging dkms
 ```
 
-* **RHEL/CentOS 9**：
+* **RHEL/CentOS 9** ：
 
 ```sh
 sudo dnf config-manager --set-enabled crb
@@ -47,7 +47,7 @@ sudo dnf install --skip-broken epel-release gcc make autoconf automake libtool r
 sudo dnf install --skip-broken --enablerepo=epel python3-packaging dkms
 ```
 
-* **Fedora 41**：
+* **Fedora 41** ：
 
 ```sh
 sudo dnf install gcc make autoconf automake libtool rpm-build kernel-rpm-macros libtirpc-devel libblkid-devel libuuid-devel systemd-devel openssl-devel zlib-ng-compat-devel libaio-devel libattr-devel libffi-devel libunwind-devel kernel-devel-$(uname -r) python3 python3-devel openssl ncompress
@@ -78,7 +78,7 @@ $ make -j1 rpm-utils rpm-kmod
 $ sudo dnf install *.$(uname -m).rpm *.noarch.rpm
 ```
 
->**注意**
+> **注意**
 >
 >Fedora 41 Workstation 内置 rpm 软件包 zfs-fuse，会妨碍安装你自己的软件包。在执行 `dnf install` 之前请先删除该软件包：
 
@@ -92,7 +92,7 @@ $ sudo rpm -e --nodeps zfs-fuse
 
 请注意，这些软件包并不完全遵循 Red Hat 的规则，因此有小概率在新内核上无法使用。我们建议在生产服务器上使用这些构建时禁用自动内核更新。
 
->**注意**
+> **注意**
 >
 >这种类型的软件包在 Fedora 上不可用。
 
@@ -112,7 +112,7 @@ $ sudo modprobe zfs
 modprobe: ERROR: could not insert 'zfs': Key was rejected by service
 ```
 
-可以选择禁用安全启动，或者**只需一次性**创建自定义机器所有者密钥（MOK），并使用该密钥手动签名当前及未来的模块：
+可以选择禁用安全启动，或者 **只需一次性** 创建自定义机器所有者密钥（MOK），并使用该密钥手动签名当前及未来的模块：
 
 ```sh
 $ sudo mkdir /etc/pki/mok

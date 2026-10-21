@@ -6,8 +6,8 @@ OpenZFS 的官方源代码由 [openzfs](https://github.com/openzfs/) 组织在 G
 
 该仓库中有两个主要组成部分：
 
-* **ZFS**：ZFS 仓库是上游的 OpenZFS 代码，该代码已针对 Linux 和 FreeBSD 进行了适配和扩展。绝大多数核心 OpenZFS 代码是自包含的，可以无需修改直接使用。
-* **SPL**：SPL 是一个轻量的 shim 层，负责实现 OpenZFS 所需的基础接口。正是这一层使 OpenZFS 能够在多个平台上使用。SPL 以前在单独的仓库中维护，但在 `0.8` 主版本中被合并进 [zfs](https://github.com/openzfs/zfs) 仓库。
+* **ZFS** ：ZFS 仓库是上游的 OpenZFS 代码，该代码已针对 Linux 和 FreeBSD 进行了适配和扩展。绝大多数核心 OpenZFS 代码是自包含的，可以无需修改直接使用。
+* **SPL** ：SPL 是一个轻量的 shim 层，负责实现 OpenZFS 所需的基础接口。正是这一层使 OpenZFS 能够在多个平台上使用。SPL 以前在单独的仓库中维护，但在 `0.8` 主版本中被合并进 [zfs](https://github.com/openzfs/zfs) 仓库。
 
 ## 安装依赖
 
@@ -15,27 +15,27 @@ OpenZFS 的官方源代码由 [openzfs](https://github.com/openzfs/) 组织在 G
 
 要构建最新 ZFS 2.1 版本需要安装以下依赖。
 
-* **RHEL/CentOS 7**：
+* **RHEL/CentOS 7** ：
 
 ```sh
 sudo yum install epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python python2-devel python-setuptools python-cffi libffi-devel git ncompress libcurl-devel
 sudo yum install --enablerepo=epel python-packaging dkms
 ```
 
-* **RHEL/CentOS 8, Fedora**：
+* **RHEL/CentOS 8, Fedora** ：
 
 ```sh
 sudo dnf install --skip-broken epel-release gcc make autoconf automake libtool rpm-build libtirpc-devel libblkid-devel libuuid-devel libudev-devel openssl-devel zlib-devel libaio-devel libattr-devel elfutils-libelf-devel kernel-devel-$(uname -r) python3 python3-devel python3-setuptools python3-cffi libffi-devel git ncompress libcurl-devel
 sudo dnf install --skip-broken --enablerepo=epel --enablerepo=powertools python3-packaging dkms
 ```
 
-* **Debian、Ubuntu**：
+* **Debian、Ubuntu** ：
 
 ```sh
 sudo apt install alien autoconf automake build-essential debhelper-compat dh-autoreconf dh-dkms dh-python dkms fakeroot gawk git libaio-dev libattr1-dev libblkid-dev libcurl4-openssl-dev libelf-dev libffi-dev libpam0g-dev libssl-dev libtirpc-dev libtool libudev-dev linux-headers-generic parallel po-debconf python3 python3-all-dev python3-cffi python3-dev python3-packaging python3-setuptools python3-sphinx uuid-dev zlib1g-dev
 ```
 
-* **FreeBSD**：
+* **FreeBSD** ：
 
 ```sh
 pkg install autoconf automake autotools gettext git gmake python devel/py-sysctl sudo
@@ -45,8 +45,8 @@ pkg install autoconf automake autotools gettext git gmake python devel/py-sysctl
 
 构建 OpenZFS 有两种方案；如何选择在很大程度上取决于你的需求。
 
-* **软件包**：通常，从 git 构建可安装到系统上的自定义软件包是很有用的。这是进行与 systemd、dracut 和 udev 集成测试的最佳方式。使用软件包的缺点是会大大增加构建、安装和测试每次更改所需的时间。
-* **树内**：开发可以完全在 SPL/ZFS 源码树内完成。这使开发者能够快速迭代补丁，从而加快开发速度。在树内工作时，开发者可以利用增量构建、加载/卸载内核模块、执行工具，然后使用 ZFS 测试套件验证所有更改。
+* **软件包** ：通常，从 git 构建可安装到系统上的自定义软件包是很有用的。这是进行与 systemd、dracut 和 udev 集成测试的最佳方式。使用软件包的缺点是会大大增加构建、安装和测试每次更改所需的时间。
+* **树内** ：开发可以完全在 SPL/ZFS 源码树内完成。这使开发者能够快速迭代补丁，从而加快开发速度。在树内工作时，开发者可以利用增量构建、加载/卸载内核模块、执行工具，然后使用 ZFS 测试套件验证所有更改。
 
 本页其余部分重点介绍 **树内** 方案，这是大多数修改推荐的开发方法。有关构建自定义软件包的更多信息，请参阅 [自定义软件包](https://openzfs.github.io/openzfs-docs/Developer%20Resources/Custom%20Packages.html) 页面。
 
@@ -75,11 +75,11 @@ make -s -j$(nproc)
 ```
 
 
->**提示**
+> **提示**
 >
 >可以向 configure 传递 `--with-linux=PATH` 和 `--with-linux-obj=PATH`，来指定安装在非默认位置的内核。
 
->**提示**
+> **提示**
 >
 > 可以向 configure 传递 `--enable-debug`，来启用所有 ASSERT 以及额外的正确性测试。
 
@@ -91,15 +91,15 @@ make deb # 构建由 RPM 转换而来的 Debian/Ubuntu 的 DEB 软件包
 make native-deb # 构建用于 Debian/Ubuntu 的原生 DEB 软件包
 ```
 
->**技巧**
+> **技巧**
 >
 >原生 Debian 软件包使用为 Debian 和 Ubuntu 预配置的路径进行构建。最好不要在 configure 阶段覆盖这些路径。
 
->**技巧**
+> **技巧**
 >
 >对于原生 Debian 软件包，可以导出 `KVERS`、`KSRC` 和 `KOBJ` 环境变量，以指定安装在非默认位置的内核。
 
->**注意**
+> **注意**
 >
 >对原生 Debian 打包的支持将从 openzfs-2.2 版本开始提供。
 
@@ -139,7 +139,7 @@ sudo apt install ksh bc bzip2 fio acl sysstat mdadm lsscsi parted attr dbench nf
 sudo apt install ksh bc bzip2 fio acl sysstat mdadm lsscsi parted attr dbench nfs-kernel-server samba rng-tools pax linux-tools-common selinux-utils quota
 ```
 
-* **FreeBSD**：
+* **FreeBSD** ：
 
 ```sh
 pkg install base64 bash checkbashisms fio hs-ShellCheck ksh93 pamtester devel/py-flake8 sudo
@@ -171,6 +171,6 @@ sudo ./scripts/zloop.sh
 ./scripts/zfs-tests.sh -vx
 ```
 
->**提示**
+> **提示**
 >
 >除非为 zfs 目录及其父目录设置了组读权限，否则将跳过 **delegate** 测试。

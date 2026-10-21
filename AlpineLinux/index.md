@@ -2,7 +2,7 @@
 
 ## 安装
 
->**注意**
+> **注意**
 >
 >这是在既有的 Alpine 系统上安装 ZFS。要将 ZFS 用作根（`/`）文件系统，请参阅《[构建以 ZFS 为根文件系统的 Alpine Linux](RootonZFS.md)》。
 

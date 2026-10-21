@@ -85,7 +85,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    sudo systemctl restart sshd.service
    ```
 
-   >**提示**
+   > **提示**
    >
    >你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后，在你的主机上，通过 `ssh user@IP` 进行连接。不要忘记用 `passwd` 为用户设置密码。
 5. 禁用自动挂载：
@@ -557,7 +557,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    127.0.1.1       FQDN HOSTNAME
    ```
 
-   >**提示**
+   > **提示**
    >
    >如果觉得 `vi` 难用，可以使用 `nano`。
 
@@ -582,7 +582,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    chroot /mnt /usr/bin/env DISK=$DISK bash --login
    ```
 
-   >**注意**
+   > **注意**
    >
    >这里使用的是 `--rbind` 而非 `--bind`。
 
@@ -625,7 +625,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    zypper install kernel-default kernel-firmware
    ```
 
-   >**注意**
+   > **注意**
    >
    >如果安装了 base pattern，需要卸载 busybox-grep 才能安装 kernel-default 包。
 
@@ -657,7 +657,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    使用 `initramfs` 是为了解决 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906) 的问题。
 
-   >**提示**
+   > **提示**
    >
    >如果创建 mirror 或 raidz 拓扑，为 `luks2` 等磁盘重复添加 `/etc/crypttab` 条目。
 
@@ -796,11 +796,11 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    mkinitrd
    ```
 
-   >**注意**
+   > **注意**
    >
    >在某些设备中，dracut 可能无法识别 LUKS 分区，会出现报错“Failure occurred during following action: configuring encrypted DM device X VOLUME_CRYPTSETUP_FAILED”。解决方法：检查 cryptsetup 的安装情况。[详细信息](https://forums.opensuse.org/showthread.php/528938-installation-with-LUKS-cryptsetup-installer-gives-error-code-3034?p=2850404#post2850404)
 
-   >**注意**
+   > **注意**
    >
    >即使已将 zfs 配置添加到系统模块 `/etc/modules.d`，若 dracut 未识别，还需强制添加：
 
@@ -845,15 +845,15 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    update-bootloader
    ```
 
-   >**注意**
+   > **注意**
    >
    >如果出现 `os-prober` 错误可忽略。
 
-   >**注意**
+   > **注意**
    >
    >如果安装 grub2 时出现问题，可考虑使用 systemd-boot。
 
-   >**注意**
+   > **注意**
    >
    >如果命令无输出，可使用经典的 `grub.cfg` 生成：
    >
@@ -883,7 +883,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
       grub2-install $DISK
       ```
 
-      >**注意**
+      > **注意**
       >
       >这里是将 GRUB 安装到整个磁盘，而非单个分区。
 
@@ -900,7 +900,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 ## 第 8 步：Systemd-Boot 安装
 
->**警告**
+> **警告**
 >
 >这将破坏你的 YaST2 启动加载器配置。仅在无法通过 grub2 修复问题时才使用此方法。本步骤是为某些情况下 grub2 无法识别 rpool 存储池而提供的替代方案。
 
@@ -1087,7 +1087,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 ## 第 11 步（可选）：配置 Swap
 
->**注意**
+> **注意**
 >
 >在内存压力极高的系统上，无论 swap 空间剩余多少，使用 zvol 作为 swap 设备都可能导致系统锁死。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
@@ -1106,7 +1106,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
 2. 配置 swap 设备：
 
-   >**注意**
+   > **注意**
    >
    >在配置文件中始终使用完整 `/dev/zvol` 别名，切勿使用短设备名 `/dev/zdX`。
 
@@ -1165,7 +1165,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
    sudo update-bootloader
    ```
 
-   >**注意**
+   > **注意**
    >
    >如果出现 `osprober` 错误，可忽略。
 
@@ -1178,7 +1178,7 @@ LUKS 会加密几乎所有内容。唯一未加密的数据是 bootloader、kern
 
    将备份妥善保存（如云端存储）。该备份受 LUKS 口令保护，但你也可选择额外加密。
   
-   >**提示**
+   > **提示**
    >
    >如果创建了镜像或 raidz 拓扑，请对每个 LUKS 卷重复此操作（如 `luks2` 等）。
 

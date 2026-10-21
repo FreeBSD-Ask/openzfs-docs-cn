@@ -2,7 +2,7 @@
 
 ## 安装
 
->**注意**
+> **注意**
 >
 >以下内容适用于在已有的 Fedora 系统上安装 ZFS。如需将 ZFS 用作根文件系统，请参阅《[构建以 ZFS 为根文件系统的 Fedora](fedora-Root-on-ZFS.md)》。
 

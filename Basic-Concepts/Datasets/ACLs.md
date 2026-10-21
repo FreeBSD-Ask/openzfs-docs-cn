@@ -8,7 +8,7 @@ ZFS 支持两种互不相关的 ACL 模型——NFSv4 风格的 ACL，它是 ZFS
 
 ### `off`
 
-禁用 ACL。**Linux 上的默认值。**（接受 `noacl` 与 `disabled` 作为别名。）
+禁用 ACL。 **Linux 上的默认值。** （接受 `noacl` 与 `disabled` 作为别名。）
 
 ### `posix`
 
@@ -16,11 +16,11 @@ POSIX ACL，仅 Linux，以扩展属性形式存储。（`posixacl` 是别名。
 
 ### `nfsv4`
 
-NFSv4 风格的 ZFS ACL，用 `getfacl`/`setfacl` 管理。**FreeBSD 上的默认值**；Linux 不支持。
+NFSv4 风格的 ZFS ACL，用 `getfacl`/`setfacl` 管理。 **FreeBSD 上的默认值** ；Linux 不支持。
 
 > **警告**
 >
-> 设置平台不支持的类型**不会**报错。在 Linux 上，`acltype=nfsv4` 与 `off` 的处理完全相同——但 `zfs get acltype` 仍然报告 `nfsv4`。因此，数据集可能看起来启用了 ACL，实际上却静默地没有任何 ACL。
+> 设置平台不支持的类型 **不会** 报错。在 Linux 上，`acltype=nfsv4` 与 `off` 的处理完全相同——但 `zfs get acltype` 仍然报告 `nfsv4`。因此，数据集可能看起来启用了 ACL，实际上却静默地没有任何 ACL。
 
 ```sh
 zfs set acltype=posix pool/home        # Linux
@@ -83,7 +83,7 @@ zfs set acltype=nfsv4 pool/data        # FreeBSD
 
 ### `sa`
 
-基于系统属性（`on` 是它的别名）。内联存放在为系统属性保留的空间中，能显著减少磁盘 I/O。有两个限制：单个属性最多 **32 KiB**（`DXATTR_MAX_ENTRY_SIZE`），单个文件上的全部 SA xattr 最多 **64 KiB**（`DXATTR_MAX_SA_SIZE`）。超出任一项都不是错误——该属性会透明地改以目录形式存放。
+基于系统属性（`on` 是它的别名）。内联存放在为系统属性保留的空间中，能显著减少磁盘 I/O。有两个限制：单个属性最多 **32 KiB** （`DXATTR_MAX_ENTRY_SIZE`），单个文件上的全部 SA xattr 最多 **64 KiB** （`DXATTR_MAX_SA_SIZE`）。超出任一项都不是错误——该属性会透明地改以目录形式存放。
 
 ### `dir`
 

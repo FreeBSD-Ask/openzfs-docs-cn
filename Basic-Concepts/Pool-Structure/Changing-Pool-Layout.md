@@ -91,7 +91,7 @@ dRAID 有自己内置的分布式 spare 容量，resilver 速度快得多；参�
 
 ## 移除设备
 
-`zpool remove` 处理热备、缓存与日志设备毫不费力。移除**顶级数据 vdev** 则是受限的情形：它在后台把该 vdev 上已分配的数据复制到别处来腾空它，并永久缩小存储池。
+`zpool remove` 处理热备、缓存与日志设备毫不费力。移除 **顶级数据 vdev** 则是受限的情形：它在后台把该 vdev 上已分配的数据复制到别处来腾空它，并永久缩小存储池。
 
 ```sh
 zpool remove pool mirror-1
@@ -101,7 +101,7 @@ zpool status pool                    # 跟踪迁移进度
 
 只有以下条件全部成立时才可行：
 
-* 存储池中**没有**任何顶级 raidz 或 draid vdev，
+* 存储池中 **没有** 任何顶级 raidz 或 draid vdev，
 * 所有顶级 vdev 具有相同的 `ashift`，
 * 所有加密数据集的密钥均已加载，
 * 已启用 `device_removal` 特性。

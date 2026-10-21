@@ -405,7 +405,7 @@ Pin-Priority: 990
 # chroot /mnt /bin/bash --login
 ```
 
->**注意**
+> **注意**
 >
 >使用的是 `--rbind`，而不是 `--bind`。
 
@@ -444,7 +444,7 @@ Pin-Priority: 990
 
 * 使用 `initramfs` 是为了绕过 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906) 的问题。
 
->**提示**
+> **提示**
 >
 >如果你创建的是镜像或 raidz 拓扑，请为 `luks2` 等重复添加 `/etc/crypttab` 条目，并根据每块磁盘进行相应调整。
 
@@ -475,7 +475,7 @@ Pin-Priority: 990
 
 * `mkdosfs` 中的 `-s 1` 仅在驱动器呈现 4 KiB 逻辑扇区（“4Kn”硬盘）时才需要，用于满足 FAT32 的最小簇大小要求（针对 512 MiB 分区）；在呈现 512 B 扇区的驱动器上也可以正常工作。
 
->**注意**
+> **注意**
 >
 >如果你创建的是镜像或 raidz 拓扑，此步骤仅在第一块磁盘上安装 GRUB，其他磁盘将在后续步骤中处理。
 
@@ -542,7 +542,7 @@ zfs
 update-initramfs: Generating /boot/initrd.img-4.9.0-8-amd64
 ```
 
->**注意**
+> **注意**
 >
 >在使用 LUKS 时，可能会显示“WARNING could not determine root device from /etc/fstab”。这是因为 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906)。
 
@@ -574,7 +574,7 @@ Found initrd image: /boot/initrd.img-4.9.0-8-amd64
 done
 ```
 
->**注意**
+> **注意**
 >
 >如果存在来自 `osprober` 的报错，请忽略。
 
@@ -713,7 +713,7 @@ Installation finished. No error reported.
 
 ## 第 7 步：（可选）配置交换空间
 
->**注意**
+> **注意**
 >
 >在内存压力极高的系统上，无论还剩多少 swap 空间可用，使用 zvol 作为交换设备都可能导致系统锁死。目前该问题正在调查中：[https://github.com/zfsonlinux/zfs/issues/7734](https://github.com/zfsonlinux/zfs/issues/7734)
 
@@ -732,7 +732,7 @@ Installation finished. No error reported.
 
 7.2 配置交换设备：
 
->**注意**
+> **注意**
 >
 >在配置文件中始终使用长别名 `/dev/zvol`，绝不要使用短 `/dev/zdX` 设备名。
 
@@ -764,7 +764,7 @@ Installation finished. No error reported.
 # tasksel
 ```
 
->**注意**
+> **注意**
 >
 >默认会勾选“Debian 桌面环境”和“打印服务器”。如果希望安装服务器版本，请取消勾选这些选项。
 
@@ -816,7 +816,7 @@ $ sudo vi /etc/default/grub
 $ sudo update-grub
 ```
 
->**注意**
+> **注意**
 >
 >如果存在来自 `osprober` 的报错，请忽略。
 
@@ -829,7 +829,7 @@ $ sudo cryptsetup luksHeaderBackup /dev/disk/by-id/scsi-SATA_disk1-part4 \
 
 将备份妥善保存（例如云存储）。备份受 LUKS 密码保护，但你也可以选择额外加密。
 
-**提示**：如果你创建了镜像或 raidz 拓扑，请对每个 LUKS 卷重复此操作（`luks2` 等）。
+**提示** ：如果你创建了镜像或 raidz 拓扑，请对每个 LUKS 卷重复此操作（`luks2` 等）。
 
 ## 故障排除
 

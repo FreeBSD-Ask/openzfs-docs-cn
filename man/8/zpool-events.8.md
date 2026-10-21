@@ -35,7 +35,7 @@ zpool events -c
 
 ## 事件
 
-以下是不同的事件子类。完整的事件名形如 `ereport.fs.zfs.`**SUBCLASS**，但这里只列出最后一部分。
+以下是不同的事件子类。完整的事件名形如 `ereport.fs.zfs.` **SUBCLASS** ，但这里只列出最后一部分。
 
 ### `checksum`
 

@@ -17,7 +17,7 @@
 
 ### `spl_kmem_cache_max_size=32`（64 位）或 `spl_kmem_cache_max_size=4`（32 位）(uint)
 
-kmem 缓存 slab 的最大大小（MiB）。这实际上将缓存对象的最大大小限制为 **spl_kmem_cache_max_size**/**spl_kmem_cache_obj_per_slab**。
+kmem 缓存 slab 的最大大小（MiB）。这实际上将缓存对象的最大大小限制为 **spl_kmem_cache_max_size** / **spl_kmem_cache_obj_per_slab** 。
 
 无法创建对象尺寸大于此限制的缓存。
 

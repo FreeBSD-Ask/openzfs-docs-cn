@@ -83,7 +83,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    sudo systemctl restart ssh
    ```
 
->**提示**
+> **提示**
 >
 >你可以使用 `ip addr show scope global | grep inet` 查找你的 IP 地址。然后从你的主机上通过 `ssh user@IP` 进行连接。
 
@@ -228,7 +228,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
        bpool ${DISK}-part3
    ```
 
->**注意**
+> **注意**
 >
 >GRUB 并不支持所有的存储池特性（参见 [`grub-core/fs/zfs/zfs.c`](https://git.savannah.gnu.org/cgit/grub.git/tree/grub-core/fs/zfs/zfs.c#288) 中的 `spa_feature_names`）。此处我们单独为 `/boot` 创建一个存储池，并指定 `-o compatibility=grub2` 属性，将该池限制为仅使用 GRUB 支持的特性，从而让根存储池可以使用任意/全部特性。
 >
@@ -420,11 +420,11 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    zfs create rpool/var/www
    ```
 
-   >**注意**
+   > **注意**
    >
    >由于 Debian Trixie 默认使用 tmpfs，旧版本中所有与 `/tmp` 相关的操作现已不再需要。
 
-   >**注意**
+   > **注意**
    >
    >如果你将启动所需的目录（例如 `/etc`）分离为单独的数据集，必须将其添加到 `/etc/default/zfs` 中的 `ZFS_INITRD_ADDITIONAL_DATASETS`。设置了 `canmount=off` 的数据集（如上面的 `rpool/usr`）不受此影响。
 
@@ -527,7 +527,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    chroot /mnt /usr/bin/env DISK=$DISK bash --login
    ```
 
-   >**注意**
+   > **注意**
    >
    >此处使用的是 `--rbind`，而不是 `--bind`。
 
@@ -555,7 +555,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    echo REMAKE_INITRD=yes > /etc/dkms/zfs.conf
    ```
 
-   >**注意**
+   > **注意**
    >
    >请忽略任何类似 `ERROR: Couldn't resolve device` 和 `WARNING: Couldn't determine root device` 的报错提示。[cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906)。
 
@@ -570,7 +570,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    使用 `initramfs` 是针对 [cryptsetup 不支持 ZFS](https://bugs.launchpad.net/ubuntu/+source/cryptsetup/+bug/1612906) 的一种变通方案。
 
-   >**提示**
+   > **提示**
    >
    >如果你创建的是 mirror 或 raidz 拓扑，请为 `luks2` 等重复添加 `/etc/crypttab` 条目，并根据每块磁盘进行相应调整。
 
@@ -652,7 +652,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
     systemctl enable zfs-import-bpool.service
     ```
 
-   >**注意**
+   > **注意**
    >
    > 在某些磁盘配置（例如 NVMe？）下，此服务[可能会失败](https://github.com/openzfs/openzfs-docs/issues/349)，提示找不到 `bpool`。如果发生这种情况，请在 `zpool import` 命令中添加 `-d DISK-part3`（将 `DISK` 替换为正确的设备路径）。
 
@@ -750,7 +750,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    update-grub
    ```
 
-   >**注意**
+   > **注意**
    >
    >请忽略来自 `osprober` 的报错（若有）。
 
@@ -905,7 +905,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 ## 第 7 步：可选：配置 Swap
 
->**注意**
+> **注意**
 >
 >在内存压力极高的系统上，无论还剩多少 swap 空间可用，使用 zvol 作为 swap 都可能导致系统死锁。[上游有相关 bug 报告](https://github.com/zfsonlinux/zfs/issues/7734)。
 
@@ -924,7 +924,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
 2. 配置 swap 设备：
 
-   >**注意**
+   > **注意**
    >
    >在配置文件中应始终使用完整的 `/dev/zvol` 别名，绝不可使用简短的 `/dev/zdX` 设备名。
 
@@ -957,7 +957,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    tasksel --new-install
    ```
 
-   >**注意**
+   > **注意**
    >
    >默认会勾选“Debian 桌面环境”和“打印服务器”。如果你需要安装服务器，请取消勾选这些选项。
 
@@ -1018,7 +1018,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
    sudo update-grub
    ```
 
-   >**注意**
+   > **注意**
    >
    >如果存在来自 `osprober` 的报错，请忽略。
 
@@ -1031,7 +1031,7 @@ LUKS 会对几乎所有内容进行加密。唯一未加密的数据是引导加
 
    将备份妥善保存（例如存储在云端）。它受你的 LUKS 口令短语保护，但你可能想使用额外的加密。
 
-   >**提示**
+   > **提示**
    >
    >如果你创建了镜像或 raidz 拓扑，请对每个 LUKS 卷（如 `luks2` 等）重复此操作。
 

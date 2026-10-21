@@ -32,7 +32,7 @@ zfs set sharenfs=off pool/export
 
 `sharenfs=on` 以默认选项 `sec=sys,rw,crossmnt,no_subtree_check` 共享。任何其他取值都是一个选项列表，先按上面的许可名单校验，再被翻译成一条 `/etc/exports` 风格的条目。
 
-注意语法：选项**以逗号分隔**，这与 [exports(5)](https://man7.org/linux/man-pages/man5/exports.5.html) 不同。这样就不必处理引号问题，也便于由脚本生成该属性。在 FreeBSD 上可以给出多组选项，彼此以分号分隔，每组应用于不同的主机或网络。
+注意语法：选项 **以逗号分隔** ，这与 [exports(5)](https://man7.org/linux/man-pages/man5/exports.5.html) 不同。这样就不必处理引号问题，也便于由脚本生成该属性。在 FreeBSD 上可以给出多组选项，彼此以分号分隔，每组应用于不同的主机或网络。
 
 当 `sharenfs=off` 时，数据集完全不由 ZFS 管理——请通过 `/etc/exports` 与 `exportfs` 以传统方式导出。
 
@@ -44,7 +44,7 @@ zfs set sharenfs=off pool/export
 zfs set sharesmb=on pool/export
 ```
 
-在 Linux 上这使用 **Samba 用户共享**：ZFS 调用 `net(8)` 来创建一个 USERSHARE（用户共享）。必须先配置 Samba 允许用户共享，这项功能才能生效。
+在 Linux 上这使用 **Samba 用户共享** ：ZFS 调用 `net(8)` 来创建一个 USERSHARE（用户共享）。必须先配置 Samba 允许用户共享，这项功能才能生效。
 
 需要了解：
 
